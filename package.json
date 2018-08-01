@@ -1,6 +1,6 @@
 {
-  "name": "generate-selectors",
-  "version": "1.0.0",
+  "name": "blrplt",
+  "version": "0.0.1",
   "main": "index.js",
   "author": "matt <matt.pocock@thevirtualforge.com>",
   "license": "MIT",
@@ -8,6 +8,6 @@
     "commander": "^2.16.0"
   },
   "bin": {
-    "generate-selectors": "./index.js"
+    "blrplt": "./index.js"
   }
 }

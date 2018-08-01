@@ -175,14 +175,14 @@ export const ${constant}_FAILED =
   isLoading: false,
   hasError: false,
   hasSucceeded: false,
-  ${pascal}: {},
+  ${pascal}Data: [],
   errorMessage: false,
 });
 
 /** ${display} Reducer */
 
 export const ${pascal}Reducer = (state = initial${normal}State, action) => {
-  switch(action.type) {
+  switch (action.type) {
     case ${constant}_STARTED:
       return state.set('isLoading', true);
     case ${constant}_FAILED:
