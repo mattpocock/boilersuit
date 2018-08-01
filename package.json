@@ -1,0 +1,13 @@
+{
+  "name": "generate-selectors",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "matt <matt.pocock@thevirtualforge.com>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.16.0"
+  },
+  "bin": {
+    "generate-selectors": "./index.js"
+  }
+}
