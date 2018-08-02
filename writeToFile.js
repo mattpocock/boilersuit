@@ -32,15 +32,15 @@ const writeToFile = (identifier, folderName) => {
 
     const stringToInsert = `  /** ${display} */
   is${normal}Loading: makeSelectIs${normal}Loading(),
-  has${normal}Failed: makeSelectHas${normal}Failed(),
-  has${normal}Succeeded: makeSelectHas${normal}Succeeded(),
-  ${pascal}: makeSelect${normal}Data(),
+  has${normal}Failed: makeSelect${normal}HasFailed(),
+  has${normal}Succeeded: makeSelect${normal}HasSucceeded(),
+  ${pascal}Data: makeSelect${normal}Data(),
   ${pascal}ErrorMessage: makeSelect${normal}ErrorMessage(),
 `;
     const importsIndex = buffer.indexOf(`} from './selectors';`);
     const importsToInsert = `  makeSelectIs${normal}Loading,
-  makeSelectHas${normal}Failed,
-  makeSelectHas${normal}Succeeded,
+  makeSelect${normal}HasFailed,
+  makeSelect${normal}HasSucceeded,
   makeSelect${normal}Data,
   makeSelect${normal}ErrorMessage,
 `;
@@ -50,7 +50,7 @@ const writeToFile = (identifier, folderName) => {
       buffer.indexOf('return {', mapDispatchToPropsBeginning) + 8;
 
     const dispatchToInsert = `
-    ${pascal}: () => dispatch(${pascal}Started()),`;
+    submit${normal}: () => dispatch(${pascal}Started()),`;
 
     const actionIndex = buffer.indexOf(` } from './actions';`);
 
@@ -84,10 +84,10 @@ const writeToFile = (identifier, folderName) => {
 export const makeSelect${normal} = () =>
   createSelector(selectDomain, (substate) => fromJS(substate.${pascal}));
 
-export const makeSelect${normal}IsLoading = () =>
+export const makeSelectIs${normal}Loading = () =>
   createSelector(makeSelect${normal}(), (substate) => substate.get('isLoading'));
 
-export const makeSelect${normal}HasError = () =>
+export const makeSelect${normal}HasFailed = () =>
   createSelector(makeSelect${normal}(), (substate) => substate.get('hasError'));
 
 export const makeSelect${normal}HasSucceeded = () =>
