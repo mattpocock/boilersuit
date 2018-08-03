@@ -4,7 +4,7 @@ const program = require('commander');
 const writeToFile = require('./writeToFile');
 
 program
-  .version('0.0.1')
+  .version('0.0.2')
   .command('create <file> <name>')
   .action((folderName, name) => {
     writeToFile(name.split(' '), folderName);

@@ -176,7 +176,7 @@ export const ${constant}_FAILED =
   hasError: false,
   hasSucceeded: false,
   ${pascal}Data: [],
-  errorMessage: false,
+  errorMessage: '',
 });
 
 /** ${display} Reducer */
