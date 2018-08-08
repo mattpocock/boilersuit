@@ -52,9 +52,10 @@ const writeToFile = (identifier, folderName) => {
     const dispatchToInsert = `
     submit${normal}: () => dispatch(${pascal}Started()),`;
 
-    const actionIndex = buffer.indexOf(` } from './actions';`);
+    const actionIndex = buffer.indexOf(`} from './actions';`);
 
-    const actionToInsert = `, ${pascal}Started`;
+    const actionToInsert = `  ${pascal}Started,
+    `;
 
     fs.writeFile(
       `${folderName}/index.js`,
