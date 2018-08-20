@@ -71,29 +71,25 @@ const ajax = (identifier, folderName) => {
   fs.readFile(`${folderName}/selectors.js`, (err, buf) => {
     const buffer = buf.toString();
 
-    const stringToInsert = `
-/**
- * ${display}
- */
-
-export const makeSelect${pascal} = () =>
-  createSelector(selectDomain, (substate) => fromJS(substate.${camel}));
-
-export const makeSelectIs${pascal}Loading = () =>
-  createSelector(makeSelect${pascal}(), (substate) => substate.get('isLoading'));
-
-export const makeSelect${pascal}HasFailed = () =>
-  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasError'));
-
-export const makeSelect${pascal}HasSucceeded = () =>
-  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasSucceeded'));
-
-export const makeSelect${pascal}Data = () =>
-  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}Data'));
-
-export const makeSelect${pascal}ErrorMessage = () =>
-  createSelector(makeSelect${pascal}(), (substate) => substate.get('errorMessage'));
-`;
+    const stringToInsert = concat([
+      '',
+      `/**`,
+      ` * ${display}`,
+      ` */`,
+      ``,
+      `export const makeSelect${pascal} = () =>`,
+      `  createSelector(selectDomain, (substate) => fromJS(substate.${camel}));`,
+      `export const makeSelectIs${pascal}Loading = () =>`,
+      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('isLoading'));`
+      `export const makeSelect${pascal}HasFailed = () =>`,
+      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasError'));`,
+      `export const makeSelect${pascal}HasSucceeded = () =>`,
+      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasSucceeded'));`,
+      `export const makeSelect${pascal}Data = () =>`,
+      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}Data'));`,
+      `export const makeSelect${pascal}ErrorMessage = () =>`,
+      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}errorMessage'));`,
+    ]);
 
     fs.writeFile(`${folderName}/selectors.js`, buffer + stringToInsert, err => {
       console.log('Selectors written!');
