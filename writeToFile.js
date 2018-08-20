@@ -37,13 +37,25 @@ const writeToFile = (identifier, folderName) => {
   ${pascal}Data: makeSelect${normal}Data(),
   ${pascal}ErrorMessage: makeSelect${normal}ErrorMessage(),
 `;
-    const importsIndex = buffer.indexOf(`} from './selectors';`);
-    const importsToInsert = `  makeSelectIs${normal}Loading,
+    /** Selectors */
+    let selectorsIndex = buffer.indexOf(`} from './selectors';`);
+    let selectorsToInsert = `  makeSelectIs${normal}Loading,
   makeSelect${normal}HasFailed,
   makeSelect${normal}HasSucceeded,
   makeSelect${normal}Data,
   makeSelect${normal}ErrorMessage,
 `;
+    if (selectorsIndex === -1) {
+      selectorsIndex = buffer.lastIndexOf('import');
+      selectorsToInsert = `import {
+  makeSelectIs${normal}Loading,
+  makeSelect${normal}HasFailed,
+  makeSelect${normal}HasSucceeded,
+  makeSelect${normal}Data,
+  makeSelect${normal}ErrorMessage,
+} from './selectors';
+`;
+    }
 
     const mapDispatchToPropsBeginning = buffer.indexOf('mapDispatchToProps');
     const mapDispatchToPropsEnd =
@@ -58,15 +70,15 @@ const writeToFile = (identifier, folderName) => {
 
     /** If actions not imported */
     if (actionIndex === -1) {
-      ActionIndex = buffer.lastIndexOf(`import`);
+      actionIndex = buffer.lastIndexOf(`import`);
       actionToInsert = `import { ${pascal}Started } from './actions';\n`;
     }
 
     fs.writeFile(
       `${folderName}/index.js`,
-      buffer.slice(0, importsIndex) +
-        importsToInsert +
-        buffer.slice(importsIndex, actionIndex) +
+      buffer.slice(0, selectorsIndex) +
+        selectorsToInsert +
+        buffer.slice(selectorsIndex, actionIndex) +
         actionToInsert +
         buffer.slice(actionIndex, mapStateToPropsEnd) +
         stringToInsert +
