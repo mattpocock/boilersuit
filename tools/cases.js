@@ -1,10 +1,12 @@
-const Cases = function() {};
+const Cases = function(array) {
+  this.array = array;
+};
 
 Cases.prototype.capitalize = string =>
   string.charAt(0).toUpperCase() + string.slice(1);
 
-Cases.prototype.camel = function(array) {
-  return array
+Cases.prototype.camel = function() {
+  return this.array
     .map((item, index) => {
       if (index === 0) {
         return item.toLowerCase();
@@ -14,24 +16,24 @@ Cases.prototype.camel = function(array) {
     .join('');
 };
 
-Cases.prototype.constant = function(array) {
-  return array.map(item => item.toUpperCase()).join('_');
+Cases.prototype.constant = function() {
+  return this.array.map(item => item.toUpperCase()).join('_');
 };
 
-Cases.prototype.display = function(array) {
-  return array.map(item => this.capitalize(item)).join(' ');
+Cases.prototype.display = function() {
+  return this.array.map(item => this.capitalize(item)).join(' ');
 };
 
-Cases.prototype.pascal = function(array) {
-  return array.map(item => this.capitalize(item)).join('');
+Cases.prototype.pascal = function() {
+  return this.array.map(item => this.capitalize(item)).join('');
 }
 
-Cases.prototype.all = function(array) {
+Cases.prototype.all = function() {
   return {
-    display: this.display(array),
-    pascal: this.pascal(array),
-    constant: this.constant(array),
-    camel: this.camel(array),
+    display: this.display(this.array),
+    pascal: this.pascal(this.array),
+    constant: this.constant(this.array),
+    camel: this.camel(this.array),
   };
 };
 

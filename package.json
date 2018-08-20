@@ -5,9 +5,98 @@
   "author": "matt <matt.pocock@thevirtualforge.com>",
   "license": "MIT",
   "dependencies": {
+    "babel-eslint": "^8.2.6",
+    "chai": "^4.1.2",
     "commander": "^2.16.0"
   },
   "bin": {
     "blrplt": "./index.js"
+  },
+  "scripts": {
+    "test": "jest --watchAll"
+  },
+  "devDependencies": {
+    "eslint": "3.19.0",
+    "eslint-config-airbnb": "15.0.1",
+    "eslint-config-airbnb-base": "11.2.0",
+    "jest": "^23.5.0",
+    "prettier": "^1.14.2"
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "extends": "airbnb",
+    "env": {
+      "browser": true,
+      "node": true,
+      "jest": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "rules": {
+      "arrow-parens": [
+        "error",
+        "always"
+      ],
+      "arrow-body-style": [
+        2,
+        "as-needed"
+      ],
+      "class-methods-use-this": 0,
+      "comma-dangle": [
+        2,
+        "always-multiline"
+      ],
+      "import/imports-first": 0,
+      "import/newline-after-import": 0,
+      "import/no-dynamic-require": 0,
+      "import/no-extraneous-dependencies": 0,
+      "import/no-named-as-default": 0,
+      "import/no-unresolved": 2,
+      "import/no-webpack-loader-syntax": 0,
+      "import/prefer-default-export": 0,
+      "indent": [
+        2,
+        2,
+        {
+          "SwitchCase": 1
+        }
+      ],
+      "newline-per-chained-call": 0,
+      "no-confusing-arrow": 0,
+      "no-console": 1,
+      "no-use-before-define": 0,
+      "prefer-template": 2,
+      "react/forbid-prop-types": 0,
+      "react/jsx-first-prop-new-line": [
+        2,
+        "multiline"
+      ],
+      "react/prefer-stateless-function": 0,
+      "react/jsx-filename-extension": 0,
+      "react/jsx-no-target-blank": 0,
+      "react/require-default-props": 0,
+      "react/require-extension": 0,
+      "react/self-closing-comp": 0,
+      "redux-saga/no-yield-in-race": 2,
+      "redux-saga/yield-effects": 2,
+      "require-yield": 0
+    },
+    "settings": {
+      "import/resolver": {
+        "webpack": {
+          "config": "./internals/webpack/webpack.prod.babel.js"
+        }
+      }
+    }
   }
 }

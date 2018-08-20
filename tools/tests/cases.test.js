@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const Cases = require('../cases');
 
-const cases = new Cases();
+const cases = new Cases(['Hello', 'World']);
 
 describe('Cases', () => {
   it('Must have certain methods', () => {
@@ -21,28 +21,25 @@ describe('Cases', () => {
 
   describe('Camel', () => {
     it('Should put something in camel case', () => {
-      expect(cases.camel(['Hello', 'World'])).to.equal('helloWorld');
+      expect(cases.camel()).to.equal('helloWorld');
     });
   });
 
   describe('Constant', () => {
     it('Should put something in constant case', () => {
-      expect(cases.constant(['Hello', 'World'])).to.equal('HELLO_WORLD');
+      expect(cases.constant()).to.equal('HELLO_WORLD');
     });
   });
 
   describe('display', () => {
     it('Should put something in display case', () => {
-      expect(cases.display(['hello', 'world'])).to.equal('Hello World');
+      expect(cases.display()).to.equal('Hello World');
     });
   });
 
   describe('all', () => {
     it('Should return an object containing all cases', () => {
-      const { display, camel, constant, pascal } = cases.all([
-        'Hello',
-        'World',
-      ]);
+      const { display, camel, constant, pascal } = cases.all();
       expect(display).to.equal('Hello World');
       expect(camel).to.equal('helloWorld');
       expect(constant).to.equal('HELLO_WORLD');

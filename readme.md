@@ -1,23 +1,31 @@
-## How To Install ##
+## How To Install
 
 Clone this repository to your machine
 Enter the repository
 Run `npm i -g`
 
-## How To Run It ##
+## How To Run It
 
 Once it's installed, the syntax is:
 
-`blrplt create path/to/folder "Do Action"`
+`blrplt ajax path/to/folder "Do Action"`
 
 For instance, this could be:
 
-`blrplt create app/containers/HomePage "Get Tweets"`
+`blrplt ajax app/containers/HomePage "Get Tweets"`
 
-And you'd get reducers/actions/constants/selectors for 'Get Tweets'.
+And you'd get reducers/actions/constants/selectors for an ajax call for 'Get Tweets'.
 
 Try it out! Though make sure you commit before you do.
 
-## Notes ##
+## Notes
 
-The codebase is horrible - I hashed it out one night while watching The Staircase. It also doesn't yet give you a 'saga'. No reason, just haven't gotten there yet.
+The codebase is horrible, but slowly improving. It also doesn't yet give you a 'saga'. No reason, just haven't gotten there yet.
+
+Things to do:
+
+In ajax/index, make the strings to Insert follow the concat() formula elsewhere in the file. Makes it a lot prettier and easier to read.
+
+Finish the parser in the tools file and write tests
+
+Consider more use cases - what else do you use Redux for? Managing on and off states, getting and setting values... Lots more than just 'ajax' to consider.

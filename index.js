@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 const program = require('commander');
-const writeToFile = require('./writeToFile');
+const ajax = require('./ajax');
 
 program
-  .version('0.0.4')
-  .command('create <file> <name>')
+  .version('0.0.5')
+  .command('ajax <file> <name>')
   .action((folderName, name) => {
-    writeToFile(name.split(' '), folderName);
+    ajax(name.split(' '), folderName);
   });
 
 program.parse(process.argv);
