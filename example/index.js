@@ -30,7 +30,11 @@ import {
 import reducer from './reducer';
 import saga from './saga';
 import messages from './messages';
-import { getAssessmentsStarted, applyFilter, getRoutesStarted } from './actions';
+import {
+  getAssessmentsStarted,
+  applyFilter,
+  getRoutesStarted,
+} from './actions';
 
 export class AdminManageAssessments extends React.Component {
   // eslint-disable-line react/prefer-stateless-function
@@ -54,9 +58,7 @@ export class AdminManageAssessments extends React.Component {
     } = this.props;
     return (
       <div className={'container'}>
-        <ManageAssessmentsSearchForm
-          onSubmit={this.props.applyFilter}
-        />
+        <ManageAssessmentsSearchForm onSubmit={this.props.applyFilter} />
         <ManageAssessmentsTable
           filters={filters}
           assessments={{
@@ -106,7 +108,7 @@ const mapStateToProps = createStructuredSelector({
 function mapDispatchToProps(dispatch) {
   return {
     getAssessments: () => dispatch(getAssessmentsStarted()),
-    applyFilter: (code) => dispatch(applyFilter(code)),
+    applyFilter: code => dispatch(applyFilter(code)),
     getRoutes: () => dispatch(getRoutesStarted()),
     dispatch,
   };

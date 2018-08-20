@@ -20,19 +20,19 @@ export const getAssessmentsStarted = () => ({
   type: GET_ASSESSMENTS_STARTED,
 });
 
-export const getAssessmentsFailed = (errorMessage) => ({
+export const getAssessmentsFailed = errorMessage => ({
   type: GET_ASSESSMENTS_FAILED,
   payload: errorMessage,
 });
 
-export const getAssessmentsSucceeded = (assessments) => ({
+export const getAssessmentsSucceeded = assessments => ({
   type: GET_ASSESSMENTS_SUCCEEDED,
   payload: assessments,
 });
 
 /** Filters */
 
-export const applyFilter = (filters) => ({
+export const applyFilter = filters => ({
   type: APPLY_FILTER,
   payload: filters,
 });
@@ -43,12 +43,12 @@ export const getRoutesStarted = () => ({
   type: GET_ROUTES_STARTED,
 });
 
-export const getRoutesFailed = (errorMessage) => ({
+export const getRoutesFailed = errorMessage => ({
   type: GET_ROUTES_FAILED,
   payload: errorMessage,
 });
 
-export const getRoutesSucceeded = (assessments) => ({
+export const getRoutesSucceeded = assessments => ({
   type: GET_ROUTES_SUCCEEDED,
   payload: assessments,
 });
