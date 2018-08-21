@@ -24,8 +24,8 @@ The codebase is horrible, but slowly improving. It also doesn't yet give you a '
 
 Things to do:
 
-In ajax/index, make the strings to Insert follow the concat() formula elsewhere in the file. Makes it a lot prettier and easier to read.
-
 Finish the parser in the tools file and write tests
 
 Consider more use cases - what else do you use Redux for? Managing on and off states, getting and setting values... Lots more than just 'ajax' to consider.
+
+Abstract out the long functions in ajax/index to their own functions to make them more testable.
