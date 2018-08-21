@@ -1,12 +1,14 @@
+const colors = require('colors');
 const fs = require('fs');
 const Cases = require('../tools/cases');
 const Parser = require('../tools/parser');
-const { concat } = require('../tools/utils');
+const { concat, fixFolderName } = require('../tools/utils');
 
 const ajax = (identifier, folderName) => {
   const cases = new Cases(identifier);
   const { camel, display, pascal, constant } = cases.all();
 
+  /** Index file */
   fs.readFile(`${folderName}/index.js`, (err, buf) => {
     const buffer = buf.toString();
     const parser = new Parser(buffer);
@@ -63,64 +65,74 @@ const ajax = (identifier, folderName) => {
         dispatchToInsert +
         buffer.slice(mapDispatchToPropsEnd),
       err => {
-        console.log('Index written!');
+        console.log('Index written!'.white);
       },
     );
   });
 
+  /** Selectors File */
   fs.readFile(`${folderName}/selectors.js`, (err, buf) => {
     const buffer = buf.toString();
 
-    const stringToInsert = concat([
-      '',
-      `/**`,
-      ` * ${display}`,
-      ` */`,
-      ``,
-      `export const makeSelect${pascal} = () =>`,
-      `  createSelector(selectDomain, (substate) => fromJS(substate.${camel}));`,
-      `export const makeSelectIs${pascal}Loading = () =>`,
-      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('isLoading'));`
-      `export const makeSelect${pascal}HasFailed = () =>`,
-      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasError'));`,
-      `export const makeSelect${pascal}HasSucceeded = () =>`,
-      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasSucceeded'));`,
-      `export const makeSelect${pascal}Data = () =>`,
-      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}Data'));`,
-      `export const makeSelect${pascal}ErrorMessage = () =>`,
-      `  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}errorMessage'));`,
-    ]);
-
-    fs.writeFile(`${folderName}/selectors.js`, buffer + stringToInsert, err => {
-      console.log('Selectors written!');
-    });
+    fs.writeFile(
+      `${folderName}/selectors.js`,
+      concat([
+        buffer,
+        '',
+        `/**`,
+        ` * ${display}`,
+        ` */`,
+        ``,
+        `export const makeSelect${pascal} = () =>`,
+        `  createSelector(selectDomain, (substate) => fromJS(substate.${camel}));`,
+        `export const makeSelectIs${pascal}Loading = () =>`,
+        `  createSelector(makeSelect${pascal}(), (substate) => substate.get('isLoading'));`,
+        `export const makeSelect${pascal}HasFailed = () =>`,
+        `  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasError'));`,
+        `export const makeSelect${pascal}HasSucceeded = () =>`,
+        `  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasSucceeded'));`,
+        `export const makeSelect${pascal}Data = () =>`,
+        `  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}Data'));`,
+        `export const makeSelect${pascal}ErrorMessage = () =>`,
+        `  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}errorMessage'));`,
+        ``,
+      ]),
+      () => {
+        console.log('Selectors written!'.white);
+      },
+    );
   });
 
   fs.readFile(`${folderName}/actions.js`, (err, buf) => {
     const buffer = buf.toString();
+    const parser = new Parser(buffer);
 
-    const stringToInsert = `
-/** ${display} */
+    const stringToInsert = concat([
+      ``,
+      `/** ${display} */`,
+      ``,
+      `export const ${camel}Started = () => ({`,
+      `  type: ${constant}_STARTED,`,
+      `});`,
+      ``,
+      `export const ${camel}Failed = () => ({`,
+      `  type: ${constant}_FAILED,`,
+      `});`,
+      ``,
+      `export const ${camel}Succeeded = () => ({`,
+      `  type: ${constant}_SUCCEEDED,`,
+      `});`,
+      ``,
+    ]);
 
-export const ${camel}Started = () => ({
-  type: ${constant}_STARTED,
-});
-
-export const ${camel}Failed = (errorMessage) => ({
-  type: ${constant}_FAILED,
-  payload: errorMessage,
-});
-
-export const ${camel}Succeeded = (${camel}Data) => ({
-  type: ${constant}_SUCCEEDED,
-  payload: ${camel}Data,
-});
-`;
-    const importsIndex = buffer.indexOf(`} from './constants';`);
-    const importsToInsert = `  ${constant}_STARTED,
-  ${constant}_SUCCEEDED,
-  ${constant}_FAILED,
-`;
+    const { index: importsIndex, prefix, suffix } = parser.getImportIndex(
+      './constants',
+    );
+    const importsToInsert = concat([
+      `${prefix || ''}${constant}_STARTED,`,
+      `  ${constant}_SUCCEEDED,`,
+      `  ${constant}_FAILED${suffix || ''}`,
+    ]);
 
     fs.writeFile(
       `${folderName}/actions.js`,
@@ -129,75 +141,105 @@ export const ${camel}Succeeded = (${camel}Data) => ({
         buffer.slice(importsIndex) +
         stringToInsert,
       err => {
-        console.log('Actions written!');
+        console.log('Actions written!'.white);
       },
     );
   });
 
   fs.readFile(`${folderName}/constants.js`, (err, buf) => {
     const buffer = buf.toString();
-    const stringToInsert = `
-/** ${display} */
 
-export const ${constant}_STARTED =
-  'app/${folderName}/${constant}_STARTED';
-export const ${constant}_SUCCEEDED =
-  'app/${folderName}/${constant}_SUCCEEDED';
-export const ${constant}_FAILED =
-  'app/${folderName}/${constant}_FAILED';
-`;
-    fs.writeFile(`${folderName}/constants.js`, buffer + stringToInsert, err => {
-      console.log('Constants Written!');
-    });
+    let fixedFolderName = fixFolderName(folderName);
+
+    fs.writeFile(
+      `${folderName}/constants.js`,
+      concat([
+        buffer,
+        `/** ${display} */`,
+        `export const ${constant}_STARTED =`,
+        `  'app/${fixedFolderName}${constant}_STARTED';`,
+        `export const ${constant}_SUCCEEDED =`,
+        `  'app/${fixedFolderName}${constant}_SUCCEEDED';`,
+        `export const ${constant}_FAILED =`,
+        `  'app/${fixedFolderName}${constant}_FAILED';`,
+        ``,
+      ]),
+      () => {
+        console.log('Constants Written!'.white);
+      },
+    );
   });
 
   fs.readFile(`${folderName}/reducer.js`, (err, buf) => {
     const buffer = buf.toString();
+    const parser = new Parser(buffer);
 
-    const stringToInsert = `const initial${pascal}State = fromJS({
-  isLoading: false,
-  hasError: false,
-  hasSucceeded: false,
-  ${camel}Data: [],
-  errorMessage: '',
-});
+    const {
+      index: lastExportIndex,
+      suffix: lastExportSuffix,
+    } = parser.getExportDefaultIndex();
 
-/** ${display} Reducer */
-
-export const ${camel}Reducer = (state = initial${pascal}State, action) => {
-  switch (action.type) {
-    case ${constant}_STARTED:
-      return state.set('isLoading', true);
-    case ${constant}_FAILED:
-      return state
-        .set('isLoading', false)
-        .set('hasError', true)
-        .set('errorMessage', action.payload);
-    case ${constant}_SUCCEEDED:
-      return state
-        .set('isLoading', false)
-        .set('hasSucceeded', true)
-        .set('${camel}Data', action.payload);
-    default:
-      return state;
-  }
-};
-
-`;
-
-    const lastExportIndex = buffer.indexOf('export default ');
+    const stringToInsert = concat([
+      `const initial${pascal}State = fromJS({`,
+      `  isLoading: false,`,
+      `  hasError: false,`,
+      `  hasSucceeded: false,`,
+      `  ${camel}Data: [],`,
+      `  errorMessage: '',`,
+      `});`,
+      ``,
+      `/** ${display} Reducer */`,
+      ``,
+      `export const ${camel}Reducer = (state = initial${pascal}State, action) => {`,
+      `  switch (action.type) {`,
+      `    case ${constant}_STARTED:`,
+      `      return state.set('isLoading', true);`,
+      `    case ${constant}_FAILED:`,
+      `      return state`,
+      `        .set('isLoading', false)`,
+      `        .set('hasError', true)`,
+      `        .set('errorMessage', action.payload);`,
+      `    case ${constant}_SUCCEEDED:`,
+      `      return state`,
+      `        .set('isLoading', false)`,
+      `        .set('hasSucceeded', true)`,
+      `        .set('${camel}Data', action.payload);`,
+      `    default:`,
+      `      return state;`,
+      `  }`,
+      `};`,
+      `${lastExportSuffix || ''}`,
+    ]);
 
     /** Insert imports */
-    const importsIndex = buffer.indexOf(`} from './constants';`);
-    const importsToInsert = `  ${constant}_STARTED,
-  ${constant}_SUCCEEDED,
-  ${constant}_FAILED,
-`;
+    const { index: importsIndex, ...imports } = parser.getImportIndex(
+      './constants',
+    );
+    const importsToInsert = concat([
+      `${imports.prefix || ''}${constant}_STARTED,`,
+      `  ${constant}_SUCCEEDED,`,
+      `  ${constant}_FAILED${imports.suffix || ''}`,
+    ]);
 
-    const endOfReducers = buffer.lastIndexOf('});');
+    let {
+      index: reducersIndex,
+      wasFound,
+      ...reducers
+    } = parser.getCombineReducers();
 
-    const reducerToInsert = `  ${camel}: ${camel}Reducer,
-`;
+    let reducerToInsert = '';
+    if (wasFound) {
+      reducerToInsert = `${reducers.prefix}  ${camel}: ${camel}Reducer, ${
+        reducers.suffix || ''
+      }`;
+    } else {
+      console.log(`No combineReducers found in './reducer'`.red.bold);
+      reducerToInsert = concat([
+        `${reducers.prefix ||
+          ''}  ${camel}: ${camel}Reducer,${reducers.suffix || ''}`,
+        '',
+      ]);
+    }
 
     fs.writeFile(
       `${folderName}/reducer.js`,
@@ -205,11 +247,11 @@ export const ${camel}Reducer = (state = initial${pascal}State, action) => {
         importsToInsert +
         buffer.slice(importsIndex, lastExportIndex) +
         stringToInsert +
-        buffer.slice(lastExportIndex, endOfReducers) +
+        buffer.slice(lastExportIndex, reducersIndex) +
         reducerToInsert +
-        buffer.slice(endOfReducers),
+        buffer.slice(reducersIndex),
       err => {
-        console.log('Reducer written!');
+        console.log('Reducer written!'.white);
       },
     );
   });

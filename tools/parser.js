@@ -1,3 +1,5 @@
+const { concat } = require('./utils');
+
 const Parser = function(buffer) {
   this.buffer = buffer;
 };
@@ -21,6 +23,31 @@ Parser.prototype.getImportIndex = function(filename) {
     return { index, prefix: `, ` };
   }
   return this.lastImportIndex();
-}
+};
+
+Parser.prototype.getCombineReducers = function() {
+  const searchTerm = `combineReducers({`;
+  let index = this.buffer.indexOf(searchTerm);
+  if (index !== -1) {
+    return { index: index + searchTerm.length, wasFound: true, prefix: `\n` };
+  }
+  let exportDefault = this.getExportDefaultIndex();
+  return {
+    index: exportDefault.index,
+    wasFound: false,
+    prefix:
+      exportDefault.suffix +
+      concat([`/**`, `export default combineReducers({`, ``]),
+    suffix: concat([``, `});`, `*/`, ``]),
+  };
+};
+
+Parser.prototype.getExportDefaultIndex = function() {
+  let index = this.buffer.lastIndexOf('export default ');
+  if (index !== -1) {
+    return { index, suffix: `\n` };
+  }
+  throw new Error('Could not find export default in file');
+};
 
 module.exports = Parser;
