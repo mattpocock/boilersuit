@@ -20,12 +20,8 @@ Try it out! Though make sure you commit before you do.
 
 ## Notes
 
-The codebase is horrible, but slowly improving. It also doesn't yet give you a 'saga'. No reason, just haven't gotten there yet.
-
 Things to do:
 
 Finish the parser in the tools file and write tests
 
 Consider more use cases - what else do you use Redux for? Managing on and off states, getting and setting values... Lots more than just 'ajax' to consider.
-
-Abstract out the long functions in ajax/index to their own functions to make them more testable.
