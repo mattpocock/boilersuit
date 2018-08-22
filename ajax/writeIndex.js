@@ -36,8 +36,10 @@ module.exports = (buf, { camel, pascal, display }) => {
   const mapDispatchToPropsEnd =
     buffer.indexOf('return {', mapDispatchToPropsBeginning) + 8;
 
-  const dispatchToInsert = `
-  submit${pascal}: () => dispatch(${camel}Started()),`;
+  const dispatchToInsert = concat([
+    ``,
+    `    submit${pascal}: () => dispatch(${camel}Started()),`,
+  ]);
 
   /** Actions */
   const { index: actionIndex, ...actions } = parser.getImportIndex('./actions');

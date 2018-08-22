@@ -6,6 +6,7 @@ const writeSelectors = require('./writeSelectors');
 const writeActions = require('./writeActions');
 const writeConstants = require('./writeConstants');
 const writeReducer = require('./writeReducer');
+const writeSaga = require('./writeSaga');
 
 const ajax = (identifier, folderName) => {
   const cases = new Cases(identifier);
@@ -62,6 +63,17 @@ const ajax = (identifier, folderName) => {
       writeReducer(buf, allCases),
       err => {
         console.log('Reducer written!'.white);
+      },
+    );
+  });
+
+  /** Saga File */
+  fs.readFile(`${folderName}/saga.js`, (err, buf) => {
+    fs.writeFile(
+      `${folderName}/saga.js`,
+      writeSaga(buf, allCases),
+      err => {
+        console.log('Saga written!'.white);
       },
     );
   });

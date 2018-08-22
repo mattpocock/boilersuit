@@ -50,4 +50,24 @@ Parser.prototype.getExportDefaultIndex = function() {
   throw new Error('Could not find export default in file');
 };
 
+Parser.prototype.getAllSagasIndex = function() {
+  const searchTerm = 'export default function* allSagas() {';
+  let index = this.buffer.indexOf(searchTerm);
+  if (index !== -1) {
+    return {
+      wasFound: true,
+      index: index + searchTerm.length,
+      prefix: `\n`,
+    };
+  }
+  return {
+    index: exportDefault.index,
+    wasFound: false,
+    prefix:
+      exportDefault.suffix +
+      concat([`/**`, `export default function* allSagas() {`, ``]),
+    suffix: concat([``, `};`, `*/`, ``]),
+  };
+};
+
 module.exports = Parser;
