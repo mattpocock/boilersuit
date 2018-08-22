@@ -54,7 +54,7 @@ module.exports = (buf, { display, pascal, camel, constant }) => {
     ]) +
     buffer.slice(lastExportIndex, allSagasIndex) +
     `${allSagas.prefix ||
-      ''}  yield takeLatest(${constant}_STARTED, ${camel}); ${allSagas.suffix ||
+      ''}  yield takeLatest(${constant}_STARTED, ${camel});${allSagas.suffix ||
       ''}` +
     buffer.slice(allSagasIndex)
   );

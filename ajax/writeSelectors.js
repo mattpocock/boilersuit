@@ -18,6 +18,6 @@ module.exports = (buf, { display, pascal, camel }) =>
     `export const makeSelect${pascal}Data = () =>`,
     `  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}Data'));`,
     `export const makeSelect${pascal}ErrorMessage = () =>`,
-    `  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}errorMessage'));`,
+    `  createSelector(makeSelect${pascal}(), (substate) => substate.get('errorMessage'));`,
     ``,
   ]);
