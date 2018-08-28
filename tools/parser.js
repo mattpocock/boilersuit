@@ -47,7 +47,10 @@ Parser.prototype.getExportDefaultIndex = function() {
   if (index !== -1) {
     return { index, suffix: `\n` };
   }
-  throw new Error('Could not find export default in file');
+  // throw new Error('Could not find export default in file');
+  console.log('Could not find export default in file');
+
+  return { index: this.buffer.length, prefix: '\n' };
 };
 
 Parser.prototype.getAllSagasIndex = function() {
