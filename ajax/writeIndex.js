@@ -6,8 +6,10 @@ module.exports = (buf, { camel, pascal, display }) => {
   const parser = new Parser(buffer);
 
   /** State to props */
-  const mapStateToPropsBeginning = buffer.indexOf('mapStateToProps');
-  const mapStateToPropsEnd = buffer.indexOf('});', mapStateToPropsBeginning);
+  const {
+    index: mapStateToPropsEnd,
+    suffix: mapStateSuffix,
+  } = parser.getMapStateToPropsIndex();
 
   const stringToInsert = concat([
     `  /** ${display} */`,
@@ -15,8 +17,8 @@ module.exports = (buf, { camel, pascal, display }) => {
     `  has${pascal}Failed: makeSelect${pascal}HasFailed(),`,
     `  has${pascal}Succeeded: makeSelect${pascal}HasSucceeded(),`,
     `  ${camel}Data: makeSelect${pascal}Data(),`,
-    `  ${camel}ErrorMessage: makeSelect${pascal}ErrorMessage(),`,
-    ``,
+    `  ${camel}ErrorMessage: makeSelect${pascal}ErrorMessage(),${mapStateSuffix ||
+      ''}`,
   ]);
 
   /** Selectors */

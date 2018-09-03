@@ -75,4 +75,13 @@ Parser.prototype.getAllSagasIndex = function() {
   };
 };
 
+Parser.prototype.getMapStateToPropsIndex = function() {
+  const mapStateToPropsBeginning = this.buffer.indexOf('mapStateToProps');
+  const mapStateToPropsEnd = this.buffer.indexOf(
+    '});',
+    mapStateToPropsBeginning,
+  );
+  return { index: mapStateToPropsEnd, suffix: '\n' };
+};
+
 module.exports = Parser;
