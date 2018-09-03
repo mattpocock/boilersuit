@@ -7,7 +7,7 @@ const Parser = function(buffer) {
 Parser.prototype.lastImportIndex = function() {
   let index = this.buffer.lastIndexOf('import');
   if (index !== -1) {
-    return { index, suffix: '\n' };
+    return index;
   }
 
   throw new Error('Last import index could not be found');
@@ -22,7 +22,11 @@ Parser.prototype.getImportIndex = function(filename) {
   if (index !== -1) {
     return { index, prefix: `, ` };
   }
-  return this.lastImportIndex();
+  return {
+    index: this.lastImportIndex(),
+    prefix: 'import {\n',
+    suffix: `} from '${filename}';\n`,
+  };
 };
 
 Parser.prototype.getCombineReducers = function() {
