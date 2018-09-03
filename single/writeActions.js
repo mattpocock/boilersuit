@@ -9,8 +9,9 @@ module.exports = (buf, { pascal, constant, display }) => {
     ``,
     `/** ${display} */`,
     ``,
-    `export const change${pascal} = () => ({`,
+    `export const change${pascal} = (value) => ({`,
     `  type: CHANGE_${constant},`,
+    `  payload: value,`,
     `});`,
     ``,
   ]);
