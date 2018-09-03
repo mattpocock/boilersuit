@@ -18,6 +18,22 @@ And you'd get reducers/actions/constants/selectors for an ajax call for 'Get Twe
 
 Try it out! Though make sure you commit before you do.
 
+## Commands
+
+We now have two commands: input and ajax
+
+### Ajax
+
+Creates all the fields necessary for an ajax call.
+
+Usage: `blrplt ajax app/containers/HomePage "Get Tweets"`
+
+### Single
+
+Creates a single field, useful for controlling form inputs or a single piece of state.
+
+Usage: `blrplt single app/containers/HomePage "Show Tooltip"`
+
 ## Notes
 
 Things to do:
