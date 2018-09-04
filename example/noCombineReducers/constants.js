@@ -27,4 +27,3 @@ export const GET_STANDARDS_SUCCEEDED =
   'app/AdminManageAssessments/GET_STANDARDS_SUCCEEDED';
 export const GET_STANDARDS_FAILED =
   'app/AdminManageAssessments/GET_STANDARDS_FAILED';
-

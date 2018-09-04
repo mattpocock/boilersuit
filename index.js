@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const program = require('commander');
-const ajax = require('./ajax');
-const single = require('./single');
+const ajax = require('./commands/ajax');
+const single = require('./commands/single');
 
 program.version('0.0.6');
 

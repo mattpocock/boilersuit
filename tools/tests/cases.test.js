@@ -39,7 +39,9 @@ describe('Cases', () => {
 
   describe('all', () => {
     it('Should return an object containing all cases', () => {
-      const { display, camel, constant, pascal } = cases.all();
+      const {
+        display, camel, constant, pascal,
+      } = cases.all();
       expect(display).to.equal('Hello World');
       expect(camel).to.equal('helloWorld');
       expect(constant).to.equal('HELLO_WORLD');

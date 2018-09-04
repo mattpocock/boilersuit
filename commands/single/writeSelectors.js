@@ -1,4 +1,4 @@
-const { concat } = require('../tools/utils');
+const { concat } = require('../../tools/utils');
 
 module.exports = (buf, { display, pascal, camel }) => concat([
   buf.toString(),

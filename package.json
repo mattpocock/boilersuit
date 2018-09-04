@@ -16,7 +16,7 @@
   },
   "scripts": {
     "test": "jest --watchAll",
-    "lint": "eslint **/*.js -c ./.eslintrc --fix"
+    "lint": "eslint . -c ./.eslintrc --fix"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.6",

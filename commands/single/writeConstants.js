@@ -1,4 +1,4 @@
-const { fixFolderName, concat } = require('../tools/utils');
+const { fixFolderName, concat } = require('../../tools/utils');
 
 module.exports = (buf, { display, constant }, folderName) => {
   const buffer = buf.toString();

@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const Parser = require('../parser');
 
 describe('Parser', () => {
-  let parser = new Parser();
+  const parser = new Parser();
   it('Should have certain methods', () => {
     expect(typeof parser.lastImportIndex).to.equal('function');
     expect(typeof parser.getImportIndex).to.equal('function');
@@ -17,7 +17,7 @@ describe('Parser', () => {
   });
 
   describe('getImportIndex', () => {
-    let parser = new Parser(`\n} from './actions';`);
+    const parser = new Parser(`\n} from './actions';`);
     expect(parser.getImportIndex('./actions').index).to.equal(0);
-  })
+  });
 });

@@ -1,5 +1,5 @@
-const { concat } = require('../tools/utils');
-const Parser = require('../tools/parser');
+const { concat } = require('../../tools/utils');
+const Parser = require('../../tools/parser');
 
 module.exports = (buf, { display, camel, constant }) => {
   const buffer = buf.toString();

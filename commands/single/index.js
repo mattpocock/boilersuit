@@ -1,26 +1,21 @@
 const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
-const Cases = require('../tools/cases');
+const Cases = require('../../tools/cases');
 const writeIndex = require('./writeIndex');
 const writeSelectors = require('./writeSelectors');
 const writeActions = require('./writeActions');
 const writeConstants = require('./writeConstants');
 const writeReducer = require('./writeReducer');
-const writeSaga = require('./writeSaga');
 
-const ajax = (identifier, folderName) => {
+const single = (identifier, folderName) => {
   const cases = new Cases(identifier);
   const allCases = cases.all();
 
   /** Index file */
   fs.readFile(`${folderName}/index.js`, (_, buf) => {
-    fs.writeFile(
-      `${folderName}/index.js`,
-      writeIndex(buf, allCases),
-      () => {
-        console.log('Index written!'.white);
-      },
-    );
+    fs.writeFile(`${folderName}/index.js`, writeIndex(buf, allCases), () => {
+      console.log('Index written!'.white);
+    });
   });
 
   /** Selectors File */
@@ -66,17 +61,6 @@ const ajax = (identifier, folderName) => {
       },
     );
   });
-
-  /** Saga File */
-  fs.readFile(`${folderName}/saga.js`, (_, buf) => {
-    fs.writeFile(
-      `${folderName}/saga.js`,
-      writeSaga(buf, allCases),
-      () => {
-        console.log('Saga written!'.white);
-      },
-    );
-  });
 };
 
-module.exports = ajax;
+module.exports = single;
