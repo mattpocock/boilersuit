@@ -5,6 +5,8 @@
     "no-console": "off",
     "operator-linebreak": "off",
     "func-names": "off",
-    "space-before-function-paren": "off"
+    "space-before-function-paren": "off",
+    "arrow-parens": "off",
+    "prefer-template": "off"
   }
 }

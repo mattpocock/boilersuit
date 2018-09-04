@@ -20,7 +20,8 @@ module.exports = (buf, {
   const stringToInsert = concat([
     `/** ${display} Reducer */`,
     ``,
-    `const initial${pascal}State = fromJS({});`,
+    `const initial${pascal}State = fromJS({`,
+    `});`,
     ``,
     `export const ${camel}Reducer = (state = initial${pascal}State, { type }) => {`,
     `  switch (type) {`,

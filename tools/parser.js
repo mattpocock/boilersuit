@@ -2,6 +2,7 @@ const { concat } = require('./utils');
 
 const Parser = function(buffer) {
   this.buffer = buffer;
+  this.ticker = 0;
 };
 
 Parser.prototype.lastImportIndex = function() {
@@ -86,6 +87,34 @@ Parser.prototype.getMapStateToPropsIndex = function() {
 
 Parser.prototype.includes = function(string) {
   return this.buffer.indexOf(string) !== -1;
+};
+
+/**
+ * Uses the ticker to go from piece of text to piece of text.
+ */
+Parser.prototype.toNext = function(string) {
+  const index = this.buffer.indexOf(string, this.ticker);
+  if (index >= this.ticker) {
+    this.ticker = index;
+    return { found: true, index };
+  }
+  return { found: false };
+};
+
+/**
+ * Uses the ticker to go from piece of text to piece of text.
+ */
+Parser.prototype.toPrev = function(string) {
+  const index = this.buffer.lastIndexOf(string, this.ticker);
+  if (index !== -1 && index <= this.ticker) {
+    this.ticker = index;
+    return { found: true, index };
+  }
+  return { found: false };
+};
+
+Parser.prototype.resetTicker = function() {
+  this.ticker = 0;
 };
 
 module.exports = Parser;

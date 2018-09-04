@@ -7,11 +7,11 @@ module.exports = (buf, { display, constant }, folderName) => {
     buffer,
     `/** ${display} */`,
     `export const ${constant}_STARTED =`,
-    `  'app/${fixedFolderName}${constant}_STARTED';`,
+    `  '${fixedFolderName}${constant}_STARTED';`,
     `export const ${constant}_SUCCEEDED =`,
-    `  'app/${fixedFolderName}${constant}_SUCCEEDED';`,
+    `  '${fixedFolderName}${constant}_SUCCEEDED';`,
     `export const ${constant}_FAILED =`,
-    `  'app/${fixedFolderName}${constant}_FAILED';`,
+    `  '${fixedFolderName}${constant}_FAILED';`,
     ``,
   ]);
 };

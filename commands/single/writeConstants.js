@@ -7,7 +7,7 @@ module.exports = (buf, { display, constant }, folderName) => {
     buffer,
     `/** ${display} */`,
     `export const CHANGE_${constant} =`,
-    `  'app/${fixedFolderName}CHANGE_${constant}';`,
+    `  '${fixedFolderName}CHANGE_${constant}';`,
     ``,
   ]);
 };
