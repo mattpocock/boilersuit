@@ -1,4 +1,4 @@
-const colors = require('colors');
+const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
 const Cases = require('../tools/cases');
 const writeIndex = require('./writeIndex');
@@ -13,18 +13,18 @@ const ajax = (identifier, folderName) => {
   const allCases = cases.all();
 
   /** Index file */
-  fs.readFile(`${folderName}/index.js`, (err, buf) => {
+  fs.readFile(`${folderName}/index.js`, (_, buf) => {
     fs.writeFile(
       `${folderName}/index.js`,
       writeIndex(buf, allCases),
-      err => {
+      () => {
         console.log('Index written!'.white);
       },
     );
   });
 
   /** Selectors File */
-  fs.readFile(`${folderName}/selectors.js`, (err, buf) => {
+  fs.readFile(`${folderName}/selectors.js`, (_, buf) => {
     fs.writeFile(
       `${folderName}/selectors.js`,
       writeSelectors(buf, allCases),
@@ -35,18 +35,18 @@ const ajax = (identifier, folderName) => {
   });
 
   /** Actions File */
-  fs.readFile(`${folderName}/actions.js`, (err, buf) => {
+  fs.readFile(`${folderName}/actions.js`, (_, buf) => {
     fs.writeFile(
       `${folderName}/actions.js`,
       writeActions(buf, allCases),
-      err => {
+      () => {
         console.log('Actions written!'.white);
       },
     );
   });
 
   /** Constants File */
-  fs.readFile(`${folderName}/constants.js`, (err, buf) => {
+  fs.readFile(`${folderName}/constants.js`, (_, buf) => {
     fs.writeFile(
       `${folderName}/constants.js`,
       writeConstants(buf, allCases, folderName),
@@ -57,22 +57,22 @@ const ajax = (identifier, folderName) => {
   });
 
   /** Reducers File */
-  fs.readFile(`${folderName}/reducer.js`, (err, buf) => {
+  fs.readFile(`${folderName}/reducer.js`, (_, buf) => {
     fs.writeFile(
       `${folderName}/reducer.js`,
       writeReducer(buf, allCases),
-      err => {
+      () => {
         console.log('Reducer written!'.white);
       },
     );
   });
 
   /** Saga File */
-  fs.readFile(`${folderName}/saga.js`, (err, buf) => {
+  fs.readFile(`${folderName}/saga.js`, (_, buf) => {
     fs.writeFile(
       `${folderName}/saga.js`,
       writeSaga(buf, allCases),
-      err => {
+      () => {
         console.log('Saga written!'.white);
       },
     );

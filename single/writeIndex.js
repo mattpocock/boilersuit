@@ -1,7 +1,7 @@
 const Parser = require('../tools/parser');
 const { concat } = require('../tools/utils');
 
-module.exports = (buf, { camel, pascal, display }) => {
+module.exports = (buf, { camel, pascal }) => {
   const buffer = buf.toString();
   const parser = new Parser(buffer);
 

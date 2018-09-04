@@ -1,7 +1,9 @@
 const Parser = require('../tools/parser');
 const { concat } = require('../tools/utils');
 
-module.exports = (buf, { pascal, camel, display, constant }) => {
+module.exports = (buf, {
+  pascal, camel, display, constant,
+}) => {
   const buffer = buf.toString();
   const parser = new Parser(buffer);
 
@@ -52,7 +54,7 @@ module.exports = (buf, { pascal, camel, display, constant }) => {
     `  ${constant}_FAILED${imports.suffix || ''}`,
   ]);
 
-  let {
+  const {
     index: reducersIndex,
     wasFound,
     ...reducers

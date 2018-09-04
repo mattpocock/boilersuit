@@ -2,8 +2,7 @@ const Cases = function(array) {
   this.array = array;
 };
 
-Cases.prototype.capitalize = string =>
-  string.charAt(0).toUpperCase() + string.slice(1);
+Cases.prototype.capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
 Cases.prototype.camel = function() {
   return this.array
@@ -26,7 +25,7 @@ Cases.prototype.display = function() {
 
 Cases.prototype.pascal = function() {
   return this.array.map(item => this.capitalize(item)).join('');
-}
+};
 
 Cases.prototype.all = function() {
   return {

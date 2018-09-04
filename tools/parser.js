@@ -5,7 +5,7 @@ const Parser = function(buffer) {
 };
 
 Parser.prototype.lastImportIndex = function() {
-  let index = this.buffer.lastIndexOf('import');
+  const index = this.buffer.lastIndexOf('import');
   if (index !== -1) {
     return index;
   }
@@ -31,11 +31,11 @@ Parser.prototype.getImportIndex = function(filename) {
 
 Parser.prototype.getCombineReducers = function() {
   const searchTerm = `combineReducers({`;
-  let index = this.buffer.indexOf(searchTerm);
+  const index = this.buffer.indexOf(searchTerm);
   if (index !== -1) {
     return { index: index + searchTerm.length, wasFound: true, prefix: `\n` };
   }
-  let exportDefault = this.getExportDefaultIndex();
+  const exportDefault = this.getExportDefaultIndex();
   return {
     index: exportDefault.index,
     wasFound: false,
@@ -47,7 +47,7 @@ Parser.prototype.getCombineReducers = function() {
 };
 
 Parser.prototype.getExportDefaultIndex = function() {
-  let index = this.buffer.lastIndexOf('export default ');
+  const index = this.buffer.lastIndexOf('export default ');
   if (index !== -1) {
     return { index, suffix: `\n` };
   }
@@ -56,7 +56,7 @@ Parser.prototype.getExportDefaultIndex = function() {
 
 Parser.prototype.getAllSagasIndex = function() {
   const searchTerm = 'export default function* allSagas() {';
-  let index = this.buffer.indexOf(searchTerm);
+  const index = this.buffer.indexOf(searchTerm);
   if (index !== -1) {
     return {
       wasFound: true,
@@ -64,7 +64,7 @@ Parser.prototype.getAllSagasIndex = function() {
       prefix: `\n`,
     };
   }
-  let exportDefault = this.getExportDefaultIndex();
+  const exportDefault = this.getExportDefaultIndex();
   return {
     index: exportDefault.index,
     wasFound: false,

@@ -21,15 +21,15 @@ module.exports = (buf, { display, camel, constant }) => {
   } = parser.getExportDefaultIndex();
 
   return (
-    buffer.slice(0, constantsImportIndex) +
-    `${constants.prefix || ''}${constant}_STARTED${constants.suffix || ''}` +
-    buffer.slice(constantsImportIndex, actionsImportIndex) +
-    concat([
+    `${buffer.slice(0, constantsImportIndex)
+    }${constants.prefix || ''}${constant}_STARTED${constants.suffix || ''}${
+      buffer.slice(constantsImportIndex, actionsImportIndex)
+    }${concat([
       `${actions.prefix || ''}${camel}Failed,`,
       `${camel}Succeeded${actions.suffix || ''}`,
-    ]) +
-    buffer.slice(actionsImportIndex, lastExportIndex) +
-    concat([
+    ])
+    }${buffer.slice(actionsImportIndex, lastExportIndex)
+    }${concat([
       `${exportDefault.prefix ||
         ''}const ${camel}ErrorText = '${display} failed';`,
       ``,
@@ -51,11 +51,11 @@ module.exports = (buf, { display, camel, constant }) => {
       `  }`,
       `}`,
       `${exportDefault.suffix || ''}`,
-    ]) +
-    buffer.slice(lastExportIndex, allSagasIndex) +
-    `${allSagas.prefix ||
+    ])
+    }${buffer.slice(lastExportIndex, allSagasIndex)
+    }${allSagas.prefix ||
       ''}  yield takeLatest(${constant}_STARTED, ${camel});${allSagas.suffix ||
-      ''}` +
-    buffer.slice(allSagasIndex)
+      ''}${
+      buffer.slice(allSagasIndex)}`
   );
 };
