@@ -8,7 +8,7 @@ module.exports = (buf, {
   const parser = new Parser(buffer);
 
   if (parser.includes(`export const ${camel}Reducer = `)) {
-    console.log(`Domain ${display} already present in './reducers'!`.white);
+    console.log(`Domain '${display}' already present in './reducers'!`.yellow);
     return buffer;
   }
 

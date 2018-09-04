@@ -7,6 +7,7 @@ module.exports = (buf, { display, pascal, camel }) => {
 
   // If already here, don't change a thing
   if (parser.includes(`export const makeSelect${pascal} = () =>`)) {
+    console.log(`Domain '${display}' already present in './selectors'!`.yellow);
     return buffer;
   }
 
