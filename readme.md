@@ -39,6 +39,7 @@ Usage: `blrplt single app/containers/HomePage "Show Tooltip"`
 Creates a new reducer, which we're calling a 'domain' for now. Using this and the next command, you can create custom reducers with custom fields.
 
 Usage: `blrplt domain <directory> <domain>`
+
 Example: `blrplt domain app/containers/HomePage "Homepage Config"`
 
 ### Field
@@ -46,6 +47,7 @@ Example: `blrplt domain app/containers/HomePage "Homepage Config"`
 Creates a new field within a domain that's already been created. Links it to the container in mapStateToProps.
 
 Usage: `blrplt field <domain> <directory> <field>`
+
 Example: `blrplt field "Homepage Config" app/containers/HomePage "data"`
 
 ## Notes
