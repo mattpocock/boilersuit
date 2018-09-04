@@ -84,4 +84,8 @@ Parser.prototype.getMapStateToPropsIndex = function() {
   return { index: mapStateToPropsEnd, suffix: '\n' };
 };
 
+Parser.prototype.includes = function(string) {
+  return this.buffer.indexOf(string) !== -1;
+};
+
 module.exports = Parser;
