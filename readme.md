@@ -1,7 +1,9 @@
 ## How To Install
 
 Clone this repository to your machine
+
 Enter the repository
+
 Run `npm i -g`
 
 ## How To Run It
