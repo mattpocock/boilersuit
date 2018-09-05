@@ -38,6 +38,7 @@ program
     addField(name.split(' '), folderName, domain.split(' '));
   });
 
+  /** Use this: https://github.com/shama/gaze */
 program.command('up').action(() => {
   // const files = glob.sync('**/suit.json');
   // files
