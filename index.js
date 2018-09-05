@@ -42,6 +42,7 @@ program
 program.command('up').action(() => {
   console.log('Watching all suit.json files...'.yellow);
   gaze('**/suit.json', (err, watcher) => {
+    /** This does it the first time */
     Object.entries(watcher.watched()).forEach(entry => {
       const file = entry[1][0];
       fs.readFile(file, (_, buf) => {
@@ -49,6 +50,7 @@ program.command('up').action(() => {
         console.log(file, schema);
       });
     });
+    /** Then this watches further changes */
     watcher.on('changed', file => {
       console.log('changed!');
       // const folder = file.slice(0, -9);
