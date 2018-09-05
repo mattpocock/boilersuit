@@ -1,13 +1,20 @@
 const fs = require('fs');
 const Parser = require('../../tools/parser');
-const { concat, transforms } = require('../../tools/utils');
+const Cases = require('../../tools/cases');
+const writeActionsInReducer = require('./writeActionsInReducer');
+const {
+  concat,
+  transforms,
+  parseCamelCaseToArray,
+  printObject,
+} = require('../../tools/utils');
 const ensureFromJSImported = require('../global/ensureFromJsImported');
 
 module.exports = ({
   file,
   cases: { pascal, camel, display },
   initialState,
-  // actions,
+  actions,
 }) => {
   const buf = fs.readFileSync(file);
   const buffer = buf.toString();
@@ -29,11 +36,9 @@ module.exports = ({
       const startIndex = p.toNext(searchTerm).index + searchTerm.length;
       const { index: endIndex } = p.toNext(');');
       console.log(`Updating ${display} Initial State!`.white);
-      return concat([
-        b.slice(0, startIndex),
-        JSON.stringify(initialState),
-        b.slice(endIndex),
-      ]);
+      return (
+        b.slice(0, startIndex) + printObject(initialState) + b.slice(endIndex)
+      );
     },
     /** Adds in boilerplate if domain does not exist */
     b => {
@@ -45,9 +50,7 @@ module.exports = ({
         `/** ${display} Reducer */`,
         ``,
         `// @boilersuit`,
-        `const initial${pascal}State = fromJS(`,
-        JSON.stringify(initialState),
-        `);`,
+        `const initial${pascal}State = fromJS(${printObject(initialState)});`,
         ``,
         `export const ${camel}Reducer = (state = initial${pascal}State, { type, payload }) => {`,
         `  switch (type) {`,
@@ -69,37 +72,36 @@ module.exports = ({
         b.slice(index)
       );
     },
+    /** Adds actions */
+    b => {
+      if (!actions) {
+        return b;
+      }
+      console.log(`Updating ${display} Actions in Reducer!`.white);
+      const p = new Parser(b);
+      p.resetTicker();
+      p.toNext(`export const ${camel}Reducer =`);
+      const searchTerm = `switch (type) {`;
+      const startIndex = p.toNext(searchTerm).index + searchTerm.length;
+      const { index: endIndex } = p.toNext('default:');
+      let content = '';
+      Object.keys(actions)
+        .map(key => ({ ...actions[key], name: key }))
+        .forEach(action => {
+          const c = new Cases(parseCamelCaseToArray(action.name));
+          const cases = c.all();
+
+          const operations = writeActionsInReducer({
+            action,
+          });
+
+          content += concat([`    case ${cases.constant}:`, operations, ``]);
+        });
+      return (
+        concat([b.slice(0, startIndex), content]) + `    ` + b.slice(endIndex)
+      );
+    },
   ]);
 
   fs.writeFileSync(file, newBuffer);
-
-  // const {
-  //   index: reducersIndex,
-  //   wasFound,
-  //   ...reducers
-  // } = parser.getCombineReducers();
-
-  // let reducerToInsert = '';
-  // if (wasFound) {
-  //   reducerToInsert = `${
-  //     reducers.prefix
-  //   }  ${camel}: ${camel}Reducer, ${reducers.suffix || ''}`;
-  // } else {
-  //   console.log(`No combineReducers found in './reducer'`.red.bold);
-  //   reducerToInsert = concat([
-  //     `${reducers.prefix || ''}  ${camel}: ${camel}Reducer,${reducers.suffix ||
-  //       ''}`,
-  //     '',
-  //   ]);
-  // }
-
-  // return (
-  //   buffer.slice(0, importsIndex) +
-  //   importsToInsert +
-  //   buffer.slice(importsIndex, lastExportIndex) +
-  //   stringToInsert +
-  //   buffer.slice(lastExportIndex, reducersIndex) +
-  //   reducerToInsert +
-  //   buffer.slice(reducersIndex)
-  // );
 };

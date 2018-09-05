@@ -18,7 +18,10 @@ const transforms = (buffer, funcArray) => {
 const isCapital = string => string === string.toUpperCase();
 
 const parseCamelCaseToArray = string =>
-  string.replace(/[A-Z]/, letter => ` ${letter}`).split(' ');
+  string.replace(/([A-Z])/g, letter => ` ${letter}`).split(' ');
+
+const printObject = object =>
+  JSON.stringify(object, null, 2).replace(/"(\w+)"\s*:/g, '$1:');
 
 module.exports = {
   concat,
@@ -26,4 +29,5 @@ module.exports = {
   transforms,
   isCapital,
   parseCamelCaseToArray,
+  printObject,
 };

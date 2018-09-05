@@ -14,13 +14,24 @@ const fromSchema = schemaFile => {
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile.slice(0, -9);
 
-  const schema = JSON.parse(buf.toString());
+  let schema;
+  try {
+    schema = JSON.parse(buf.toString());
+  } catch (e) {
+    console.log(e);
+  }
+  if (!schema) return;
   /** Turns the schema into an array of domains */
   Object.keys(schema)
     .map(key => ({ ...schema[key], domainName: key }))
     .forEach(({ domainName, initialState, actions }) => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
+
+      if (!initialState) {
+        console.log(`No initialState specified for ${allDomainCases.display}!`.red);
+        return;
+      }
 
       writeReducer({
         file: `${folder}/reducer.js`,
