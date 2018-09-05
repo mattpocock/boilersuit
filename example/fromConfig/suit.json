@@ -3,9 +3,7 @@
     "initialState": {
       "isLoading": false,
       "hasCompleted": false,
-      "data": [],
-      "hasError": false,
-      "errorMessage": ""
+      "data": {}
     },
     "actions": {
       "getTweetsStarted": {
@@ -33,6 +31,14 @@
           "data": "payload"
         }
       }
+    }
+  },
+  "getFarts": {
+    "initialState": {
+      "data": [],
+      "isLoading": false,
+      "hasSucceeded": false,
+      "hasError": false 
     }
   }
 }

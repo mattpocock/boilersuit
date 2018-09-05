@@ -2,11 +2,11 @@
 
 const program = require('commander');
 const gaze = require('gaze');
-const fs = require('fs');
 const ajax = require('./commands/ajax');
 const single = require('./commands/single');
 const addDomain = require('./commands/domain/addDomain');
 const addField = require('./commands/domain/addField');
+const fromSchema = require('./commands/fromSchema');
 
 program.version('0.0.7');
 
@@ -43,20 +43,13 @@ program.command('up').action(() => {
   gaze('**/suit.json', (err, watcher) => {
     /** This does it the first time */
     Object.entries(watcher.watched()).forEach(entry => {
-      const file = entry[1][0];
-      fs.readFile(file, (_, buf) => {
-        const schema = JSON.parse(buf.toString());
-        console.log(file, schema);
-      });
+      const schemaFile = entry[1][0];
+      fromSchema(schemaFile);
     });
     /** Then this watches further changes */
-    watcher.on('changed', file => {
-      console.log('changed!');
-      // const folder = file.slice(0, -9);
-      fs.readFile(file, (_, buf) => {
-        const schema = JSON.parse(buf.toString());
-        console.log(file, schema);
-      });
+    watcher.on('changed', schemaFile => {
+      console.log('File changed, making changes...'.yellow);
+      fromSchema(schemaFile);
     });
   });
 });
