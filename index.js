@@ -38,7 +38,6 @@ program
     addField(name.split(' '), folderName, domain.split(' '));
   });
 
-/** Use this: https://github.com/shama/gaze */
 program.command('up').action(() => {
   console.log('Watching all suit.json files...'.yellow);
   gaze('**/suit.json', (err, watcher) => {
