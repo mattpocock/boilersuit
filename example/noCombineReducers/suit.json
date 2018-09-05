@@ -12,7 +12,6 @@
         "set": {
           "isLoading": true
         },
-        
         "saga": {
           "onFail": "getTweetsFailed",
           "onSuccess": "getTweetsSucceeded"
