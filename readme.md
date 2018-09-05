@@ -1,3 +1,5 @@
+<div style="text-align: center;"><img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/logo.png" alt="boilerplate logo"/></div>
+
 ## How To Install
 
 Clone this repository to your machine
