@@ -7,7 +7,16 @@ const fixFolderName = (string) => {
   return string;
 };
 
+const transforms = (buffer, funcArray) => {
+  let newBuffer = buffer;
+  funcArray.forEach(func => {
+    newBuffer = func(newBuffer);
+  });
+  return newBuffer;
+};
+
 module.exports = {
   concat,
   fixFolderName,
+  transforms,
 };

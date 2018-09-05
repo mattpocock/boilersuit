@@ -1,8 +1,9 @@
-const { concat } = require('../../../tools/utils');
+const { concat, transforms } = require('../../../tools/utils');
 const Parser = require('../../../tools/parser');
+const ensureFromJsImported = require('../../global/ensureFromJsImported');
 
 module.exports = (buf, { display, pascal, camel }) => {
-  const buffer = buf.toString();
+  const buffer = transforms(buf.toString(), [ensureFromJsImported]);
   const parser = new Parser(buffer);
 
   // If already here, don't change a thing

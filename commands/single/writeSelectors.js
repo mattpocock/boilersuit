@@ -1,7 +1,8 @@
 const { concat } = require('../../tools/utils');
+const ensureFromJsImported = require('../global/ensureFromJsImported');
 
 module.exports = (buf, { display, pascal, camel }) => concat([
-  buf.toString(),
+  ensureFromJsImported(buf.toString()),
   `/**`,
   ` * ${display}`,
   ` */`,

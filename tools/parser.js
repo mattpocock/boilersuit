@@ -14,6 +14,14 @@ Parser.prototype.lastImportIndex = function() {
   throw new Error('Last import index could not be found');
 };
 
+Parser.prototype.firstImportIndex = function() {
+  const index = this.buffer.indexOf('import');
+  if (index === -1) {
+    throw new Error('No imports present in file.');
+  }
+  return index;
+};
+
 Parser.prototype.getImportIndex = function(filename) {
   let index = this.buffer.indexOf(`\n} from '${filename}`);
   if (index !== -1) {
@@ -115,6 +123,10 @@ Parser.prototype.toPrev = function(string) {
 
 Parser.prototype.resetTicker = function() {
   this.ticker = 0;
+};
+
+Parser.prototype.indexOf = function(string) {
+  return this.buffer.indexOf(string);
 };
 
 module.exports = Parser;
