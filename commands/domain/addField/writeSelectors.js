@@ -1,8 +1,11 @@
-const { concat } = require('../../../tools/utils');
+const { concat, transforms } = require('../../../tools/utils');
 const Parser = require('../../../tools/parser');
+const ensureFromJsImported = require('../../global/ensureFromJsImported');
 
 module.exports = (buf, { pascal, camel }, { pascal: domainPascal }) => {
-  const buffer = buf.toString();
+  const buffer = transforms(buf.toString(), [
+    ensureFromJsImported,
+  ]);
   const parser = new Parser(buffer);
 
   parser.toNext(`export const makeSelect${domainPascal} = () =>`);

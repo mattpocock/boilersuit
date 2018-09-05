@@ -1,0 +1,42 @@
+{
+  "getTweets": {
+    "initialState": {
+      "isLoading": false,
+      "hasCompleted": false,
+      "data": [],
+      "hasError": false,
+      "errorMessage": ""
+    },
+    "actions": {
+      "getTweetsStarted": {
+        "set": {
+          "isLoading": true
+        },
+        "saga": {
+          "onFail": "getTweetsFailed",
+          "onSuccess": "getTweetsSucceeded"
+        }
+      },
+      "getTweetsInfo": {
+        "custom": true,
+        "description": ""
+      },
+      "getTweetsFailed": {
+        "payload": true,
+        "set": {
+          "isLoading": false,
+          "errorMessage": "payload",
+          "hasError": true
+        }
+      },
+      "getTweetsSucceeded": {
+        "payload": true,
+        "set": {
+          "isLoading": false,
+          "hasCompleted": true,
+          "data": "payload"
+        }
+      }
+    }
+  }
+}
