@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const program = require('commander');
-// const glob = require('glob');
+const gaze = require('gaze');
 const fs = require('fs');
 const ajax = require('./commands/ajax');
 const single = require('./commands/single');
@@ -40,18 +40,23 @@ program
 
 /** Use this: https://github.com/shama/gaze */
 program.command('up').action(() => {
-  // const files = glob.sync('**/suit.json');
-  // files
-  //   .map(path => ({ folder: `./${path.slice(0, -9)}`, file: `./${path}` }))
-  //   .forEach(({ file, folder }) => {
-
-  //   });
-  fs.watch('**/suit.json', (one, two) => {
-    console.log(one, two);
-    // fs.readFile(file, (err, buf) => {
-    //   const schema = JSON.parse(buf.toString());
-    //   console.log(file, schema);
-    // });
+  console.log('Watching all suit.json files...'.yellow);
+  gaze('**/suit.json', (err, watcher) => {
+    Object.entries(watcher.watched()).forEach(entry => {
+      const file = entry[1][0];
+      fs.readFile(file, (_, buf) => {
+        const schema = JSON.parse(buf.toString());
+        console.log(file, schema);
+      });
+    });
+    watcher.on('changed', file => {
+      console.log('changed!');
+      // const folder = file.slice(0, -9);
+      fs.readFile(file, (_, buf) => {
+        const schema = JSON.parse(buf.toString());
+        console.log(file, schema);
+      });
+    });
   });
 });
 
