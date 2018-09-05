@@ -1,5 +1,5 @@
 {
-  "name": "blrplt",
+  "name": "boilersuit",
   "version": "0.0.4",
   "main": "index.js",
   "author": "matt <matt.pocock@thevirtualforge.com>",
@@ -12,7 +12,7 @@
     "lint"
   ],
   "bin": {
-    "blrplt": "./index.js"
+    "suit": "./index.js"
   },
   "scripts": {
     "test": "jest --watchAll",

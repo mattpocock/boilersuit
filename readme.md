@@ -10,11 +10,11 @@ Run `npm i -g`
 
 Once it's installed, the syntax is:
 
-`blrplt ajax path/to/folder "Do Action"`
+`suit ajax path/to/folder "Do Action"`
 
 For instance, this could be:
 
-`blrplt ajax app/containers/HomePage "Get Tweets"`
+`suit ajax app/containers/HomePage "Get Tweets"`
 
 And you'd get reducers/actions/constants/selectors for an ajax call for 'Get Tweets'.
 
@@ -28,29 +28,29 @@ We now have four commands.
 
 Creates all the fields necessary for an ajax call.
 
-Usage: `blrplt ajax app/containers/HomePage "Get Tweets"`
+Usage: `suit ajax app/containers/HomePage "Get Tweets"`
 
 ### Single
 
 Creates a single field, useful for controlling form inputs or a single piece of state.
 
-Usage: `blrplt single app/containers/HomePage "Show Tooltip"`
+Usage: `suit single app/containers/HomePage "Show Tooltip"`
 
 ### Domain
 
 Creates a new reducer, which we're calling a 'domain' for now. Using this and the next command, you can create custom reducers with custom fields.
 
-Usage: `blrplt domain <directory> <domain>`
+Usage: `suit domain <directory> <domain>`
 
-Example: `blrplt domain app/containers/HomePage "Homepage Config"`
+Example: `suit domain app/containers/HomePage "Homepage Config"`
 
 ### Field
 
 Creates a new field within a domain that's already been created. Links it to the container in mapStateToProps.
 
-Usage: `blrplt field <domain> <directory> <field>`
+Usage: `suit field <domain> <directory> <field>`
 
-Example: `blrplt field "Homepage Config" app/containers/HomePage "data"`
+Example: `suit field "Homepage Config" app/containers/HomePage "data"`
 
 ## Notes
 
