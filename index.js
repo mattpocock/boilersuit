@@ -6,7 +6,7 @@ const single = require('./commands/single');
 const addDomain = require('./commands/domain/addDomain');
 const addField = require('./commands/domain/addField');
 
-program.version('0.0.6');
+program.version('0.0.7');
 
 program
   .command('ajax <file> <name>')
