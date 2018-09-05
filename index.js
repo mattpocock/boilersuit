@@ -43,7 +43,7 @@ program.command('up').action(() => {
   // files
   //   .map(path => ({ folder: `./${path.slice(0, -9)}`, file: `./${path}` }))
   //   .forEach(({ file, folder }) => {
-      
+
   //   });
   fs.watch('**/suit.json', (one, two) => {
     console.log(one, two);
