@@ -1,44 +1,22 @@
 {
-  "getTweets": {
+  "getActions": {
     "initialState": {
       "isLoading": false,
-      "hasCompleted": false,
-      "data": {}
-    },
-    "actions": {
-      "getTweetsStarted": {
-        "set": {
-          "isLoading": true
-        },
-        "saga": {
-          "onFail": "getTweetsFailed",
-          "onSuccess": "getTweetsSucceeded"
-        }
-      },
-      "getTweetsFailed": {
-        "payload": true,
-        "set": {
-          "isLoading": false,
-          "errorMessage": "payload",
-          "hasError": true
-        }
-      },
-      "getTweetsSucceeded": {
-        "payload": true,
-        "set": {
-          "isLoading": false,
-          "hasCompleted": true,
-          "data": "payload"
-        }
-      }
+      "hasCompleted": true,
+      "data": []
     }
   },
-  "getFarts": {
+  "getPosts": {
     "initialState": {
-      "data": [],
       "isLoading": false,
-      "hasSucceeded": false,
-      "hasError": false 
+      "hasCompleted": true,
+      "data": [],
+      "errorMessage": ""
+    },
+    "actions": {
+      "getPostsStarted": {
+        "set": { "isLoading": true, "data": "payload" }
+      }
     }
   }
 }

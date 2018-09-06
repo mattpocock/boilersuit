@@ -7,39 +7,52 @@ const Cases = require('../../tools/cases');
 // const writeConstants = require('./writeConstants');
 const writeReducer = require('./writeReducer');
 // const writeSaga = require('./writeSaga');
-const { parseCamelCaseToArray } = require('../../tools/utils');
+const {
+  parseCamelCaseToArray,
+  cleanFile,
+  transforms,
+} = require('../../tools/utils');
 
 const fromSchema = schemaFile => {
-  const buf = fs.readFileSync(schemaFile);
+  const schemaBuf = fs.readFileSync(schemaFile);
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile.slice(0, -9);
 
   let schema;
   try {
-    schema = JSON.parse(buf.toString());
+    schema = JSON.parse(schemaBuf.toString());
   } catch (e) {
     console.log(e);
   }
   if (!schema) return;
   /** Turns the schema into an array of domains */
-  Object.keys(schema)
-    .map(key => ({ ...schema[key], domainName: key }))
-    .forEach(({ domainName, initialState, actions }) => {
-      const cases = new Cases(parseCamelCaseToArray(domainName));
-      const allDomainCases = cases.all();
 
-      if (!initialState) {
-        console.log(`No initialState specified for ${allDomainCases.display}!`.red);
-        return;
-      }
+  const reducersFile = `${folder}/reducer.js`;
+  const buffer = cleanFile(fs.readFileSync(reducersFile).toString());
+  const newBuffer = transforms(buffer, [
+    ...Object.keys(schema)
+      .map(key => ({ ...schema[key], domainName: key }))
+      .map(({ domainName, initialState, actions }) => b => {
+        const cases = new Cases(parseCamelCaseToArray(domainName));
+        const allDomainCases = cases.all();
 
-      writeReducer({
-        file: `${folder}/reducer.js`,
-        cases: allDomainCases,
-        initialState,
-        actions,
-      });
-    });
+        if (!initialState) {
+          console.log(
+            `No initialState specified for ${allDomainCases.display}!`.red,
+          );
+          return b;
+        }
+
+        return writeReducer({
+          buffer: b,
+          cases: allDomainCases,
+          initialState,
+          actions,
+        });
+      }),
+  ]);
+
+  fs.writeFileSync(reducersFile, newBuffer);
 
   // const cases = new Cases(identifier);
   // const allCases = cases.all();
