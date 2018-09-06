@@ -40,6 +40,61 @@ const cleanFile = buffer => {
   return newBuffer;
 };
 
+const ensureImport = (
+  property,
+  fileName,
+  { destructure = false },
+) => buffer => {
+  /** Checks if already loaded */
+  const isImported =
+    buffer.lastIndexOf(property, buffer.lastIndexOf(' from ')) !== -1;
+  if (isImported) {
+    return buffer;
+  }
+
+  const hasImportsFromFileName = buffer.indexOf(fileName) !== -1;
+
+  /** If no imports from fileName, add it and the filename */
+  if (!hasImportsFromFileName) {
+    const firstImportLineIndex = buffer
+      .split('\n')
+      .findIndex(line => line.includes('import'));
+    return buffer
+      .split('\n')
+      .splice(
+        firstImportLineIndex,
+        0,
+        `import ${
+          destructure ? `{ ${property} }` : property
+        } from './${fileName}';`,
+      )
+      .join('\n');
+  }
+  /**
+   * Now we know that we have imports from the filename,
+   * it's just whether it's destructured or not
+   */
+  if (destructure) {
+    const isOnNewLine =
+      buffer.split('\n').findIndex(line => line === `} from '${fileName}';`) !==
+      -1;
+    if (isOnNewLine) {
+      const index = buffer.indexOf(`\n} from '${fileName}';`);
+      return buffer.slice(0, index) + `\n  ${property}, // @suit-line` + buffer.slice(index);
+    }
+    const index = buffer.indexOf(` } from '${fileName};`);
+    return buffer.slice(0, index) + `,\n  ${property}, // @suit-line\n`;
+  }
+
+  /**
+   * I don't think there's a case for handling
+   * multiple default inputs from the same filename,
+   * so I'm not writing it.
+   */
+
+  return buffer;
+};
+
 module.exports = {
   concat,
   fixFolderName,
@@ -48,4 +103,5 @@ module.exports = {
   parseCamelCaseToArray,
   printObject,
   cleanFile,
+  ensureImport,
 };
