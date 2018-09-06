@@ -1,5 +1,8 @@
 const concat = array => array.join(`\n`);
 
+const capitalize = string =>
+  string.charAt(0).toUpperCase() + string.slice(1);
+
 const fixFolderName = string => {
   if (string.charAt(string.length - 1) !== '/') {
     return `${string}/`;
@@ -131,4 +134,5 @@ module.exports = {
   removeWhiteSpace,
   removeSuitDoubling,
   prettify,
+  capitalize,
 };

@@ -1,17 +1,37 @@
-const { fixFolderName, concat } = require('../../tools/utils');
+const Cases = require('../../tools/cases');
+const {
+  concat,
+  transforms,
+  parseCamelCaseToArray,
+  prettify,
+} = require('../../tools/utils');
 
-module.exports = (buf, { display, constant }, folderName) => {
-  const buffer = buf.toString();
-  const fixedFolderName = fixFolderName(folderName);
-  return concat([
-    buffer,
-    `/** ${display} */`,
-    `export const ${constant}_STARTED =`,
-    `  '${fixedFolderName}${constant}_STARTED';`,
-    `export const ${constant}_SUCCEEDED =`,
-    `  '${fixedFolderName}${constant}_SUCCEEDED';`,
-    `export const ${constant}_FAILED =`,
-    `  '${fixedFolderName}${constant}_FAILED';`,
-    ``,
+module.exports = ({ buffer, cases, actions, folder }) =>
+  transforms(buffer, [
+    /** Adds the domain */
+    b => concat([b, `// @suit-start`, ``, `/** ${cases.display} constants */`]),
+    /** Adds each action */
+    ...Object.keys(actions)
+      .map(key => ({ name: key, ...actions[key] }))
+      .reverse()
+      .map(({ name }, i) => b => {
+        const c = new Cases(parseCamelCaseToArray(name));
+        const actionCases = c.all();
+
+        const searchTerm = `/** ${cases.display} constants */`;
+        const index = b.indexOf(searchTerm) + searchTerm.length;
+
+        let content = '';
+        content += concat([
+          ``,
+          `export const ${actionCases.constant} = `,
+          `  '${folder}${actionCases.constant}';`,
+        ]);
+        if (i === 0) {
+          content += '\n\n// @suit-end';
+        }
+
+        return concat([b.slice(0, index), content, b.slice(index)]);
+      }),
+    prettify,
   ]);
-};

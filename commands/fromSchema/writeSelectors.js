@@ -1,24 +1,60 @@
-const { concat } = require('../../tools/utils');
-const ensureFromJsImported = require('../global/ensureFromJsImported');
+const Cases = require('../../tools/cases');
+const {
+  concat,
+  transforms,
+  parseCamelCaseToArray,
+  prettify,
+  ensureImport,
+  capitalize,
+} = require('../../tools/utils');
 
-module.exports = (buf, { display, pascal, camel }) =>
-  concat([
-    ensureFromJsImported(buf.toString()),
-    `/**`,
-    ` * ${display}`,
-    ` */`,
-    ``,
-    `export const makeSelect${pascal} = () =>`,
-    `  createSelector(selectDomain, (substate) => fromJS(substate.${camel}));`,
-    `export const makeSelectIs${pascal}Loading = () =>`,
-    `  createSelector(makeSelect${pascal}(), (substate) => substate.get('isLoading'));`,
-    `export const makeSelect${pascal}HasFailed = () =>`,
-    `  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasError'));`,
-    `export const makeSelect${pascal}HasSucceeded = () =>`,
-    `  createSelector(makeSelect${pascal}(), (substate) => substate.get('hasSucceeded'));`,
-    `export const makeSelect${pascal}Data = () =>`,
-    `  createSelector(makeSelect${pascal}(), (substate) => substate.get('${camel}Data'));`,
-    `export const makeSelect${pascal}ErrorMessage = () =>`,
-    `  createSelector(makeSelect${pascal}(), (substate) => substate.get('errorMessage'));`,
-    ``,
+module.exports = ({ buffer, cases, initialState, folder }) => {
+  const domainName = folder
+    .split('/')
+    .reverse()
+    .filter(x => x !== '')[0];
+  const mainSelector = concat([
+    `export const makeSelect${cases.pascal} = () =>`,
+    `  createSelector(select${capitalize(domainName)}Domain, (substate) => `,
+    `    fromJS(substate.${cases.camel}));`,
   ]);
+
+  return transforms(buffer, [
+    ensureImport('fromJS', 'immutable', { destructure: true }),
+    /** Adds the domain */
+    b =>
+      concat([
+        b,
+        `// @suit-start`,
+        ``,
+        `/** ${cases.display} Selectors */`,
+        ``,
+        mainSelector,
+      ]),
+    /** Adds each field */
+    ...Object.keys(initialState)
+      .map(key => ({ name: key, ...initialState[key] }))
+      .reverse()
+      .map(({ name }, i) => b => {
+        const c = new Cases(parseCamelCaseToArray(name));
+        const fieldCases = c.all();
+
+        const index = b.indexOf(mainSelector) + mainSelector.length;
+
+        let content = '';
+        content += concat([
+          ``,
+          `export const makeSelect${fieldCases.pascal} = () =>`,
+          `  createSelector(makeSelect${cases.pascal}, (substate) =>`,
+          `    substate.get('${fieldCases.camel}')`,
+          `  );`,
+        ]);
+        if (i === 0) {
+          content += '\n\n// @suit-end';
+        }
+
+        return concat([b.slice(0, index), content, b.slice(index)]);
+      }),
+    prettify,
+  ]);
+};

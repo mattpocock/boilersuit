@@ -80,8 +80,11 @@ module.exports = ({
         concat([b.slice(0, startIndex), content]) + `    ` + b.slice(endIndex)
       );
     },
-    buf =>
-      transforms(buf, [
+    buf => {
+      if (!actions) {
+        return buf;
+      }
+      return transforms(buf, [
         ...Object.keys(actions)
           .map(key => ({ ...actions[key], name: key }))
           .map(action => {
@@ -89,7 +92,8 @@ module.exports = ({
             const constant = c.constant();
             return ensureImport(constant, './constants', { destructure: true });
           }),
-      ]),
+      ]);
+    },
     prettify,
   ]);
 

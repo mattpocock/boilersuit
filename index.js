@@ -42,10 +42,11 @@ program.command('up').action(() => {
   console.log('Watching all suit.json files...'.yellow);
   gaze('**/suit.json', (err, watcher) => {
     /** This does it the first time */
-    Object.entries(watcher.watched()).forEach(entry => {
-      const schemaFile = entry[1][0];
+    Object.entries(watcher.relative()).forEach(entry => {
+      const schemaFile = entry[0] + entry[1][0];
       fromSchema(schemaFile);
     });
+
     /** Then this watches further changes */
     watcher.on('changed', schemaFile => {
       console.log('File changed, making changes...'.yellow);

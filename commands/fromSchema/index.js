@@ -2,9 +2,9 @@ const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
 const Cases = require('../../tools/cases');
 // const writeIndex = require('./writeIndex');
-// const writeSelectors = require('./writeSelectors');
+const writeSelectors = require('./writeSelectors');
 const writeActions = require('./writeActions');
-// const writeConstants = require('./writeConstants');
+const writeConstants = require('./writeConstants');
 const writeReducer = require('./writeReducer');
 // const writeSaga = require('./writeSaga');
 const {
@@ -80,6 +80,57 @@ const fromSchema = schemaFile => {
   ]);
 
   fs.writeFileSync(`${folder}/actions.js`, newActionsBuffer);
+
+  /** Write Constants */
+
+  const constantsBuffer = fs.readFileSync(`${folder}/constants.js`).toString();
+
+  const newConstantsBuffer = transforms(constantsBuffer, [
+    cleanFile,
+    ...arrayOfDomains.map(({ domainName, actions }) => b => {
+      const cases = new Cases(parseCamelCaseToArray(domainName));
+      const allDomainCases = cases.all();
+      if (!actions) {
+        // They will have been warned already, so can fail silently
+        return b;
+      }
+
+      return writeConstants({
+        buffer: b,
+        cases: allDomainCases,
+        actions,
+        folder,
+      });
+    }),
+  ]);
+
+  fs.writeFileSync(`${folder}/constants.js`, newConstantsBuffer);
+
+  /** Write Selectors */
+
+  const selectorsBuffer = fs.readFileSync(`${folder}/selectors.js`).toString();
+
+  const newSelectorsBuffer = transforms(selectorsBuffer, [
+    cleanFile,
+    ...arrayOfDomains.map(({ domainName, initialState }) => b => {
+      const cases = new Cases(parseCamelCaseToArray(domainName));
+      const allDomainCases = cases.all();
+      if (!initialState) {
+        // They will have been warned already, so can fail silently
+        return b;
+      }
+
+      return writeSelectors({
+        buffer: b,
+        cases: allDomainCases,
+        initialState,
+        folder,
+      });
+    }),
+  ]);
+
+  fs.writeFileSync(`${folder}/selectors.js`, newSelectorsBuffer);
+  // console.log(newSelectorsBuffer);
 
   // const cases = new Cases(identifier);
   // const allCases = cases.all();
