@@ -87,8 +87,8 @@ const ensureImport = (
         buffer.slice(index)
       );
     }
-    const index = buffer.indexOf(` } from '${fileName};`);
-    return buffer.slice(0, index) + `,\n  ${property}, // @suit-line\n`;
+    const index = buffer.indexOf(` } from '${fileName}';`);
+    return buffer.slice(0, index) + `,\n  ${property}, // @suit-line\n` + buffer.slice(index);
   }
 
   /**
