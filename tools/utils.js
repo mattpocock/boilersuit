@@ -56,6 +56,7 @@ const ensureImport = (
 
   /** If no imports from fileName, add it and the filename */
   if (!hasImportsFromFileName) {
+    console.log('buffer', buffer);
     const firstImportLineIndex = buffer
       .split('\n')
       .findIndex(line => line.includes('import'));
@@ -64,9 +65,13 @@ const ensureImport = (
       .splice(
         firstImportLineIndex,
         0,
-        `import ${
-          destructure ? `{ ${property} }` : property
-        } from './${fileName}';`,
+        concat([
+          `// @suit-start`,
+          `import ${
+            destructure ? `{ ${property} }` : property
+          } from './${fileName}';`,
+          `// @suit-end`,
+        ]),
       )
       .join('\n');
   }
@@ -80,7 +85,11 @@ const ensureImport = (
       -1;
     if (isOnNewLine) {
       const index = buffer.indexOf(`\n} from '${fileName}';`);
-      return buffer.slice(0, index) + `\n  ${property}, // @suit-line` + buffer.slice(index);
+      return (
+        buffer.slice(0, index) +
+        `\n  ${property}, // @suit-line` +
+        buffer.slice(index)
+      );
     }
     const index = buffer.indexOf(` } from '${fileName};`);
     return buffer.slice(0, index) + `,\n  ${property}, // @suit-line\n`;
@@ -95,6 +104,21 @@ const ensureImport = (
   return buffer;
 };
 
+const removeWhiteSpace = buffer => {
+  const lines = buffer.split('\n');
+  return lines
+    .filter((thisLine, index) => !(thisLine === '' && lines[index + 1] === ''))
+    .join('\n');
+};
+
+const removeSuitDoubling = buffer =>
+  buffer
+    .replace(concat([`// @suit-end`, ``, `// @suit-start`]), '')
+    .replace(concat([`// @suit-end`, `// @suit-start`]), '');
+
+const prettify = buffer =>
+  transforms(buffer, [removeWhiteSpace, removeSuitDoubling, removeWhiteSpace]);
+
 module.exports = {
   concat,
   fixFolderName,
@@ -104,4 +128,7 @@ module.exports = {
   printObject,
   cleanFile,
   ensureImport,
+  removeWhiteSpace,
+  removeSuitDoubling,
+  prettify,
 };

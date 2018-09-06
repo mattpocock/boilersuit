@@ -4,6 +4,7 @@ const {
   transforms,
   parseCamelCaseToArray,
   ensureImport,
+  prettify,
 } = require('../../tools/utils');
 
 module.exports = ({ buffer, cases, actions }) =>
@@ -46,6 +47,11 @@ module.exports = ({ buffer, cases, actions }) =>
           content += '\n\n// @suit-end';
         }
 
-        return concat([newBuffer.slice(0, index), content, newBuffer.slice(index)]);
+        return concat([
+          newBuffer.slice(0, index),
+          content,
+          newBuffer.slice(index),
+        ]);
       }),
+    prettify,
   ]);

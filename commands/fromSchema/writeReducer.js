@@ -6,8 +6,9 @@ const {
   transforms,
   parseCamelCaseToArray,
   printObject,
+  prettify,
+  ensureImport,
 } = require('../../tools/utils');
-const ensureFromJSImported = require('../global/ensureFromJsImported');
 
 module.exports = ({
   buffer,
@@ -16,7 +17,7 @@ module.exports = ({
   actions,
 }) => {
   const newBuffer = transforms(buffer, [
-    ensureFromJSImported,
+    ensureImport('fromJS', 'immutable', { destructure: true }),
     /** Adds in boilerplate if domain does not exist */
     b => {
       const index = b.lastIndexOf('export default');
@@ -79,6 +80,17 @@ module.exports = ({
         concat([b.slice(0, startIndex), content]) + `    ` + b.slice(endIndex)
       );
     },
+    buf =>
+      transforms(buf, [
+        ...Object.keys(actions)
+          .map(key => ({ ...actions[key], name: key }))
+          .map(action => {
+            const c = new Cases(parseCamelCaseToArray(action.name));
+            const constant = c.constant();
+            return ensureImport(constant, './constants', { destructure: true });
+          }),
+      ]),
+    prettify,
   ]);
 
   return newBuffer;
