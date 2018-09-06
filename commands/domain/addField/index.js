@@ -31,7 +31,7 @@ const addField = (identifier, folderName, domain) => {
       `${folderName}/index.js`,
       writeIndex(buf, allCases, allDomainCases),
       () => {
-        console.log('Index written!'.white);
+        console.log('Index written!');
       },
     );
   });
@@ -42,7 +42,7 @@ const addField = (identifier, folderName, domain) => {
       `${folderName}/selectors.js`,
       writeSelectors(buf, allCases, allDomainCases),
       () => {
-        console.log('Selectors written!'.white);
+        console.log('Selectors written!');
       },
     );
   });
@@ -53,7 +53,7 @@ const addField = (identifier, folderName, domain) => {
       `${folderName}/reducer.js`,
       writeReducer(buf, allCases, allDomainCases),
       () => {
-        console.log('Reducer written!'.white);
+        console.log('Reducer written!');
       },
     );
   });

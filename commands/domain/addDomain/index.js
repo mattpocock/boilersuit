@@ -14,7 +14,7 @@ const addDomain = (identifier, folderName) => {
       `${folderName}/selectors.js`,
       writeSelectors(buf, allCases),
       () => {
-        console.log('Selectors written!'.white);
+        console.log('Selectors written!');
       },
     );
   });
@@ -25,7 +25,7 @@ const addDomain = (identifier, folderName) => {
       `${folderName}/reducer.js`,
       writeReducer(buf, allCases),
       () => {
-        console.log('Reducer written!'.white);
+        console.log('Reducer written!');
       },
     );
   });

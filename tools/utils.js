@@ -26,7 +26,6 @@ const printObject = object =>
   JSON.stringify(object, null, 2).replace(/"(\w+)"\s*:/g, '$1:');
 
 const cleanFile = buffer => {
-  console.log('Cleaning file!'.white);
   let newBuffer = buffer;
   while (newBuffer.indexOf('// @suit-start') !== -1) {
     const startIndex = newBuffer.indexOf('\n// @suit-start');

@@ -18,6 +18,8 @@ const fromSchema = schemaFile => {
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile.slice(0, -9);
 
+  console.log(`\n${folder}`.yellow);
+
   let schema;
   try {
     schema = JSON.parse(schemaBuf.toString());
@@ -138,7 +140,7 @@ const fromSchema = schemaFile => {
   // /** Index file */
   // fs.readFile(`${folderName}/index.js`, (_, buf) => {
   //   fs.writeFile(`${folderName}/index.js`, writeIndex(buf, allCases), () => {
-  //     console.log('Index written!'.white);
+  //     console.log('Index written!');
   //   });
   // });
 
@@ -148,7 +150,7 @@ const fromSchema = schemaFile => {
   //     `${folderName}/selectors.js`,
   //     writeSelectors(buf, allCases),
   //     () => {
-  //       console.log('Selectors written!'.white);
+  //       console.log('Selectors written!');
   //     },
   //   );
   // });
@@ -159,7 +161,7 @@ const fromSchema = schemaFile => {
   //     `${folderName}/constants.js`,
   //     writeConstants(buf, allCases, folderName),
   //     () => {
-  //       console.log('Constants Written!'.white);
+  //       console.log('Constants Written!');
   //     },
   //   );
   // });
@@ -170,7 +172,7 @@ const fromSchema = schemaFile => {
   //     `${folderName}/reducer.js`,
   //     writeReducer(buf, allCases),
   //     () => {
-  //       console.log('Reducer written!'.white);
+  //       console.log('Reducer written!');
   //     },
   //   );
   // });
@@ -178,7 +180,7 @@ const fromSchema = schemaFile => {
   // /** Saga File */
   // fs.readFile(`${folderName}/saga.js`, (_, buf) => {
   //   fs.writeFile(`${folderName}/saga.js`, writeSaga(buf, allCases), () => {
-  //     console.log('Saga written!'.white);
+  //     console.log('Saga written!');
   //   });
   // });
 };

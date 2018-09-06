@@ -18,7 +18,7 @@ const ajax = (identifier, folderName) => {
       `${folderName}/index.js`,
       writeIndex(buf, allCases),
       () => {
-        console.log('Index written!'.white);
+        console.log('Index written!');
       },
     );
   });
@@ -29,7 +29,7 @@ const ajax = (identifier, folderName) => {
       `${folderName}/selectors.js`,
       writeSelectors(buf, allCases),
       () => {
-        console.log('Selectors written!'.white);
+        console.log('Selectors written!');
       },
     );
   });
@@ -40,7 +40,7 @@ const ajax = (identifier, folderName) => {
       `${folderName}/actions.js`,
       writeActions(buf, allCases),
       () => {
-        console.log('Actions written!'.white);
+        console.log('Actions written!');
       },
     );
   });
@@ -51,7 +51,7 @@ const ajax = (identifier, folderName) => {
       `${folderName}/constants.js`,
       writeConstants(buf, allCases, folderName),
       () => {
-        console.log('Constants Written!'.white);
+        console.log('Constants Written!');
       },
     );
   });
@@ -62,7 +62,7 @@ const ajax = (identifier, folderName) => {
       `${folderName}/reducer.js`,
       writeReducer(buf, allCases),
       () => {
-        console.log('Reducer written!'.white);
+        console.log('Reducer written!');
       },
     );
   });
@@ -73,7 +73,7 @@ const ajax = (identifier, folderName) => {
       `${folderName}/saga.js`,
       writeSaga(buf, allCases),
       () => {
-        console.log('Saga written!'.white);
+        console.log('Saga written!');
       },
     );
   });
