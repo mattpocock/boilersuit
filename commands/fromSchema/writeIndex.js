@@ -8,6 +8,7 @@ const {
 } = require('../../tools/utils');
 
 module.exports = ({ buffer, cases, initialState, actions }) => {
+  if (!actions || !initialState) return buffer;
   const hasPropFiltering = Object.values(actions).filter(actionValues =>
     Object.keys(actionValues).includes('passAsProp'),
   ).length;

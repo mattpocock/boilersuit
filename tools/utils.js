@@ -22,8 +22,12 @@ const isCapital = string => string === string.toUpperCase();
 const parseCamelCaseToArray = string =>
   string.replace(/([A-Z])/g, letter => ` ${letter}`).split(' ');
 
-const printObject = object =>
-  JSON.stringify(object, null, 2).replace(/"(\w+)"\s*:/g, '$1:');
+const printObject = object => {
+  const newObject = JSON.stringify(object, null, 2)
+    .replace(/"(\w+)"\s*:/g, '$1:')
+    .replace(/"/g, "'");
+  return newObject.slice(0, -2) + ',' + newObject.slice(-2);
+};
 
 const cleanFile = buffer => {
   let newBuffer = buffer;
@@ -49,7 +53,7 @@ const ensureImport = (
 ) => buffer => {
   /** Checks if already loaded */
   const isImported =
-    buffer.lastIndexOf(property, buffer.lastIndexOf(' from ')) !== -1;
+    buffer.slice(0, buffer.lastIndexOf(' from ')).indexOf(`${property}`) !== -1;
   if (isImported) {
     return buffer;
   }
@@ -63,7 +67,7 @@ const ensureImport = (
       buffer.slice(0, firstImportLineIndex),
       `import ${
         destructure ? `{ ${property} }` : property
-      } from './${fileName}'; // @suit-line`,
+      } from '${fileName}'; // @suit-line`,
       buffer.slice(firstImportLineIndex),
     ]);
   }

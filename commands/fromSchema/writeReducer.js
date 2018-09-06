@@ -15,13 +15,23 @@ module.exports = ({
   cases: { pascal, camel, display },
   initialState,
   actions,
-}) => {
-  const newBuffer = transforms(buffer, [
+}) =>
+  transforms(buffer, [
     ensureImport('fromJS', 'immutable', { destructure: true }),
     /** Adds in boilerplate if domain does not exist */
     b => {
       const index = b.lastIndexOf('export default');
-      console.log(`Writing ${display} Reducer!`);
+      let hasPayload;
+      if (actions) {
+        hasPayload = Object.values(actions).filter(({ set }) => {
+          if (!set) return false;
+          return (
+            Object.values(set).filter(val => `${val}`.includes('payload'))
+              .length > 0
+          );
+        }).length;
+      }
+
       return concat([
         b.slice(0, index),
         `// @suit-start`,
@@ -29,7 +39,9 @@ module.exports = ({
         ``,
         `const initial${pascal}State = fromJS(${printObject(initialState)});`,
         ``,
-        `export const ${camel}Reducer = (state = initial${pascal}State, { type, payload }) => {`,
+        `export const ${camel}Reducer = (state = initial${pascal}State, { type${
+          hasPayload ? ', payload' : ''
+        } }) => {`,
         `  switch (type) {`,
         `    default:`,
         `      return state;`,
@@ -43,6 +55,14 @@ module.exports = ({
     /** Adds to combineReducers */
     b => {
       const searchTerm = 'combineReducers({';
+
+      if (b.indexOf(searchTerm) === -1) {
+        console.log(
+          `ERROR`.red + `: refactor to use combineReducers in reducer.js`,
+        );
+        return b;
+      }
+
       const index = b.indexOf(searchTerm) + searchTerm.length;
       return (
         concat([
@@ -51,6 +71,7 @@ module.exports = ({
         ]) + b.slice(index)
       );
     },
+    ensureImport('combineReducers', 'redux', { destructure: true }),
     /** Adds actions */
     b => {
       if (!actions) {
@@ -96,6 +117,3 @@ module.exports = ({
     },
     prettify,
   ]);
-
-  return newBuffer;
-};

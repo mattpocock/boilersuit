@@ -15,8 +15,9 @@ module.exports = ({ buffer, cases, initialState, folder }) => {
     .filter(x => x !== '')[0];
   const mainSelector = concat([
     `export const makeSelect${cases.pascal} = () =>`,
-    `  createSelector(select${capitalize(domainName)}Domain, (substate) => `,
-    `    fromJS(substate.${cases.camel}));`,
+    `  createSelector(select${capitalize(domainName)}Domain, (substate) =>`,
+    `    fromJS(substate.${cases.camel}),`,
+    `  );`,
   ]);
 
   return transforms(buffer, [
@@ -30,6 +31,7 @@ module.exports = ({ buffer, cases, initialState, folder }) => {
         `/** ${cases.display} Selectors */`,
         ``,
         mainSelector,
+        !Object.keys(initialState).length ? '// @suit-end' : undefined,
       ]),
     /** Adds each field */
     ...Object.keys(initialState)
@@ -46,7 +48,7 @@ module.exports = ({ buffer, cases, initialState, folder }) => {
           ``,
           `export const makeSelect${cases.pascal}${fieldCases.pascal} = () =>`,
           `  createSelector(makeSelect${cases.pascal}, (substate) =>`,
-          `    substate.get('${fieldCases.camel}')`,
+          `    substate.get('${fieldCases.camel}'),`,
           `  );`,
         ]);
         if (i === 0) {

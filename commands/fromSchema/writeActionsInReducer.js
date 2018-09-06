@@ -15,7 +15,7 @@ module.exports = ({ action }) => {
         /* eslint-disable no-param-reassign */
         value = `'${value}'`;
       }
-      return `        .set(${key}, ${value})`;
+      return `        .set('${key}', ${value})`;
     }),
   ]) + ';';
 };

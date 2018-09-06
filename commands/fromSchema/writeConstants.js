@@ -24,7 +24,7 @@ module.exports = ({ buffer, cases, actions, folder }) =>
         let content = '';
         content += concat([
           ``,
-          `export const ${actionCases.constant} = `,
+          `export const ${actionCases.constant} =`,
           `  '${folder}${actionCases.constant}';`,
         ]);
         if (i === 0) {
