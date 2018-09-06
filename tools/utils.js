@@ -1,7 +1,6 @@
 const concat = array => array.join(`\n`);
 
-const capitalize = string =>
-  string.charAt(0).toUpperCase() + string.slice(1);
+const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
 const fixFolderName = string => {
   if (string.charAt(string.length - 1) !== '/') {
@@ -59,24 +58,14 @@ const ensureImport = (
 
   /** If no imports from fileName, add it and the filename */
   if (!hasImportsFromFileName) {
-    console.log('buffer', buffer);
-    const firstImportLineIndex = buffer
-      .split('\n')
-      .findIndex(line => line.includes('import'));
-    return buffer
-      .split('\n')
-      .splice(
-        firstImportLineIndex,
-        0,
-        concat([
-          `// @suit-start`,
-          `import ${
-            destructure ? `{ ${property} }` : property
-          } from './${fileName}';`,
-          `// @suit-end`,
-        ]),
-      )
-      .join('\n');
+    const firstImportLineIndex = buffer.indexOf('import');
+    return concat([
+      buffer.slice(0, firstImportLineIndex),
+      `import ${
+        destructure ? `{ ${property} }` : property
+      } from './${fileName}'; // @suit-line`,
+      buffer.slice(firstImportLineIndex),
+    ]);
   }
   /**
    * Now we know that we have imports from the filename,

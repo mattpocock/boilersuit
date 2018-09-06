@@ -8,7 +8,7 @@ const addDomain = require('./commands/domain/addDomain');
 const addField = require('./commands/domain/addField');
 const fromSchema = require('./commands/fromSchema');
 
-program.version('0.0.7');
+program.version('0.1.0');
 
 program
   .command('ajax <file> <name>')
