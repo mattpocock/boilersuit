@@ -3,7 +3,7 @@ const fs = require('fs');
 const Cases = require('../../tools/cases');
 // const writeIndex = require('./writeIndex');
 // const writeSelectors = require('./writeSelectors');
-// const writeActions = require('./writeActions');
+const writeActions = require('./writeActions');
 // const writeConstants = require('./writeConstants');
 const writeReducer = require('./writeReducer');
 // const writeSaga = require('./writeSaga');
@@ -25,34 +25,61 @@ const fromSchema = schemaFile => {
     console.log(e);
   }
   if (!schema) return;
-  /** Turns the schema into an array of domains */
 
+  const arrayOfDomains = Object.keys(schema).map(key => ({
+    ...schema[key],
+    domainName: key,
+  }));
+
+  /** Write Reducers */
   const reducersFile = `${folder}/reducer.js`;
-  const buffer = cleanFile(fs.readFileSync(reducersFile).toString());
-  const newBuffer = transforms(buffer, [
-    ...Object.keys(schema)
-      .map(key => ({ ...schema[key], domainName: key }))
-      .map(({ domainName, initialState, actions }) => b => {
-        const cases = new Cases(parseCamelCaseToArray(domainName));
-        const allDomainCases = cases.all();
+  const reducerBuffer = cleanFile(fs.readFileSync(reducersFile).toString());
+  const newReducerBuffer = transforms(reducerBuffer, [
+    ...arrayOfDomains.map(({ domainName, initialState, actions }) => b => {
+      const cases = new Cases(parseCamelCaseToArray(domainName));
+      const allDomainCases = cases.all();
 
-        if (!initialState) {
-          console.log(
-            `No initialState specified for ${allDomainCases.display}!`.red,
-          );
-          return b;
-        }
+      if (!initialState) {
+        console.log(
+          `No initialState specified for ${allDomainCases.display}!`.red,
+        );
+        return b;
+      }
 
-        return writeReducer({
-          buffer: b,
-          cases: allDomainCases,
-          initialState,
-          actions,
-        });
-      }),
+      return writeReducer({
+        buffer: b,
+        cases: allDomainCases,
+        initialState,
+        actions,
+      });
+    }),
   ]);
 
-  fs.writeFileSync(reducersFile, newBuffer);
+  fs.writeFileSync(reducersFile, newReducerBuffer);
+
+  /** Write Actions */
+
+  const actionsBuffer = fs.readFileSync(`${folder}/actions.js`).toString();
+
+  const newActionsBuffer = transforms(actionsBuffer, [
+    cleanFile,
+    ...arrayOfDomains.map(({ domainName, actions }) => b => {
+      const cases = new Cases(parseCamelCaseToArray(domainName));
+      const allDomainCases = cases.all();
+      if (!actions) {
+        console.log(`No actions specified for ${allDomainCases.display}`.red);
+        return b;
+      }
+
+      return writeActions({
+        buffer: b,
+        cases: allDomainCases,
+        actions,
+      });
+    }),
+  ]);
+
+  fs.writeFileSync(`${folder}/actions.js`, newActionsBuffer);
 
   // const cases = new Cases(identifier);
   // const allCases = cases.all();
@@ -71,17 +98,6 @@ const fromSchema = schemaFile => {
   //     writeSelectors(buf, allCases),
   //     () => {
   //       console.log('Selectors written!'.white);
-  //     },
-  //   );
-  // });
-
-  // /** Actions File */
-  // fs.readFile(`${folderName}/actions.js`, (_, buf) => {
-  //   fs.writeFile(
-  //     `${folderName}/actions.js`,
-  //     writeActions(buf, allCases),
-  //     () => {
-  //       console.log('Actions written!'.white);
   //     },
   //   );
   // });

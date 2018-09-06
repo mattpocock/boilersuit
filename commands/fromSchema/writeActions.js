@@ -1,41 +1,45 @@
-const Parser = require('../../tools/parser');
-const { concat } = require('../../tools/utils');
+const Cases = require('../../tools/cases');
+const {
+  concat,
+  transforms,
+  parseCamelCaseToArray,
+} = require('../../tools/utils');
 
-module.exports = (buf, { camel, constant, display }) => {
-  const buffer = buf.toString();
-  const parser = new Parser(buffer);
+module.exports = ({ buffer, cases, actions }) =>
+  transforms(buffer, [
+    /** Adds the domain */
+    b => concat([b, `// @suit-start`, ``, `/** ${cases.display} actions */`]),
+    ...Object.keys(actions)
+      .map(key => ({ name: key, ...actions[key] }))
+      .reverse()
+      .map(({ name, set }, i) => b => {
+        const c = new Cases(parseCamelCaseToArray(name));
+        const actionCases = c.all();
 
-  const stringToInsert = concat([
-    ``,
-    `/** ${display} */`,
-    ``,
-    `export const ${camel}Started = () => ({`,
-    `  type: ${constant}_STARTED,`,
-    `});`,
-    ``,
-    `export const ${camel}Failed = () => ({`,
-    `  type: ${constant}_FAILED,`,
-    `});`,
-    ``,
-    `export const ${camel}Succeeded = () => ({`,
-    `  type: ${constant}_SUCCEEDED,`,
-    `});`,
-    ``,
+        const searchTerm = `/** ${cases.display} actions */`;
+        const index = b.indexOf(searchTerm) + searchTerm.length;
+
+        let content = '';
+        if (Object.values(set).includes('payload')) {
+          content += concat([
+            ``,
+            `export const ${actionCases.camel} = (payload) => ({`,
+            `  type: ${actionCases.constant},`,
+            `  payload,`,
+            `});`,
+          ]);
+        } else {
+          content += concat([
+            ``,
+            `export const ${actionCases.camel} = () => ({`,
+            `  type: ${actionCases.constant},`,
+            `});`,
+          ]);
+        }
+        if (i === 0) {
+          content += '\n\n// @suit-end';
+        }
+
+        return concat([b.slice(0, index), content, b.slice(index)]);
+      }),
   ]);
-
-  const { index: importsIndex, prefix, suffix } = parser.getImportIndex(
-    './constants',
-  );
-  const importsToInsert = concat([
-    `${prefix || ''}${constant}_STARTED,`,
-    `  ${constant}_SUCCEEDED,`,
-    `  ${constant}_FAILED${suffix || ''}`,
-  ]);
-
-  return (
-    buffer.slice(0, importsIndex) +
-    importsToInsert +
-    buffer.slice(importsIndex) +
-    stringToInsert
-  );
-};

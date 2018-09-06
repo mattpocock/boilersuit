@@ -4,9 +4,16 @@
       "isLoading": false,
       "hasCompleted": true,
       "data": []
+    },
+    "actions": {
+      "getActionsStarted": {
+        "set": {
+          "isLoading": false
+        }
+      }
     }
   },
-  "getPosts": {
+  "getFields": {
     "initialState": {
       "isLoading": false,
       "hasCompleted": true,
@@ -14,8 +21,14 @@
       "errorMessage": ""
     },
     "actions": {
-      "getPostsStarted": {
-        "set": { "isLoading": true, "data": "payload" }
+      "getFieldsStarted": {
+        "set": { "isLoading": true }
+      },
+      "getFieldsFailed": {
+        "set": {
+          "isLoading": false,
+          "data": "payload"
+        }
       }
     }
   }
