@@ -1,7 +1,7 @@
 const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
 const Cases = require('../../tools/cases');
-// const writeIndex = require('./writeIndex');
+const writeIndex = require('./writeIndex');
 const writeSelectors = require('./writeSelectors');
 const writeActions = require('./writeActions');
 const writeConstants = require('./writeConstants');
@@ -132,6 +132,33 @@ const fromSchema = schemaFile => {
   ]);
 
   fs.writeFileSync(`${folder}/selectors.js`, newSelectorsBuffer);
+
+  /** Write Index */
+
+  const indexBuffer = fs.readFileSync(`${folder}/index.js`).toString();
+
+  const newIndexBuffer = transforms(indexBuffer, [
+    cleanFile,
+    ...arrayOfDomains.map(({ domainName, actions, initialState }) => b => {
+      const cases = new Cases(parseCamelCaseToArray(domainName));
+      const allDomainCases = cases.all();
+      if (!initialState) {
+        // They will have been warned already, so can fail silently
+        return b;
+      }
+
+      return writeIndex({
+        buffer: b,
+        cases: allDomainCases,
+        initialState,
+        actions,
+      });
+    }),
+  ]);
+
+  fs.writeFileSync(`${folder}/index.js`, newIndexBuffer);
+  // console.log(newIndexBuffer);
+
   // console.log(newSelectorsBuffer);
 
   // const cases = new Cases(identifier);

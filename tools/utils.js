@@ -28,9 +28,10 @@ const printObject = object =>
 const cleanFile = buffer => {
   let newBuffer = buffer;
   while (newBuffer.indexOf('// @suit-start') !== -1) {
-    const startIndex = newBuffer.indexOf('\n// @suit-start');
+    const startIndex =
+      newBuffer.lastIndexOf('\n', newBuffer.indexOf('// @suit-start')) + 1;
     const endIndex =
-      newBuffer.indexOf('\n// @suit-end', startIndex) + '// @ suit-end'.length;
+      newBuffer.indexOf('// @suit-end', startIndex) + '// @ suit-end'.length;
     newBuffer = newBuffer.slice(0, startIndex) + newBuffer.slice(endIndex);
   }
   newBuffer = newBuffer
@@ -105,7 +106,9 @@ const removeWhiteSpace = buffer => {
 const removeSuitDoubling = buffer =>
   buffer
     .replace(concat([`// @suit-end`, ``, `// @suit-start`]), '')
-    .replace(concat([`// @suit-end`, `// @suit-start`]), '');
+    .replace(concat([`// @suit-end`, `// @suit-start`]), '')
+    .replace(concat([`    // @suit-end`, `    // @suit-start`, '']), '')
+    .replace(concat([`  // @suit-end`, `  // @suit-start`, '']), '');
 
 const prettify = buffer =>
   transforms(buffer, [removeWhiteSpace, removeSuitDoubling, removeWhiteSpace]);

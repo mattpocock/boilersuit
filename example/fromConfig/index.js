@@ -26,6 +26,13 @@ import {
   makeSelectRoutesHasSucceeded,
   makeSelectRoutesErrorMessage,
   makeSelectRoutesList,
+  makeSelectGetActionsIsLoading, // @suit-line
+  makeSelectGetActionsHasCompleted, // @suit-line
+  makeSelectGetActionsData, // @suit-line
+  makeSelectGetFieldsIsLoading, // @suit-line
+  makeSelectGetFieldsHasCompleted, // @suit-line
+  makeSelectGetFieldsData, // @suit-line
+  makeSelectGetFieldsErrorMessage, // @suit-line
 } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
@@ -34,6 +41,8 @@ import {
   getAssessmentsStarted,
   applyFilter,
   getRoutesStarted,
+  getActionsStarted, // @suit-line
+  getFieldsFailed, // @suit-line
 } from './actions';
 
 export class AdminManageAssessments extends React.Component {
@@ -89,6 +98,15 @@ AdminManageAssessments.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
+  // @suit-start
+  getFieldsIsLoading: makeSelectGetFieldsIsLoading(),
+  getFieldsHasCompleted: makeSelectGetFieldsHasCompleted(),
+  getFieldsData: makeSelectGetFieldsData(),
+  getFieldsErrorMessage: makeSelectGetFieldsErrorMessage(),
+  getActionsIsLoading: makeSelectGetActionsIsLoading(),
+  getActionsHasCompleted: makeSelectGetActionsHasCompleted(),
+  getActionsData: makeSelectGetActionsData(),
+  // @suit-end
   /** Filters */
   filters: makeSelectFilters(),
   /** Assessments */
@@ -107,6 +125,10 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
+    // @suit-start
+    submitGetFieldsFailed: (payload) => dispatch(getFieldsFailed(payload)),
+    submitGetActionsStarted: () => dispatch(getActionsStarted()),
+    // @suit-end
     getAssessments: () => dispatch(getAssessmentsStarted()),
     applyFilter: code => dispatch(applyFilter(code)),
     getRoutes: () => dispatch(getRoutesStarted()),

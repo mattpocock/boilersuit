@@ -44,7 +44,7 @@ module.exports = ({ buffer, cases, initialState, folder }) => {
         let content = '';
         content += concat([
           ``,
-          `export const makeSelect${fieldCases.pascal} = () =>`,
+          `export const makeSelect${cases.pascal}${fieldCases.pascal} = () =>`,
           `  createSelector(makeSelect${cases.pascal}, (substate) =>`,
           `    substate.get('${fieldCases.camel}')`,
           `  );`,

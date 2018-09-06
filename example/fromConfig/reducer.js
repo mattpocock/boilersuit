@@ -14,6 +14,9 @@ import {
   GET_ROUTES_STARTED,
   GET_ROUTES_FAILED,
   GET_ROUTES_SUCCEEDED,
+  GET_ACTIONS_STARTED, // @suit-line
+  GET_FIELDS_STARTED, // @suit-line
+  GET_FIELDS_FAILED, // @suit-line
 } from './constants';
 
 const initialAssessmentsState = fromJS({
@@ -87,7 +90,52 @@ export const routesReducer = (state = initialRoutesState, action) => {
   }
 }; 
 
+// @suit-start
+/** Get Actions Reducer */
+
+const initialGetActionsState = fromJS({
+  isLoading: false,
+  hasCompleted: true,
+  data: []
+});
+
+export const getActionsReducer = (state = initialGetActionsState, { type, payload }) => {
+  switch (type) {
+    case GET_ACTIONS_STARTED:
+      return state
+        .set(isLoading, false);
+    default:
+      return state;
+  }
+};
+
+/** Get Fields Reducer */
+
+const initialGetFieldsState = fromJS({
+  isLoading: false,
+  hasCompleted: true,
+  data: [],
+  errorMessage: ""
+});
+
+export const getFieldsReducer = (state = initialGetFieldsState, { type, payload }) => {
+  switch (type) {
+    case GET_FIELDS_STARTED:
+      return state
+        .set(isLoading, true);
+    case GET_FIELDS_FAILED:
+      return state
+        .set(isLoading, false)
+        .set(data, payload);
+    default:
+      return state;
+  }
+};
+// @suit-end
+
 export default combineReducers({
+  getFields: getFieldsReducer, // @suit-line
+  getActions: getActionsReducer, // @suit-line
   filters: filtersReducer,
   assessments: assessmentsReducer,
   routes: routesReducer,

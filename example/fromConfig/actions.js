@@ -12,6 +12,9 @@ import {
   GET_ROUTES_STARTED,
   GET_ROUTES_SUCCEEDED,
   GET_ROUTES_FAILED,
+  GET_ACTIONS_STARTED, // @suit-line
+  GET_FIELDS_FAILED, // @suit-line
+  GET_FIELDS_STARTED, // @suit-line
 } from './constants';
 
 /** Get Assessments */
@@ -52,3 +55,24 @@ export const getRoutesSucceeded = assessments => ({
   type: GET_ROUTES_SUCCEEDED,
   payload: assessments,
 });
+
+// @suit-start
+
+/** Get Actions actions */
+
+export const getActionsStarted = () => ({
+  type: GET_ACTIONS_STARTED,
+});
+
+/** Get Fields actions */
+
+export const getFieldsStarted = () => ({
+  type: GET_FIELDS_STARTED,
+});
+
+export const getFieldsFailed = (payload) => ({
+  type: GET_FIELDS_FAILED,
+  payload,
+});
+
+// @suit-end

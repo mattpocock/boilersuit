@@ -9,6 +9,7 @@
     "arrow-parens": "off",
     "prefer-template": "off",
     "implicit-arrow-linebreak": "off",
-    "object-curly-newline": "off"
+    "object-curly-newline": "off",
+    "function-paren-newline": "off"
   }
 }

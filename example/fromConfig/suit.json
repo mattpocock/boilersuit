@@ -22,9 +22,11 @@
     },
     "actions": {
       "getFieldsStarted": {
+        "passAsProp": false,
         "set": { "isLoading": true }
       },
       "getFieldsFailed": {
+        "passAsProp": true,
         "set": {
           "isLoading": false,
           "data": "payload"
