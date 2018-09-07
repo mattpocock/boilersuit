@@ -15,7 +15,7 @@ module.exports = ({ buffer, cases, actions }) =>
     ...Object.keys(actions)
       .map(key => ({ name: key, ...actions[key] }))
       .reverse()
-      .map(({ name, set }, i) => b => {
+      .map(({ name, set, payload: hasPayload }, i) => b => {
         const c = new Cases(parseCamelCaseToArray(name));
         const actionCases = c.all();
         /** Ensures the imports of the constants */
@@ -27,7 +27,7 @@ module.exports = ({ buffer, cases, actions }) =>
         const index = newBuffer.indexOf(searchTerm) + searchTerm.length;
 
         let content = '';
-        if (Object.values(set).includes('payload')) {
+        if (Object.values(set).includes('payload') || hasPayload) {
           content += concat([
             ``,
             `export const ${actionCases.camel} = (payload) => ({`,

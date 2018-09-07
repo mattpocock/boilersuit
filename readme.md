@@ -30,6 +30,7 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
     },
     "actions": {
       "getFieldsStarted": {
+        "payload": true,
         "passAsProp": true,
         "set": { "isLoading": true }
       },
@@ -52,3 +53,29 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
   }
 }
 ```
+
+## Suit Files
+
+### initialState
+
+This is an object which defines the initial data structure of the reducer's state.
+
+### actions
+
+#### set
+
+`type: object`
+
+Defines how you want the data to be changed after the action is run.
+
+#### payload
+
+`type: bool`
+
+Whether or not you want the action to carry a payload.
+
+#### passAsProp
+
+`type: bool`
+
+Whether or not you want to pass this action to the container component as a dispatch.

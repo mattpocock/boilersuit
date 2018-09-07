@@ -88,7 +88,7 @@ module.exports = ({ buffer, cases, initialState, actions }) => {
               if (actions[key].set) {
                 const hasPayload = Object.values(actions[key].set).filter(
                   value => `${value}`.includes('payload'),
-                ).length;
+                ).length || actions[key].payload;
                 if (hasPayload) {
                   return `    submit${
                     actionCases.pascal
