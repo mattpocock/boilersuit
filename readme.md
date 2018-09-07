@@ -8,54 +8,45 @@ Run `npm i -g`
 
 ## How To Run It
 
-Once it's installed, the syntax is:
+Once it's installed, go into the folder of a container and add a `suit.json` file.
 
-`suit ajax path/to/folder "Do Action"`
+This file acts as the manifest for boilersuit to make changes. Copy the one below if you fancy it.
 
-For instance, this could be:
+Once it's set up, run `suit up` in the root directory of your project. It will watch for changes in any suit.json file and reflect those changes in the surrounding container.
 
-`suit ajax app/containers/HomePage "Get Tweets"`
+```json
+// suit.json
 
-And you'd get reducers/actions/constants/selectors for an ajax call for 'Get Tweets'.
-
-Try it out! Though make sure you commit before you do.
-
-## Commands
-
-We now have four commands.
-
-### Ajax
-
-Creates all the fields necessary for an ajax call.
-
-Usage: `suit ajax app/containers/HomePage "Get Tweets"`
-
-### Single
-
-Creates a single field, useful for controlling form inputs or a single piece of state.
-
-Usage: `suit single app/containers/HomePage "Show Tooltip"`
-
-### Domain
-
-Creates a new reducer, which we're calling a 'domain' for now. Using this and the next command, you can create custom reducers with custom fields.
-
-Usage: `suit domain <directory> <domain>`
-
-Example: `suit domain app/containers/HomePage "Homepage Config"`
-
-### Field
-
-Creates a new field within a domain that's already been created. Links it to the container in mapStateToProps.
-
-Usage: `suit field <domain> <directory> <field>`
-
-Example: `suit field "Homepage Config" app/containers/HomePage "data"`
-
-## Notes
-
-Things to do:
-
-Finish the parser in the tools file and write tests
-
-Consider more use cases - what else do you use Redux for? Managing on and off states, getting and setting values... Lots more than just 'ajax' to consider.
+{
+  "getFields": {
+    "initialState": {
+      "isLoading": false,
+      "hasSucceeded": true,
+      "data": [],
+      "errorMessage": "",
+      "hasError": false
+    },
+    "actions": {
+      "getFieldsStarted": {
+        "passAsProp": true,
+        "set": { "isLoading": true }
+      },
+      "getFieldsFailed": {
+        "set": {
+          "isLoading": false,
+          "errorMessage": "payload",
+          "hasError": true
+        }
+      },
+      "getFieldsSucceeded": {
+        "set": {
+          "isLoading": false,
+          "hasError": false,
+          "hasSucceded": true,
+          "data": "payload"
+        }
+      }
+    }
+  }
+}
+```
