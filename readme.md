@@ -24,7 +24,7 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
     "initialState": {
       "isLoading": false,
       "hasSucceeded": true,
-      "data": [],
+      "data": null,
       "errorMessage": "",
       "hasError": false
     },
@@ -53,6 +53,16 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
   }
 }
 ```
+
+## Commands
+
+### Ajax
+
+Either generates or adds an ajax call to a suit.json.
+
+Usage: `suit ajax <folder> <name>`
+
+Example: `suit ajax app/containers/HomePage getPosts`
 
 ## Suit Files
 

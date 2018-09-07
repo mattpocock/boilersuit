@@ -3,6 +3,7 @@
 const program = require('commander');
 const gaze = require('gaze');
 const fromSchema = require('./commands/fromSchema');
+const ajax = require('./commands/ajax');
 
 program.version('0.1.3');
 
@@ -23,8 +24,8 @@ program.command('up').action(() => {
   });
 });
 
-program.command('ajax').action(() => {
-  console.log('The ajax command has been deprecated');
+program.command('ajax <folder> <name>').action((folder, name) => {
+  ajax(folder, name);
 });
 
 program.command('field').action(() => {
