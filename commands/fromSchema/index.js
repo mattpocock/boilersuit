@@ -10,6 +10,7 @@ const writeReducer = require('./writeReducer');
 const {
   parseCamelCaseToArray,
   cleanFile,
+  fixInlineImports,
   transforms,
   checkErrorsInSchema,
 } = require('../../tools/utils');
@@ -73,6 +74,7 @@ const fromSchema = schemaFile => {
 
   const newActionsBuffer = transforms(actionsBuffer, [
     cleanFile,
+    fixInlineImports,
     ...arrayOfDomains.map(({ domainName, actions }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
@@ -94,6 +96,7 @@ const fromSchema = schemaFile => {
 
   const newConstantsBuffer = transforms(constantsBuffer, [
     cleanFile,
+    fixInlineImports,
     ...arrayOfDomains.map(({ domainName, actions }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
@@ -120,6 +123,7 @@ const fromSchema = schemaFile => {
 
   const newSelectorsBuffer = transforms(selectorsBuffer, [
     cleanFile,
+    fixInlineImports,
     ...arrayOfDomains.map(({ domainName, initialState }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
@@ -146,6 +150,7 @@ const fromSchema = schemaFile => {
 
   const newIndexBuffer = transforms(indexBuffer, [
     cleanFile,
+    fixInlineImports,
     ...arrayOfDomains.map(({ domainName, actions, initialState }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
