@@ -62,12 +62,18 @@ const ensureImport = (
 
   /** If no imports from fileName, add it and the filename */
   if (!hasImportsFromFileName) {
-    const firstImportLineIndex = buffer.indexOf('import');
+    const firstImportLineIndex = buffer.lastIndexOf('import');
+    if (destructure) {
+      return buffer.slice(0, firstImportLineIndex) + concat([
+        `import {`,
+        `  ${property}, // @suit-line`,
+        `} from '${fileName}';`,
+        buffer.slice(firstImportLineIndex),
+      ]);
+    }
     return concat([
       buffer.slice(0, firstImportLineIndex),
-      `import ${
-        destructure ? `{ ${property} }` : property
-      } from '${fileName}'; // @suit-line`,
+      `import ${property} from '${fileName}'; // @suit-line`,
       buffer.slice(firstImportLineIndex),
     ]);
   }
@@ -87,21 +93,12 @@ const ensureImport = (
         buffer.slice(index)
       );
     }
-    const isInline = buffer.indexOf(` } from '${fileName}';`) !== -1;
-    if (isInline) {
-      const index = buffer.indexOf(` } from '${fileName}';`);
-      return (
-        buffer.slice(0, index) +
-        `,\n  ${property}, // @suit-line\n` +
-        buffer.slice(index)
-      );
-    }
     const index = buffer.indexOf(` from '${fileName}';`);
-    return buffer.slice(0, index) + concat([
-      `, {`,
-      `  ${property},`,
-      `}`,
-    ]) + buffer.slice(index);
+    return (
+      buffer.slice(0, index) +
+      concat([`, {`, `  ${property}, // @suit-line`, `}`]) +
+      buffer.slice(index)
+    );
   }
 
   /**

@@ -45,6 +45,8 @@ const fromSchema = schemaFile => {
   const reducersFile = `${folder}/reducer.js`;
   const reducerBuffer = cleanFile(fs.readFileSync(reducersFile).toString());
   const newReducerBuffer = transforms(reducerBuffer, [
+    cleanFile,
+    fixInlineImports,
     ...arrayOfDomains.map(({ domainName, initialState, actions }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
