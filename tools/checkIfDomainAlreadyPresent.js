@@ -8,30 +8,44 @@ module.exports = (folder, cases, actions) => {
   );
   const errors = [];
   const hasDuplicateReducer =
-    cleanFile(fs.readFileSync(`${folder}/reducer.js`)).indexOf(
+    cleanFile(fs.readFileSync(`${folder}/reducer.js`).toString()).indexOf(
       `${cases.camel}Reducer = `,
     ) !== -1;
 
-  const constantFile = cleanFile(fs.readFileSync(`${folder}/constants.js`));
+  const constantFile = cleanFile(
+    fs.readFileSync(`${folder}/constants.js`).toString(),
+  );
 
   const hasDuplicateConstants = arrayOfActionCases.filter(
     ({ constant }) => constantFile.indexOf(constant) !== -1,
   );
 
-  const actionsFile = cleanFile(fs.readFileSync(`${folder}/actions.js`));
+  const actionsFile = cleanFile(
+    fs.readFileSync(`${folder}/actions.js`).toString(),
+  );
 
   const hasDuplicateActions = arrayOfActionCases.filter(
     ({ camel }) => actionsFile.indexOf(camel) !== -1,
   );
 
   if (hasDuplicateReducer) {
-    errors.push(`Duplicate domain: ${cases.display} already present in reducer.`);
+    errors.push(
+      `Duplicate domain: ${cases.display} already present in reducer.`,
+    );
   }
   if (hasDuplicateConstants.length) {
-    errors.push(`Duplicate constant: ${hasDuplicateConstants[0].constant} already present in constants.`);
+    errors.push(
+      `Duplicate constant: ${
+        hasDuplicateConstants[0].constant
+      } already present in constants.`,
+    );
   }
   if (hasDuplicateActions.length) {
-    errors.push(`Duplicate action: ${hasDuplicateActions[0].camel} already present in actions.`);
+    errors.push(
+      `Duplicate action: ${
+        hasDuplicateActions[0].camel
+      } already present in actions.`,
+    );
   }
   return errors;
 };

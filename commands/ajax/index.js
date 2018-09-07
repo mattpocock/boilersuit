@@ -13,7 +13,7 @@ module.exports = (folder, camelCase) => {
   let buffer = concat(['{', '}']);
   let includeComma = false;
   if (fs.existsSync(`${fixedFolder}suit.json`)) {
-    buffer = fs.readFileSync(`${fixedFolder}suit.json`);
+    buffer = fs.readFileSync(`${fixedFolder}suit.json`).toString();
     includeComma = true;
   }
   console.log(`${folder}`.yellow);

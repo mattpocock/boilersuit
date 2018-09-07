@@ -4,7 +4,7 @@ const { concat } = require('./utils');
 module.exports = (folder) => {
   const errors = [];
   const noCombineReducers =
-    fs.readFileSync(`${folder}/reducer.js`).indexOf('combineReducers({') === -1;
+    fs.readFileSync(`${folder}/reducer.js`).toString().indexOf('combineReducers({') === -1;
   if (noCombineReducers) {
     errors.push(
       concat([

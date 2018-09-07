@@ -18,7 +18,7 @@ const {
 } = require('../../tools/utils');
 
 const fromSchema = schemaFile => {
-  const schemaBuf = fs.readFileSync(schemaFile);
+  const schemaBuf = fs.readFileSync(schemaFile).toString();
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile.slice(0, -9);
 
@@ -46,26 +46,24 @@ const fromSchema = schemaFile => {
   /** Write Reducers */
   const reducersFile = `${folder}/reducer.js`;
   const reducerBuffer = cleanFile(fs.readFileSync(reducersFile).toString());
-  const { newReducerBuffer, domainErrors } = transforms(reducerBuffer, [
+  let domainErrors = [];
+  const newReducerBuffer = transforms(reducerBuffer, [
     cleanFile,
     fixInlineImports,
     ...arrayOfDomains.map(({ domainName, initialState, actions }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
+      domainErrors = [
+        ...domainErrors,
+        ...checkIfDomainAlreadyPresent(folder, allDomainCases, actions),
+      ];
 
-      return {
-        newReducerBuffer: writeReducer({
-          buffer: b,
-          cases: allDomainCases,
-          initialState,
-          actions,
-        }),
-        domainErrors: checkIfDomainAlreadyPresent(
-          folder,
-          allDomainCases,
-          actions,
-        ),
-      };
+      return writeReducer({
+        buffer: b,
+        cases: allDomainCases,
+        initialState,
+        actions,
+      });
     }),
   ]);
 
