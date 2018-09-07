@@ -6,11 +6,12 @@ const writeSelectors = require('./writeSelectors');
 const writeActions = require('./writeActions');
 const writeConstants = require('./writeConstants');
 const writeReducer = require('./writeReducer');
+const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
+const checkIfDomainAlreadyPresent = require('../../tools/checkIfDomainAlreadyPresent');
 // const writeSaga = require('./writeSaga');
 const {
   parseCamelCaseToArray,
   cleanFile,
-  concat,
   fixInlineImports,
   transforms,
   checkErrorsInSchema,
@@ -31,45 +32,7 @@ const fromSchema = schemaFile => {
   }
   if (!schema) return;
 
-  const errors = checkErrorsInSchema(schema);
-
-  const noCombineReducers =
-    fs.readFileSync(`${folder}/reducer.js`).indexOf('combineReducers({') === -1;
-  if (noCombineReducers) {
-    errors.push(
-      concat([
-        `No 'combineReducers({' in './reducer.js'`,
-        `- Consider a refactor to combine the reducers, such as:`,
-        `| `,
-        `| import { combineReducers } from 'redux';`,
-        `| `,
-        `| const getTweetsReducer = (state, action) => { ... }`,
-        `| `,
-        `| export default combineReducers({`,
-        `|   getTweets: getTweetsReducer,`,
-        `| });`,
-      ]),
-    );
-  }
-
-  const noCreateStructuredSelector =
-    fs
-      .readFileSync(`${folder}/index.js`)
-      .indexOf('createStructuredSelector({') === -1;
-  if (noCreateStructuredSelector) {
-    errors.push(
-      concat([
-        `No 'createStructuredSelector({' in './index.js'`,
-        `- Consider a refactor in mapStateToProps to use createStructuredSelector.`,
-        `| import { createStructuredSelector } from 'reselect';`,
-        `| import { makeSelectGetTweetsIsLoading } from './selectors';`,
-        `| `,
-        `| const mapStateToProps = createStructuredSelector({`,
-        `|   getTweetsIsLoading: makeSelectGetTweetsIsLoading(),`,
-        `| });`,
-      ]),
-    );
-  }
+  const errors = [...checkErrorsInSchema(schema), ...checkIfBadBuffer(folder)];
 
   if (errors.length) {
     errors.forEach(error => console.log('ERROR: '.red + error));
@@ -83,21 +46,33 @@ const fromSchema = schemaFile => {
   /** Write Reducers */
   const reducersFile = `${folder}/reducer.js`;
   const reducerBuffer = cleanFile(fs.readFileSync(reducersFile).toString());
-  const newReducerBuffer = transforms(reducerBuffer, [
+  const { newReducerBuffer, domainErrors } = transforms(reducerBuffer, [
     cleanFile,
     fixInlineImports,
     ...arrayOfDomains.map(({ domainName, initialState, actions }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
 
-      return writeReducer({
-        buffer: b,
-        cases: allDomainCases,
-        initialState,
-        actions,
-      });
+      return {
+        newReducerBuffer: writeReducer({
+          buffer: b,
+          cases: allDomainCases,
+          initialState,
+          actions,
+        }),
+        domainErrors: checkIfDomainAlreadyPresent(
+          folder,
+          allDomainCases,
+          actions,
+        ),
+      };
     }),
   ]);
+
+  if (domainErrors.length) {
+    domainErrors.forEach(error => console.log('ERROR: '.red + error));
+    return;
+  }
 
   console.log(' - writing reducers');
   fs.writeFileSync(reducersFile, newReducerBuffer);
