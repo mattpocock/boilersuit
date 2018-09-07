@@ -44,7 +44,7 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
         "set": {
           "isLoading": false,
           "hasError": false,
-          "hasSucceded": true,
+          "hasSucceeded": true,
           "data": "payload"
         }
       }
