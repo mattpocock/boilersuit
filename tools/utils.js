@@ -88,7 +88,11 @@ const ensureImport = (
       );
     }
     const index = buffer.indexOf(` } from '${fileName}';`);
-    return buffer.slice(0, index) + `,\n  ${property}, // @suit-line\n` + buffer.slice(index);
+    return (
+      buffer.slice(0, index) +
+      `,\n  ${property}, // @suit-line\n` +
+      buffer.slice(index)
+    );
   }
 
   /**
@@ -117,6 +121,56 @@ const removeSuitDoubling = buffer =>
 const prettify = buffer =>
   transforms(buffer, [removeWhiteSpace, removeSuitDoubling, removeWhiteSpace]);
 
+const checkErrorsInSchema = schema => {
+  const errors = [];
+  if (!Object.keys(schema).length) {
+    errors.push(
+      concat([
+        'No domains defined within suit.json.',
+        'Try this:',
+        '{',
+        '  "getTweets": {}',
+        '}',
+      ]),
+    );
+    return errors;
+  }
+  const domains = Object.keys(schema).map(key => ({ name: key, ...schema[key] }));
+  domains.forEach(domain => {
+    if (!domain.actions || !Object.keys(domain.actions).length) {
+      errors.push(concat([
+        `No actions defined on ${domain.name}`,
+        `Try this:`.green,
+        `{`,
+        `  "${domain.name}": {`,
+        `    "actions": {`,
+        `      "${domain.name}FirstAction: {`,
+        `        "set": {`,
+        `          "isFirstAction": true`,
+        `        }`,
+        `      }`,
+        `    }`,
+        `  }`,
+        `}`,
+      ]));
+    }
+    if (!domain.initialState || !Object.keys(domain.initialState).length) {
+      errors.push(concat([
+        `No initialState defined on ${domain.name}`,
+        `Try this:`.green,
+        `{`,
+        `  "${domain.name}": {`,
+        `    "initialState": {`,
+        `      "isLoading": true`,
+        `    }`,
+        `  }`,
+        `}`,
+      ]));
+    }
+  });
+  return errors;
+};
+
 module.exports = {
   concat,
   fixFolderName,
@@ -130,4 +184,5 @@ module.exports = {
   removeSuitDoubling,
   prettify,
   capitalize,
+  checkErrorsInSchema,
 };

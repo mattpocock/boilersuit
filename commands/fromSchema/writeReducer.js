@@ -77,7 +77,6 @@ module.exports = ({
       if (!actions) {
         return b;
       }
-      console.log(`Updating ${display} Actions in Reducer!`);
       const p = new Parser(b);
       p.resetTicker();
       p.toNext(`export const ${camel}Reducer =`);

@@ -11,6 +11,7 @@ const {
   parseCamelCaseToArray,
   cleanFile,
   transforms,
+  checkErrorsInSchema,
 } = require('../../tools/utils');
 
 const fromSchema = schemaFile => {
@@ -27,6 +28,12 @@ const fromSchema = schemaFile => {
     console.log(e);
   }
   if (!schema) return;
+
+  const errors = checkErrorsInSchema(schema);
+  if (errors.length) {
+    errors.forEach(error => console.log('ERROR: '.red + error));
+    return;
+  }
 
   const arrayOfDomains = Object.keys(schema).map(key => ({
     ...schema[key],
@@ -57,6 +64,7 @@ const fromSchema = schemaFile => {
     }),
   ]);
 
+  console.log(' - writing reducers');
   fs.writeFileSync(reducersFile, newReducerBuffer);
 
   /** Write Actions */
@@ -68,10 +76,6 @@ const fromSchema = schemaFile => {
     ...arrayOfDomains.map(({ domainName, actions }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
-      if (!actions) {
-        console.log(`No actions specified for ${allDomainCases.display}`.red);
-        return b;
-      }
 
       return writeActions({
         buffer: b,
@@ -81,6 +85,7 @@ const fromSchema = schemaFile => {
     }),
   ]);
 
+  console.log(' - writing actions');
   fs.writeFileSync(`${folder}/actions.js`, newActionsBuffer);
 
   /** Write Constants */
@@ -106,6 +111,7 @@ const fromSchema = schemaFile => {
     }),
   ]);
 
+  console.log(' - writing constants');
   fs.writeFileSync(`${folder}/constants.js`, newConstantsBuffer);
 
   /** Write Selectors */
@@ -131,6 +137,7 @@ const fromSchema = schemaFile => {
     }),
   ]);
 
+  console.log(' - writing selectors');
   fs.writeFileSync(`${folder}/selectors.js`, newSelectorsBuffer);
 
   /** Write Index */
@@ -156,60 +163,8 @@ const fromSchema = schemaFile => {
     }),
   ]);
 
+  console.log(' - writing index');
   fs.writeFileSync(`${folder}/index.js`, newIndexBuffer);
-  // console.log(newIndexBuffer);
-
-  // console.log(newSelectorsBuffer);
-
-  // const cases = new Cases(identifier);
-  // const allCases = cases.all();
-
-  // /** Index file */
-  // fs.readFile(`${folderName}/index.js`, (_, buf) => {
-  //   fs.writeFile(`${folderName}/index.js`, writeIndex(buf, allCases), () => {
-  //     console.log('Index written!');
-  //   });
-  // });
-
-  // /** Selectors File */
-  // fs.readFile(`${folderName}/selectors.js`, (_, buf) => {
-  //   fs.writeFile(
-  //     `${folderName}/selectors.js`,
-  //     writeSelectors(buf, allCases),
-  //     () => {
-  //       console.log('Selectors written!');
-  //     },
-  //   );
-  // });
-
-  // /** Constants File */
-  // fs.readFile(`${folderName}/constants.js`, (_, buf) => {
-  //   fs.writeFile(
-  //     `${folderName}/constants.js`,
-  //     writeConstants(buf, allCases, folderName),
-  //     () => {
-  //       console.log('Constants Written!');
-  //     },
-  //   );
-  // });
-
-  // /** Reducers File */
-  // fs.readFile(`${folderName}/reducer.js`, (_, buf) => {
-  //   fs.writeFile(
-  //     `${folderName}/reducer.js`,
-  //     writeReducer(buf, allCases),
-  //     () => {
-  //       console.log('Reducer written!');
-  //     },
-  //   );
-  // });
-
-  // /** Saga File */
-  // fs.readFile(`${folderName}/saga.js`, (_, buf) => {
-  //   fs.writeFile(`${folderName}/saga.js`, writeSaga(buf, allCases), () => {
-  //     console.log('Saga written!');
-  //   });
-  // });
 };
 
 module.exports = fromSchema;
