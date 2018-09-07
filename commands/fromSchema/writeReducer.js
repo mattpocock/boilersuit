@@ -8,6 +8,7 @@ const {
   printObject,
   prettify,
   ensureImport,
+  actionHasPayload,
 } = require('../../tools/utils');
 
 module.exports = ({
@@ -21,16 +22,7 @@ module.exports = ({
     /** Adds in boilerplate if domain does not exist */
     b => {
       const index = b.lastIndexOf('export default');
-      let hasPayload;
-      if (actions) {
-        hasPayload = Object.values(actions).filter(({ set }) => {
-          if (!set) return false;
-          return (
-            Object.values(set).filter(val => `${val}`.includes('payload'))
-              .length > 0
-          );
-        }).length;
-      }
+      const hasPayload = actionHasPayload(actions);
 
       return concat([
         b.slice(0, index),
@@ -55,14 +47,6 @@ module.exports = ({
     /** Adds to combineReducers */
     b => {
       const searchTerm = 'combineReducers({';
-
-      if (b.indexOf(searchTerm) === -1) {
-        console.log(
-          `ERROR`.red + `: refactor to use combineReducers in reducer.js`,
-        );
-        return b;
-      }
-
       const index = b.indexOf(searchTerm) + searchTerm.length;
       return (
         concat([

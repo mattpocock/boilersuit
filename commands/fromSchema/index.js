@@ -49,13 +49,6 @@ const fromSchema = schemaFile => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
 
-      if (!initialState) {
-        console.log(
-          `No initialState specified for ${allDomainCases.display}!`.red,
-        );
-        return b;
-      }
-
       return writeReducer({
         buffer: b,
         cases: allDomainCases,

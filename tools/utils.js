@@ -87,12 +87,21 @@ const ensureImport = (
         buffer.slice(index)
       );
     }
-    const index = buffer.indexOf(` } from '${fileName}';`);
-    return (
-      buffer.slice(0, index) +
-      `,\n  ${property}, // @suit-line\n` +
-      buffer.slice(index)
-    );
+    const isInline = buffer.indexOf(` } from '${fileName}';`) !== -1;
+    if (isInline) {
+      const index = buffer.indexOf(` } from '${fileName}';`);
+      return (
+        buffer.slice(0, index) +
+        `,\n  ${property}, // @suit-line\n` +
+        buffer.slice(index)
+      );
+    }
+    const index = buffer.indexOf(` from '${fileName}';`);
+    return buffer.slice(0, index) + concat([
+      `, {`,
+      `  ${property},`,
+      `}`,
+    ]) + buffer.slice(index);
   }
 
   /**
@@ -207,7 +216,8 @@ const fixInlineImports = buffer => {
     const startIndex = newBuffer.indexOf('import { ') + 'import {'.length;
     const endIndex = newBuffer.indexOf('} from', startIndex);
     const content = newBuffer
-      .slice(startIndex, endIndex).replace(/ /g, '')
+      .slice(startIndex, endIndex)
+      .replace(/ /g, '')
       .split(',')
       .map(line => `  ${line.replace('\n', '').replace(',', '')},`)
       .join('\n');
@@ -219,6 +229,14 @@ const fixInlineImports = buffer => {
   }
   return newBuffer;
 };
+
+const actionHasPayload = actions =>
+  Object.values(actions).filter(({ set }) => {
+    if (!set) return false;
+    return (
+      Object.values(set).filter(val => `${val}`.includes('payload')).length > 0
+    );
+  }).length > 0;
 
 module.exports = {
   concat,
@@ -235,4 +253,5 @@ module.exports = {
   capitalize,
   checkErrorsInSchema,
   fixInlineImports,
+  actionHasPayload,
 };
