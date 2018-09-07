@@ -23,4 +23,20 @@ program.command('up').action(() => {
   });
 });
 
+program.command('ajax').action(() => {
+  console.log('The ajax command has been deprecated');
+});
+
+program.command('field').action(() => {
+  console.log('The field command has been deprecated');
+});
+
+program.command('domain').action(() => {
+  console.log('The domain command has been deprecated');
+});
+
+program.command('single').action(() => {
+  console.log('The single command has been deprecated');
+});
+
 program.parse(process.argv);
