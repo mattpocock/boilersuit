@@ -12,6 +12,8 @@ Run `npm i -g`
 
 Once it's installed, go into the folder of a container and add a `suit.json` file.
 
+`suit.json` files always belong in the FOLDER OF THE CONTAINER YOU WANT TO SUIT UP - the same file as index.js, reducers.js, actions.js etc.
+
 This file acts as the manifest for boilersuit to make changes. Copy the one below if you fancy it.
 
 Once it's set up, run `suit up` in the root directory of your project. It will watch for changes in any suit.json file and reflect those changes in the surrounding container.
@@ -55,6 +57,12 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
 ```
 
 ## Commands
+
+### Up
+
+Run this command in the root directory of your project. This will recursively check for changes in any directory below it.
+
+Usage: `suit up`
 
 ### Ajax
 
