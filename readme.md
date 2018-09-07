@@ -14,6 +14,16 @@ Once it's installed, go into the folder of a container and add a `suit.json` fil
 
 `suit.json` files always belong in the FOLDER OF THE CONTAINER YOU WANT TO SUIT UP - alongside index.js, reducers.js, actions.js etc.
 
+```
+actions.js
+constants.js
+index.js
+reducer.js
+saga.js
+selectors.js
+suit.json
+```
+
 This file acts as the manifest for boilersuit to make changes. Copy the one below if you fancy it.
 
 Once it's set up, run `suit up` in the root directory of your project. It will watch for changes in any suit.json file and reflect those changes in the surrounding container.
