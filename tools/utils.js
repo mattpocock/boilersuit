@@ -182,19 +182,42 @@ const checkErrorsInSchema = schema => {
 
     arrayOfActions.forEach(action => {
       if (!action.set) {
-        errors.push(concat([
-          `${action.name} has no 'set' property defined. That means it won't do anything.`,
-          `Try this:`.green,
-          `${action.name}: {`,
-          `  "set": {`,
-          `    "isFirstAction": true`,
-          `  }`,
-          `}`,
-        ]));
+        errors.push(
+          concat([
+            `${
+              action.name
+            } has no 'set' property defined. That means it won't do anything.`,
+            `Try this:`.green,
+            `${action.name}: {`,
+            `  "set": {`,
+            `    "isFirstAction": true`,
+            `  }`,
+            `}`,
+          ]),
+        );
       }
     });
   });
   return errors;
+};
+
+const fixInlineImports = buffer => {
+  let newBuffer = buffer;
+  while (newBuffer.indexOf('import { ') !== -1) {
+    const startIndex = newBuffer.indexOf('import { ') + 'import {'.length;
+    const endIndex = newBuffer.indexOf('} from', startIndex);
+    const content = newBuffer
+      .slice(startIndex, endIndex).replace(/ /g, '')
+      .split(',')
+      .map(line => `  ${line.replace('\n', '').replace(',', '')},`)
+      .join('\n');
+    newBuffer = concat([
+      newBuffer.slice(0, startIndex),
+      content,
+      newBuffer.slice(endIndex),
+    ]);
+  }
+  return newBuffer;
 };
 
 module.exports = {
@@ -211,4 +234,5 @@ module.exports = {
   prettify,
   capitalize,
   checkErrorsInSchema,
+  fixInlineImports,
 };
