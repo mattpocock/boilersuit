@@ -78,6 +78,18 @@ Example: `suit ajax app/containers/HomePage getPosts`
 
 This is an object which defines the initial data structure of the reducer's state.
 
+```json
+{
+  "initialState": {
+    "isLoading": false,
+    "hasSucceeded": true,
+    "data": null,
+    "errorMessage": "",
+    "hasError": false
+  }
+}
+```
+
 ### actions
 
 #### set
@@ -86,14 +98,46 @@ This is an object which defines the initial data structure of the reducer's stat
 
 Defines how you want the data to be changed after the action is run.
 
+```json
+{
+  "actions": {
+    "getFieldsStarted": {
+      "set": { "isLoading": true }
+    }
+  }
+}
+```
+
 #### payload
 
 `type: bool`
 
 Whether or not you want the action to carry a payload.
 
+```json
+{
+  "actions": {
+    "getFieldsStarted": {
+      "payload": true,
+      "set": { "isLoading": true }
+    }
+  }
+}
+```
+
 #### passAsProp
 
 `type: bool`
 
 Whether or not you want to pass this action to the container component as a dispatch.
+
+```json
+{
+  "actions": {
+    "getFieldsStarted": {
+      "passAsProp": true,
+      "set": { "isLoading": true }
+    }
+  }
+}
+```
