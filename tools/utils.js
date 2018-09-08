@@ -1,4 +1,4 @@
-const concat = array => array.join(`\n`);
+const concat = array => array.filter(line => line !== null).join(`\n`);
 
 const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -25,8 +25,14 @@ const parseCamelCaseToArray = string =>
 const printObject = object => {
   const newObject = JSON.stringify(object, null, 2)
     .replace(/"(\w+)"\s*:/g, '$1:')
-    .replace(/"/g, "'");
-  return newObject.slice(0, -2) + ',' + newObject.slice(-2);
+    .replace(/"/g, "'")
+    .split('\n')
+    .map(line => {
+      const lastChar = line[line.length - 1];
+      return (line.length === 1 || lastChar === '{' || lastChar === ',') ? line : `${line},`;
+    })
+    .join(`\n`);
+  return newObject.slice(0, -2) + newObject.slice(-2);
 };
 
 const cleanFile = buffer => {

@@ -16,6 +16,7 @@ module.exports = ({
   cases: { pascal, camel, display },
   initialState,
   actions,
+  describe,
 }) =>
   transforms(buffer, [
     ensureImport('fromJS', 'immutable', { destructure: true }),
@@ -27,7 +28,10 @@ module.exports = ({
       return concat([
         b.slice(0, index),
         `// @suit-start`,
-        `/** ${display} Reducer */`,
+        `/**`,
+        ` * ${display} Reducer`,
+        describe ? ` * - ${describe}` : null,
+        ` */`,
         ``,
         `const initial${pascal}State = fromJS(${printObject(initialState)});`,
         ``,
@@ -78,7 +82,12 @@ module.exports = ({
             action,
           });
 
-          content += concat([`    case ${cases.constant}:`, operations, ``]);
+          content += concat([
+            action.describe ? `    // ${action.describe}` : null,
+            `    case ${cases.constant}:`,
+            operations,
+            ``,
+          ]);
         });
       return (
         concat([b.slice(0, startIndex), content]) + `    ` + b.slice(endIndex)

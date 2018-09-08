@@ -12,6 +12,7 @@ const checkIfNoAllSagas = require('../../tools/checkIfNoAllSagas');
 const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
 const printWarning = require('../../tools/printWarning');
 const checkErrorsInSchema = require('../../tools/checkErrorsInSchema');
+const checkWarningsInSchema = require('../../tools/checkWarningsInSchema');
 const checkIfDomainAlreadyPresent = require('../../tools/checkIfDomainAlreadyPresent');
 const {
   parseCamelCaseToArray,
@@ -22,15 +23,11 @@ const {
 } = require('../../tools/utils');
 
 const up = schemaFile => {
-  // Resets the console
-  process.stdout.write('\x1Bc');
   const schemaBuf = fs.readFileSync(schemaFile).toString();
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile.slice(0, -9);
 
-  console.log(
-    `\n ${folder}suit.json `.black.bgGreen,
-  );
+  console.log(`\n ${folder}suit.json `.black.bgGreen);
 
   let schema;
   try {
@@ -46,6 +43,7 @@ const up = schemaFile => {
     printError(errors);
     return;
   }
+
   const arrayOfDomains = Object.keys(schema).map(key => ({
     ...schema[key],
     domainName: key,
@@ -58,21 +56,24 @@ const up = schemaFile => {
   const newReducerBuffer = transforms(reducerBuffer, [
     cleanFile,
     fixInlineImports,
-    ...arrayOfDomains.map(({ domainName, initialState, actions }) => b => {
-      const cases = new Cases(parseCamelCaseToArray(domainName));
-      const allDomainCases = cases.all();
-      domainErrors = [
-        ...domainErrors,
-        ...checkIfDomainAlreadyPresent(folder, allDomainCases, actions),
-      ];
+    ...arrayOfDomains.map(
+      ({ domainName, initialState, actions, describe }) => b => {
+        const cases = new Cases(parseCamelCaseToArray(domainName));
+        const allDomainCases = cases.all();
+        domainErrors = [
+          ...domainErrors,
+          ...checkIfDomainAlreadyPresent(folder, allDomainCases, actions),
+        ];
 
-      return writeReducer({
-        buffer: b,
-        cases: allDomainCases,
-        initialState,
-        actions,
-      });
-    }),
+        return writeReducer({
+          buffer: b,
+          cases: allDomainCases,
+          initialState,
+          actions,
+          describe,
+        });
+      },
+    ),
   ]);
 
   if (domainErrors.length) {
@@ -226,6 +227,8 @@ const up = schemaFile => {
 
   console.log('- writing saga');
   fs.writeFileSync(`${folder}/saga.js`, newSagaBuffer);
+
+  printWarning([...checkWarningsInSchema(schema)]);
 };
 
 module.exports = up;

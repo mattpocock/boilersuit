@@ -7,7 +7,7 @@ module.exports = (folder, camelCase) => {
   const cases = new Cases(array).all();
 
   let fixedFolder = folder;
-  if (folder[folder.length - 1] === '/') {
+  if (folder[folder.length - 1] !== '/') {
     fixedFolder += '/';
   }
   let buffer = concat(['{', '}']);
@@ -16,7 +16,7 @@ module.exports = (folder, camelCase) => {
     buffer = fs.readFileSync(`${fixedFolder}suit.json`).toString();
     includeComma = true;
   }
-  console.log(` ${folder}suit.json `.bgGreen.black);
+  console.log(` ${fixedFolder}suit.json `.bgGreen.black);
   console.log(
     'SUIT: '.green + (includeComma ? 'writing existing suit.json' : 'writing new suit.json'),
   );
@@ -26,6 +26,7 @@ module.exports = (folder, camelCase) => {
       concat([
         includeComma ? ',' : undefined,
         `  "${cases.camel}": {`,
+        `    "describe": "Makes a ${cases.display} API call",`,
         `    "initialState": {`,
         `      "isLoading": false,`,
         `      "hasSucceeded": false,`,
@@ -35,6 +36,7 @@ module.exports = (folder, camelCase) => {
         `    },`,
         `    "actions": {`,
         `      "${cases.camel}Started": {`,
+        `        "describe": "Begins the ${cases.display} API Call. No payload.",`,
         `        "saga": true,`,
         `        "passAsProp": true,`,
         `        "set": {`,
@@ -46,13 +48,15 @@ module.exports = (folder, camelCase) => {
         `        }`,
         `      },`,
         `      "${cases.camel}Succeeded": {`,
+        `        "describe": "Called when the ${cases.display} API call completes, passing the data as a payload.",`,
         `        "set": {`,
         `          "isLoading": false,`,
         `          "data": "payload",`,
-        `          "hasSucceeded": false`,
+        `          "hasSucceeded": true`,
         `        }`,
         `      },`,
         `      "${cases.camel}Failed": {`,
+        `        "describe": "Called when the ${cases.display} API Call fails, delivering a standard error message.",`,
         `        "set": {`,
         `          "isLoading": false,`,
         `          "errorMessage": "${cases.display} has failed",`,

@@ -2,15 +2,17 @@
 
 ## How To Install
 
+### Globally
+
+`npm i -g boilersuit`
+
 ### Per project
 
 `npm i boilersuit`
 
-Add `"suit": "suit up"` to the `"scripts"` object in your package.json.
+Add `"suit": "suit"` to the `"scripts"` object in your package.json.
 
-### Globally
-
-`npm i -g boilersuit`
+Then, you can run `npm run suit up` instead of `suit up` below.
 
 ## How To Run It
 
@@ -34,41 +36,60 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
 
 ```json
 // suit.json
-
 {
-  "getFields": {
+  "submitTodo": {
+    "describe": "Makes a Submit Todo API call",
     "initialState": {
       "isLoading": false,
-      "hasSucceeded": true,
-      "data": null,
-      "errorMessage": "",
-      "hasError": false
+      "hasSucceeded": false,
+      "hasError": false,
+      "errorMessage": ""
     },
     "actions": {
-      "getFieldsStarted": {
+      "submitTodoStarted": {
+        "describe": "Begins the Submit Todo API Call. Passes the todo as the payload.",
         "saga": true,
-        "payload": true,
         "passAsProp": true,
-        "set": { "isLoading": true }
-      },
-      "getFieldsFailed": {
+        "payload": true,
         "set": {
-          "isLoading": false,
-          "errorMessage": "payload",
-          "hasError": true
+          "isLoading": true,
+          "hasSucceeded": false,
+          "hasError": false,
+          "errorMessage": ""
         }
       },
-      "getFieldsSucceeded": {
+      "submitTodoSucceeded": {
+        "describe": "Called when the Submit Todo API call completes.",
         "set": {
           "isLoading": false,
-          "hasError": false,
-          "hasSucceeded": true,
-          "data": "payload"
+          "hasSucceeded": true
+        }
+      },
+      "submitTodoFailed": {
+        "describe": "Called when the Submit Todo API Call fails, delivering a standard error message.",
+        "set": {
+          "isLoading": false,
+          "errorMessage": "Submit Todo has failed",
+          "hasError": true
         }
       }
     }
   }
 }
+```
+
+## How Boilersuit works
+
+Boilersuit acts as a declarative syntax for quickly writing and editing reducers. It cuts down development time, prevents silly errors, and makes documentation easy.
+
+Boilersuit takes control of parts of your application, using a few little 'tags'. Boilersuit completely controls the code between these tags, which means **any changes you make to boilersuit-controlled code will not persist**.
+
+```javascript
+// @suit-start
+const codeBetweenTheseTags = 'Is entirely controlled by boilersuit.';
+// @suit-end
+
+const codeBeforeThisTag = 'Is entirely controlled by boilersuit.'; // @suit-line
 ```
 
 ## Commands
@@ -87,7 +108,7 @@ Usage: `suit ajax <folder> <name>`
 
 Example: `suit ajax app/containers/HomePage getPosts`
 
-## Suit Files
+## Suit Files API
 
 ### initialState
 
@@ -171,6 +192,22 @@ Sagas are interesting in boilersuit - because they are so complex, and can be us
     "getFieldsStarted": {
       "saga": true,
       "set": { "isLoading": true }
+    }
+  }
+}
+```
+
+#### describe
+
+`type: string`
+
+Allows you to add a description which is added as comments to the code
+
+```json
+{
+  "actions": {
+    "getFieldsStarted": {
+      "describe": "Why do I exist? Do I pass a payload? What do I do?"
     }
   }
 }

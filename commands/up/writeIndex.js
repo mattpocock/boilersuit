@@ -85,19 +85,16 @@ module.exports = ({ buffer, cases, initialState, actions }) => {
             .map(key => {
               const c = new Cases(parseCamelCaseToArray(key));
               const actionCases = c.all();
-              if (actions[key].set) {
-                const hasPayload = Object.values(actions[key].set).filter(
-                  value => `${value}`.includes('payload'),
+              const hasPayload =
+                Object.values(actions[key].set).filter(value =>
+                  `${value}`.includes('payload'),
                 ).length || actions[key].payload;
-                if (hasPayload) {
-                  return `    submit${
-                    actionCases.pascal
-                  }: (payload) => dispatch(${actionCases.camel}(payload)),`;
-                }
-              }
-              return `    submit${actionCases.pascal}: () => dispatch(${
-                actionCases.camel
-              }()),`;
+              return concat([
+                actions[key].describe ? `    /** ${actions[key].describe} */` : null,
+                `    submit${actionCases.pascal}: (${hasPayload ? 'payload' : ''}) => dispatch(${
+                  actionCases.camel
+                }(${hasPayload ? 'payload' : ''})),`,
+              ]);
             }),
           '    // @suit-end',
           b.slice(index),

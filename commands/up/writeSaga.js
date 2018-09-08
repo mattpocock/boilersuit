@@ -22,7 +22,7 @@ module.exports = ({ buffer, cases, actionCases, action }) =>
     ensureImport('put', 'redux-saga/effects', { destructure: true }),
     b => {
       const sagaPresent =
-        b.indexOf(`export function* ${cases.camel}() {`) !== -1;
+        b.indexOf(`export function* ${cases.camel}`) !== -1;
       if (sagaPresent) {
         console.log(
           `\nSAGA:`.green +

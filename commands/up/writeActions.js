@@ -15,7 +15,7 @@ module.exports = ({ buffer, cases, actions }) =>
     ...Object.keys(actions)
       .map(key => ({ name: key, ...actions[key] }))
       .reverse()
-      .map(({ name, set, payload: hasPayload }, i) => b => {
+      .map(({ name, set, payload: payloadOverride, describe }, i) => b => {
         const c = new Cases(parseCamelCaseToArray(name));
         const actionCases = c.all();
         /** Ensures the imports of the constants */
@@ -27,22 +27,15 @@ module.exports = ({ buffer, cases, actions }) =>
         const index = newBuffer.indexOf(searchTerm) + searchTerm.length;
 
         let content = '';
-        if (Object.values(set).includes('payload') || hasPayload) {
-          content += concat([
-            ``,
-            `export const ${actionCases.camel} = (payload) => ({`,
-            `  type: ${actionCases.constant},`,
-            `  payload,`,
-            `});`,
-          ]);
-        } else {
-          content += concat([
-            ``,
-            `export const ${actionCases.camel} = () => ({`,
-            `  type: ${actionCases.constant},`,
-            `});`,
-          ]);
-        }
+        const hasPayload = Object.values(set).includes('payload') || payloadOverride;
+        content += concat([
+          ``,
+          describe ? `// ${describe}` : null,
+          `export const ${actionCases.camel} = (${hasPayload ? 'payload' : ''}) => ({`,
+          `  type: ${actionCases.constant},`,
+          hasPayload ? `  payload,` : null,
+          `});`,
+        ]);
         if (i === 0) {
           content += '\n\n// @suit-end';
         }

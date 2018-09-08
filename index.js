@@ -5,10 +5,12 @@ const gaze = require('gaze');
 const up = require('./commands/up');
 const ajax = require('./commands/ajax');
 
-program.version('0.1.10');
+program.version('0.1.11');
 
 program.command('up').action(() => {
   gaze('**/suit.json', (err, watcher) => {
+    // Resets the console
+    process.stdout.write('\x1Bc');
     const watchedFiles = Object.keys(watcher.relative()).length;
     console.log(
       `Watching ${watchedFiles} suit.json ${
@@ -26,6 +28,8 @@ program.command('up').action(() => {
 
     /** Then this watches further changes */
     watcher.on('changed', schemaFile => {
+      // Resets the console
+      process.stdout.write('\x1Bc');
       const relativePath = Object.keys(relativePaths).filter(path =>
         schemaFile.includes(path),
       )[0];

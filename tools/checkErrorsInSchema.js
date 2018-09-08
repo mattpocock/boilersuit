@@ -19,6 +19,21 @@ module.exports = schema => {
     ...schema[key],
   }));
   domains.forEach(domain => {
+    if (!domain.initialState || !Object.keys(domain.initialState).length) {
+      errors.push(
+        concat([
+          `No initialState defined on ${domain.name}`,
+          `| Try this:`.green,
+          `| {`,
+          `|   "${domain.name}": {`,
+          `|     "initialState": {`,
+          `|       "isLoading": true`,
+          `|     }`,
+          `|   }`,
+          `| }`,
+        ]),
+      );
+    }
     if (!domain.actions || !Object.keys(domain.actions).length) {
       errors.push(
         concat([
@@ -32,21 +47,6 @@ module.exports = schema => {
           `|           "isFirstAction": true`,
           `|         }`,
           `|       }`,
-          `|     }`,
-          `|   }`,
-          `| }`,
-        ]),
-      );
-    }
-    if (!domain.initialState || !Object.keys(domain.initialState).length) {
-      errors.push(
-        concat([
-          `No initialState defined on ${domain.name}`,
-          `| Try this:`.green,
-          `| {`,
-          `|   "${domain.name}": {`,
-          `|     "initialState": {`,
-          `|       "isLoading": true`,
           `|     }`,
           `|   }`,
           `| }`,
@@ -74,25 +74,27 @@ module.exports = schema => {
             `| }`,
           ]),
         );
+      } else {
+        Object.keys(action.set).forEach(actionSetKey => {
+          if (!Object.keys(domain.initialState).includes(actionSetKey)) {
+            errors.push(
+              concat([
+                `${action.name}`.cyan +
+                  ` is attempting to set ` +
+                  `${actionSetKey}`.cyan +
+                  `. Sadly, ` +
+                  `${actionSetKey}`.cyan +
+                  ` doesn't exist in ` +
+                  `${domain.name}`.cyan +
+                  `'s initial state.`,
+                `- Did you forget to define it in the initialState?`,
+                `- Did you do a typo?`,
+                `- Don't worry - it hapens to the best of us.`,
+              ]),
+            );
+          }
+        });
       }
-      Object.keys(action.set).forEach(actionSetKey => {
-        if (!Object.keys(domain.initialState).includes(actionSetKey)) {
-          errors.push(
-            concat([
-              `${action.name}`.cyan +
-                ` is attempting to set ` +
-                `${actionSetKey}`.cyan + `. Sadly, ` +
-                `${actionSetKey}`.cyan +
-                ` doesn't exist in ` +
-                `${domain.name}`.cyan +
-                `'s initial state.`,
-              `- Did you forget to define it in the initialState?`,
-              `- Did you do a typo?`,
-              `- Don't worry - it hapens to the best of us.`,
-            ]),
-          );
-        }
-      });
     });
   });
   return errors;
