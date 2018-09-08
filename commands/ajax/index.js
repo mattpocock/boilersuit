@@ -16,7 +16,7 @@ module.exports = (folder, camelCase) => {
     buffer = fs.readFileSync(`${fixedFolder}suit.json`).toString();
     includeComma = true;
   }
-  console.log(` ${folder} `.bgGreen.black);
+  console.log(` ${folder}suit.json `.bgGreen.black);
   console.log(
     'SUIT: '.green + (includeComma ? 'writing existing suit.json' : 'writing new suit.json'),
   );

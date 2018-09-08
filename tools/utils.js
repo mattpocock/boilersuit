@@ -168,86 +168,6 @@ const prettify = buffer =>
     correctInlineImports,
   ]);
 
-const checkErrorsInSchema = schema => {
-  const errors = [];
-  if (!Object.keys(schema).length) {
-    errors.push(
-      concat([
-        'No domains defined within suit.json.',
-        'Try this:',
-        '{',
-        '  "getTweets": {}',
-        '}',
-      ]),
-    );
-    return errors;
-  }
-  const domains = Object.keys(schema).map(key => ({
-    name: key,
-    ...schema[key],
-  }));
-  domains.forEach(domain => {
-    if (!domain.actions || !Object.keys(domain.actions).length) {
-      errors.push(
-        concat([
-          `No actions defined on ${domain.name}`,
-          `Try this:`.green,
-          `{`,
-          `  "${domain.name}": {`,
-          `    "actions": {`,
-          `      "${domain.name}FirstAction: {`,
-          `        "set": {`,
-          `          "isFirstAction": true`,
-          `        }`,
-          `      }`,
-          `    }`,
-          `  }`,
-          `}`,
-        ]),
-      );
-    }
-    if (!domain.initialState || !Object.keys(domain.initialState).length) {
-      errors.push(
-        concat([
-          `No initialState defined on ${domain.name}`,
-          `Try this:`.green,
-          `{`,
-          `  "${domain.name}": {`,
-          `    "initialState": {`,
-          `      "isLoading": true`,
-          `    }`,
-          `  }`,
-          `}`,
-        ]),
-      );
-    }
-    if (errors.length) return;
-    const arrayOfActions = Object.keys(domain.actions).map(key => ({
-      name: key,
-      ...domain.actions[key],
-    }));
-
-    arrayOfActions.forEach(action => {
-      if (!action.set) {
-        errors.push(
-          concat([
-            `${
-              action.name
-            } has no 'set' property defined. That means it won't do anything.`,
-            `Try this:`.green,
-            `${action.name}: {`,
-            `  "set": {`,
-            `    "isFirstAction": true`,
-            `  }`,
-            `}`,
-          ]),
-        );
-      }
-    });
-  });
-  return errors;
-};
-
 const fixInlineImports = buffer => {
   let newBuffer = buffer;
   while (newBuffer.indexOf('import { ') !== -1) {
@@ -289,7 +209,6 @@ module.exports = {
   removeSuitDoubling,
   prettify,
   capitalize,
-  checkErrorsInSchema,
   fixInlineImports,
   actionHasPayload,
   eachIndexOf,

@@ -11,23 +11,25 @@ const printError = require('../../tools/printError');
 const checkIfNoAllSagas = require('../../tools/checkIfNoAllSagas');
 const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
 const printWarning = require('../../tools/printWarning');
+const checkErrorsInSchema = require('../../tools/checkErrorsInSchema');
 const checkIfDomainAlreadyPresent = require('../../tools/checkIfDomainAlreadyPresent');
 const {
   parseCamelCaseToArray,
   cleanFile,
   fixInlineImports,
   transforms,
-  checkErrorsInSchema,
   concat,
 } = require('../../tools/utils');
 
 const up = schemaFile => {
+  // Resets the console
+  process.stdout.write('\x1Bc');
   const schemaBuf = fs.readFileSync(schemaFile).toString();
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile.slice(0, -9);
 
   console.log(
-    `\n ${folder} `.black.bgGreen,
+    `\n ${folder}suit.json `.black.bgGreen,
   );
 
   let schema;
