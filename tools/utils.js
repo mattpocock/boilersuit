@@ -64,12 +64,15 @@ const ensureImport = (
   if (!hasImportsFromFileName) {
     const firstImportLineIndex = buffer.lastIndexOf('import');
     if (destructure) {
-      return buffer.slice(0, firstImportLineIndex) + concat([
-        `import {`,
-        `  ${property}, // @suit-line`,
-        `} from '${fileName}';`,
-        buffer.slice(firstImportLineIndex),
-      ]);
+      return (
+        buffer.slice(0, firstImportLineIndex) +
+        concat([
+          `import {`,
+          `  ${property}, // @suit-line`,
+          `} from '${fileName}';`,
+          buffer.slice(firstImportLineIndex),
+        ])
+      );
     }
     return concat([
       buffer.slice(0, firstImportLineIndex),
@@ -124,8 +127,46 @@ const removeSuitDoubling = buffer =>
     .replace(concat([`    // @suit-end`, `    // @suit-start`, '']), '')
     .replace(concat([`  // @suit-end`, `  // @suit-start`, '']), '');
 
+const correctInlineImports = buffer =>
+  transforms(buffer, [
+    ...eachIndexOf(buffer, 'import {')
+      .map(startIndex => {
+        const endIndex = buffer.indexOf(';', startIndex) + 1;
+        return {
+          length: endIndex - startIndex,
+          content: buffer.slice(startIndex + 'import {'.length, endIndex),
+        };
+      })
+      .filter(({ length }) => length <= 80)
+      .filter(({ content }) => !content.includes('@suit'))
+      .map(({ content }) => b =>
+        b.slice(0, b.indexOf(content)) +
+        content
+          .replace(/\n/g, '')
+          .replace(/ {2}/g, ' ')
+          .replace(/,(?=})/, ' ') +
+        b.slice(b.indexOf(content) + content.length),
+      ),
+  ]);
+
+const eachIndexOf = (buffer, string) => {
+  let count = 0;
+  const indexArray = [];
+  while (buffer.indexOf(string, count) !== -1) {
+    const index = buffer.indexOf(string, count);
+    count = index + 1;
+    indexArray.push(index);
+  }
+  return indexArray;
+};
+
 const prettify = buffer =>
-  transforms(buffer, [removeWhiteSpace, removeSuitDoubling, removeWhiteSpace]);
+  transforms(buffer, [
+    removeWhiteSpace,
+    removeSuitDoubling,
+    removeWhiteSpace,
+    correctInlineImports,
+  ]);
 
 const checkErrorsInSchema = schema => {
   const errors = [];
@@ -251,4 +292,5 @@ module.exports = {
   checkErrorsInSchema,
   fixInlineImports,
   actionHasPayload,
+  eachIndexOf,
 };

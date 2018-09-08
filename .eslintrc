@@ -10,6 +10,7 @@
     "prefer-template": "off",
     "implicit-arrow-linebreak": "off",
     "object-curly-newline": "off",
-    "function-paren-newline": "off"
+    "function-paren-newline": "off",
+    "no-use-before-define": "off"
   }
 }
