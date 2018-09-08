@@ -2,11 +2,15 @@
 
 ## How To Install
 
-Clone this repository to your machine
+### Per project
 
-Enter the repository
+`npm i boilersuit`
 
-Run `npm i -g`
+Add `"suit": "suit up"` to the `"scripts"` object in your package.json.
+
+### Globally
+
+`npm i -g boilersuit`
 
 ## How To Run It
 
