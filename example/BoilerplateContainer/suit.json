@@ -1,14 +1,16 @@
 {
-  "getTweets": {
+  "getAssessments": {
     "initialState": {
       "isLoading": false,
       "hasSucceeded": false,
       "hasError": false,
       "errorMessage": "",
-      "data": null
+      "data": null,
+      "assessmentType": null
     },
     "actions": {
-      "getTweetsStarted": {
+      "getAssessmentsStarted": {
+        "saga": true,
         "passAsProp": true,
         "set": {
           "isLoading": true,
@@ -18,122 +20,18 @@
           "data": null
         }
       },
-      "getTweetsSucceeded": {
+      "getAssessmentsSucceeded": {
         "set": {
           "isLoading": false,
-          "data": "payload",
-          "hasSucceeded": false
-        }
-      },
-      "getTweetsFailed": {
-        "set": {
-          "isLoading": false,
-          "errorMessage": "Get Tweets has failed",
-          "hasError": true
-        }
-      }
-    }
-  },
-  "getPosts": {
-    "initialState": {
-      "isLoading": false,
-      "hasSucceeded": false,
-      "hasError": false,
-      "errorMessage": "",
-      "data": null
-    },
-    "actions": {
-      "getPostsStarted": {
-        "passAsProp": true,
-        "set": {
-          "isLoading": true,
+          "data": "payload.data",
           "hasSucceeded": false,
-          "hasError": false,
-          "errorMessage": "",
-          "data": null
+          "assessmentType": "payload.assessmentType"
         }
       },
-      "getPostsSucceeded": {
-        "set": {
-          "isLoading": false,
-          "data": "payload",
-          "hasSucceeded": false
-        }
-      },
-      "getPostsFailed": {
+      "getAssessmentsFailed": {
         "set": {
           "isLoading": false,
           "errorMessage": "Get Posts has failed",
-          "hasError": true
-        }
-      }
-    }
-  },
-  "getPosts": {
-    "initialState": {
-      "isLoading": false,
-      "hasSucceeded": false,
-      "hasError": false,
-      "errorMessage": "",
-      "data": null
-    },
-    "actions": {
-      "getPostsStarted": {
-        "passAsProp": true,
-        "set": {
-          "isLoading": true,
-          "hasSucceeded": false,
-          "hasError": false,
-          "errorMessage": "",
-          "data": null
-        }
-      },
-      "getPostsSucceeded": {
-        "set": {
-          "isLoading": false,
-          "data": "payload",
-          "hasSucceeded": false
-        }
-      },
-      "getPostsFailed": {
-        "set": {
-          "isLoading": false,
-          "errorMessage": "Get Posts has failed",
-          "hasError": true
-        }
-      }
-    }
-  },
-  "getPeople": {
-    "initialState": {
-      "isLoading": false,
-      "hasSucceeded": false,
-      "hasError": false,
-      "errorMessage": "",
-      "data": null
-    },
-    "actions": {
-      "getPeopleStarted": {
-        "passAsProp": true,
-        "set": {
-          "isLoading": true,
-          "hasSucceeded": false,
-          "hasError": false,
-          "errorMessage": "",
-          "data": null
-        }
-      },
-      "getPeopleSucceeded": {
-        "set": {
-          "isLoading": false,
-          "data": "payload",
-          "hasSucceeded": false
-        }
-      },
-      "getPeopleFailed": {
-        "set": {
-          "isLoading": false,
-          "errorMessage": "Get People has failed",
           "hasError": true
         }
       }

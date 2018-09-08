@@ -35,6 +35,7 @@ module.exports = (folder, camelCase) => {
         `    },`,
         `    "actions": {`,
         `      "${cases.camel}Started": {`,
+        `        "saga": true,`,
         `        "passAsProp": true,`,
         `        "set": {`,
         `          "isLoading": true,`,

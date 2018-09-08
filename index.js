@@ -5,7 +5,7 @@ const gaze = require('gaze');
 const fromSchema = require('./commands/fromSchema');
 const ajax = require('./commands/ajax');
 
-program.version('0.1.7');
+program.version('0.1.8');
 
 program.command('up').action(() => {
   console.log('Watching all suit.json files...'.yellow);

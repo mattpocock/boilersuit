@@ -46,6 +46,7 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
     },
     "actions": {
       "getFieldsStarted": {
+        "saga": true,
         "payload": true,
         "passAsProp": true,
         "set": { "isLoading": true }
@@ -150,6 +151,25 @@ Whether or not you want to pass this action to the container component as a disp
   "actions": {
     "getFieldsStarted": {
       "passAsProp": true,
+      "set": { "isLoading": true }
+    }
+  }
+}
+```
+
+#### saga
+
+`type: bool`
+
+Whether or not you want to generate a saga that is fired from this action.
+
+Sagas are interesting in boilersuit - because they are so complex, and can be used in so many divergent ways, we don't control them in the same way that we do with other files. Specifying `"saga": true` on an action will generate some boilerplate in the sagas file which you will then have to customise and manage.
+
+```json
+{
+  "actions": {
+    "getFieldsStarted": {
+      "saga": true,
       "set": { "isLoading": true }
     }
   }

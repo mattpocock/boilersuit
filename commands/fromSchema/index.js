@@ -6,15 +6,19 @@ const writeSelectors = require('./writeSelectors');
 const writeActions = require('./writeActions');
 const writeConstants = require('./writeConstants');
 const writeReducer = require('./writeReducer');
+const writeSaga = require('./writeSaga');
+const printError = require('../../tools/printError');
+const checkIfNoAllSagas = require('../../tools/checkIfNoAllSagas');
 const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
+const printWarning = require('../../tools/printWarning');
 const checkIfDomainAlreadyPresent = require('../../tools/checkIfDomainAlreadyPresent');
-// const writeSaga = require('./writeSaga');
 const {
   parseCamelCaseToArray,
   cleanFile,
   fixInlineImports,
   transforms,
   checkErrorsInSchema,
+  concat,
 } = require('../../tools/utils');
 
 const fromSchema = schemaFile => {
@@ -22,7 +26,9 @@ const fromSchema = schemaFile => {
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile.slice(0, -9);
 
-  console.log(`\n${folder}`.yellow);
+  console.log(
+    `\n ${folder} `.black.bgGreen,
+  );
 
   let schema;
   try {
@@ -35,7 +41,7 @@ const fromSchema = schemaFile => {
   const errors = [...checkErrorsInSchema(schema), ...checkIfBadBuffer(folder)];
 
   if (errors.length) {
-    errors.forEach(error => console.log('ERROR: '.red + error));
+    printError(errors);
     return;
   }
   const arrayOfDomains = Object.keys(schema).map(key => ({
@@ -68,12 +74,9 @@ const fromSchema = schemaFile => {
   ]);
 
   if (domainErrors.length) {
-    domainErrors.forEach(error => console.log('ERROR: '.red + error));
+    printError(domainErrors);
     return;
   }
-
-  console.log(' - writing reducers');
-  fs.writeFileSync(reducersFile, newReducerBuffer);
 
   /** Write Actions */
 
@@ -94,9 +97,6 @@ const fromSchema = schemaFile => {
     }),
   ]);
 
-  console.log(' - writing actions');
-  fs.writeFileSync(`${folder}/actions.js`, newActionsBuffer);
-
   /** Write Constants */
 
   const constantsBuffer = fs.readFileSync(`${folder}/constants.js`).toString();
@@ -107,10 +107,6 @@ const fromSchema = schemaFile => {
     ...arrayOfDomains.map(({ domainName, actions }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
-      if (!actions) {
-        // They will have been warned already, so can fail silently
-        return b;
-      }
 
       return writeConstants({
         buffer: b,
@@ -120,9 +116,6 @@ const fromSchema = schemaFile => {
       });
     }),
   ]);
-
-  console.log(' - writing constants');
-  fs.writeFileSync(`${folder}/constants.js`, newConstantsBuffer);
 
   /** Write Selectors */
 
@@ -134,10 +127,6 @@ const fromSchema = schemaFile => {
     ...arrayOfDomains.map(({ domainName, initialState }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
-      if (!initialState) {
-        // They will have been warned already, so can fail silently
-        return b;
-      }
 
       return writeSelectors({
         buffer: b,
@@ -147,9 +136,6 @@ const fromSchema = schemaFile => {
       });
     }),
   ]);
-
-  console.log(' - writing selectors');
-  fs.writeFileSync(`${folder}/selectors.js`, newSelectorsBuffer);
 
   /** Write Index */
 
@@ -161,10 +147,6 @@ const fromSchema = schemaFile => {
     ...arrayOfDomains.map(({ domainName, actions, initialState }) => b => {
       const cases = new Cases(parseCamelCaseToArray(domainName));
       const allDomainCases = cases.all();
-      if (!initialState) {
-        // They will have been warned already, so can fail silently
-        return b;
-      }
 
       return writeIndex({
         buffer: b,
@@ -175,8 +157,73 @@ const fromSchema = schemaFile => {
     }),
   ]);
 
-  console.log(' - writing index');
+  /** Write Saga */
+
+  const sagaBuffer = fs.readFileSync(`${folder}/saga.js`).toString();
+
+  const sagaErrors = checkIfNoAllSagas(sagaBuffer);
+
+  if (sagaErrors.length) {
+    printError(sagaErrors);
+    return;
+  }
+
+  const newSagaBuffer = transforms(sagaBuffer, [
+    cleanFile,
+    fixInlineImports,
+    ...arrayOfDomains.map(({ domainName, actions }) => b => {
+      const cases = new Cases(parseCamelCaseToArray(domainName));
+      const allDomainCases = cases.all();
+      const actionsWithSagas = Object.keys(actions).filter(
+        key => actions[key].saga === true,
+      );
+      if (actionsWithSagas > 1) {
+        printWarning([
+          concat([
+            `More than one action in ${
+              allDomainCases.display
+            } has been given an attribute of "saga": true`,
+            `- Only one action can be assigned a saga per reducer.`,
+          ]),
+        ]);
+        return b;
+      }
+
+      if (actionsWithSagas < 1) {
+        return b;
+      }
+
+      const actionCases = new Cases(parseCamelCaseToArray(actionsWithSagas[0]));
+      const allActionCases = actionCases.all();
+
+      return writeSaga({
+        buffer: b,
+        cases: allDomainCases,
+        actionCases: allActionCases,
+        action: actions[actionsWithSagas[0]],
+      });
+    }),
+  ]);
+
+  console.log('\nCHANGES:'.green);
+
+  console.log('- writing reducers');
+  fs.writeFileSync(reducersFile, newReducerBuffer);
+
+  console.log('- writing actions');
+  fs.writeFileSync(`${folder}/actions.js`, newActionsBuffer);
+
+  console.log('- writing constants');
+  fs.writeFileSync(`${folder}/constants.js`, newConstantsBuffer);
+
+  console.log('- writing selectors');
+  fs.writeFileSync(`${folder}/selectors.js`, newSelectorsBuffer);
+
+  console.log('- writing index');
   fs.writeFileSync(`${folder}/index.js`, newIndexBuffer);
+
+  console.log('- writing saga');
+  fs.writeFileSync(`${folder}/saga.js`, newSagaBuffer);
 };
 
 module.exports = fromSchema;

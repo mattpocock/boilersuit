@@ -1,61 +1,73 @@
-const { concat } = require('../../tools/utils');
-const Parser = require('../../tools/parser');
+const {
+  concat,
+  transforms,
+  prettify,
+  ensureImport,
+} = require('../../tools/utils');
 
-module.exports = (buf, { display, camel, constant }) => {
-  const buffer = buf.toString();
-  const parser = new Parser(buffer);
+module.exports = ({ buffer, cases, actionCases, action }) =>
+  transforms(buffer, [
+    b => {
+      const index = b.indexOf('{', b.indexOf('export default function*')) + 1;
+      return concat([
+        b.slice(0, index),
+        `  // @suit-start`,
+        `  yield takeLatest(${actionCases.constant}, ${cases.camel});`,
+        `  // @suit-end` + b.slice(index),
+      ]);
+    },
+    ensureImport(actionCases.constant, './constants', { destructure: true }),
+    ensureImport('takeLatest', 'redux-saga/effects', { destructure: true }),
+    ensureImport('call', 'redux-saga/effects', { destructure: true }),
+    ensureImport('put', 'redux-saga/effects', { destructure: true }),
+    b => {
+      const sagaPresent =
+        b.indexOf(`export function* ${cases.camel}() {`) !== -1;
+      if (sagaPresent) {
+        console.log(
+          `\nSAGA:`.green +
+            ` ${
+              cases.camel
+            } saga already present in file. No edits have been made.`,
+        );
+        return b;
+      }
+      const index = b.indexOf(`export default`);
 
-  const { index: constantsImportIndex, ...constants } = parser.getImportIndex(
-    './constants',
-  );
+      console.log(
+        concat([
+          `\nSAGA:`.green + ` ${cases.camel} saga not found in file.`,
+          `- Adding a basic skeleton of a saga. This needs to be updated manually.`,
+        ]),
+      );
 
-  const { index: actionsImportIndex, ...actions } = parser.getImportIndex(
-    './actions',
-  );
-
-  const { index: allSagasIndex, ...allSagas } = parser.getAllSagasIndex();
-
-  const {
-    index: lastExportIndex,
-    ...exportDefault
-  } = parser.getExportDefaultIndex();
-
-  return (
-    `${buffer.slice(0, constantsImportIndex)
-    }${constants.prefix || ''}${constant}_STARTED${constants.suffix || ''}${
-      buffer.slice(constantsImportIndex, actionsImportIndex)
-    }${concat([
-      `${actions.prefix || ''}${camel}Failed,`,
-      `${camel}Succeeded${actions.suffix || ''}`,
-    ])
-    }${buffer.slice(actionsImportIndex, lastExportIndex)
-    }${concat([
-      `${exportDefault.prefix ||
-        ''}const ${camel}ErrorText = '${display} failed';`,
-      ``,
-      `export function* ${camel}() {`,
-      `  let data = '';`,
-      `  try {`,
-      `    // data = yield call(${camel}AjaxCall, params);`,
-      `    data = { mockedUp: true };`,
-      `  } catch (err) {`,
-      `    console.log(err); // eslint-disable-line`,
-      `    yield put(${camel}Failed(${camel}ErrorText));`,
-      `  }`,
-      `  if (!data) {`,
-      `    yield put(${camel}Failed(${camel}ErrorText));`,
-      `  } else if (!data.error) {`,
-      `    yield put(${camel}Succeeded(data));`,
-      `  } else {`,
-      `    yield put(${camel}Failed(${camel}ErrorText));`,
-      `  }`,
-      `}`,
-      `${exportDefault.suffix || ''}`,
-    ])
-    }${buffer.slice(lastExportIndex, allSagasIndex)
-    }${allSagas.prefix ||
-      ''}  yield takeLatest(${constant}_STARTED, ${camel});${allSagas.suffix ||
-      ''}${
-      buffer.slice(allSagasIndex)}`
-  );
-};
+      return concat([
+        b.slice(0, index),
+        `/**`,
+        ` * ${cases.display} Saga`,
+        ` * This saga was added by boilersuit, but is not managed by boilersuit.`,
+        ` * That means you need to edit it yourself, and delete it yourself if your`,
+        ` * actions, constants or reducer name changes.`,
+        ` */`,
+        `export function* ${cases.camel}(${action.payload ? '{ payload }' : ''}) {`,
+        `  let data = '';`,
+        `  try {`,
+        `    data = yield call(${cases.camel}AjaxCall${action.payload ? ', payload' : ''});`,
+        `  } catch (err) {`,
+        `    console.log(err); // eslint-disable-line`,
+        `    yield put(actionToFireWhen${cases.pascal}Fails());`,
+        `  }`,
+        `  if (!data) {`,
+        `    yield put(actionToFireWhen${cases.pascal}Fails());`,
+        `  } else if (!data.error) {`,
+        `    yield put(actionToFireWhen${cases.pascal}Succeeds(data.body));`,
+        `  } else {`,
+        `    yield put(actionToFireWhen${cases.pascal}Fails());`,
+        `  }`,
+        `}`,
+        ``,
+        b.slice(index),
+      ]);
+    },
+    prettify,
+  ]);
