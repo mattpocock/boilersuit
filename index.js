@@ -5,14 +5,20 @@ const gaze = require('gaze');
 const up = require('./commands/up');
 const ajax = require('./commands/ajax');
 
-program.version('0.1.8');
+program.version('0.1.9');
 
 program.command('up').action(() => {
-  console.log('Watching all suit.json files...'.yellow);
   gaze('**/suit.json', (err, watcher) => {
+    const watchedFiles = Object.keys(watcher.relative()).length;
+    console.log(
+      `Watching ${watchedFiles} suit.json ${
+        watchedFiles > 1 ? 'files' : 'file'
+      }...`.yellow,
+    );
     /** This does it the first time */
     Object.entries(watcher.relative()).forEach(entry => {
-      const schemaFile = entry[0] + entry[1][0];
+      // This bit of fidgeting allows for suiting up from the same folder
+      const schemaFile = (entry[0] === '.' ? './' : entry[0]) + entry[1][0];
       up(schemaFile);
     });
 
@@ -20,11 +26,11 @@ program.command('up').action(() => {
 
     /** Then this watches further changes */
     watcher.on('changed', schemaFile => {
-      console.log('File changed, making changes...'.yellow);
       const relativePath = Object.keys(relativePaths).filter(path =>
         schemaFile.includes(path),
       )[0];
-      up(relativePath + 'suit.json');
+
+      up((relativePath === '.' ? './' : relativePath) + 'suit.json');
     });
   });
 });
