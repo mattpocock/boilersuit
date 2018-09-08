@@ -21,7 +21,7 @@ const {
   concat,
 } = require('../../tools/utils');
 
-const fromSchema = schemaFile => {
+const up = schemaFile => {
   const schemaBuf = fs.readFileSync(schemaFile).toString();
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile.slice(0, -9);
@@ -226,4 +226,4 @@ const fromSchema = schemaFile => {
   fs.writeFileSync(`${folder}/saga.js`, newSagaBuffer);
 };
 
-module.exports = fromSchema;
+module.exports = up;

@@ -2,7 +2,7 @@
 
 const program = require('commander');
 const gaze = require('gaze');
-const fromSchema = require('./commands/fromSchema');
+const up = require('./commands/up');
 const ajax = require('./commands/ajax');
 
 program.version('0.1.8');
@@ -13,13 +13,18 @@ program.command('up').action(() => {
     /** This does it the first time */
     Object.entries(watcher.relative()).forEach(entry => {
       const schemaFile = entry[0] + entry[1][0];
-      fromSchema(schemaFile);
+      up(schemaFile);
     });
+
+    const relativePaths = watcher.relative();
 
     /** Then this watches further changes */
     watcher.on('changed', schemaFile => {
       console.log('File changed, making changes...'.yellow);
-      fromSchema(schemaFile);
+      const relativePath = Object.keys(relativePaths).filter(path =>
+        schemaFile.includes(path),
+      )[0];
+      up(relativePath + 'suit.json');
     });
   });
 });
