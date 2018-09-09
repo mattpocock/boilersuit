@@ -43,11 +43,12 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
       "isLoading": false,
       "hasSucceeded": false,
       "hasError": false,
-      "errorMessage": ""
+      "errorMessage": "",
+      "data": null
     },
     "actions": {
       "submitTodoStarted": {
-        "describe": "Begins the Submit Todo API Call. Passes the todo as the payload.",
+        "describe": "Begins the Submit Todo API Call. Passes the todo as the payload to the saga.",
         "saga": true,
         "passAsProp": true,
         "payload": true,
@@ -55,14 +56,16 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
           "isLoading": true,
           "hasSucceeded": false,
           "hasError": false,
-          "errorMessage": ""
+          "errorMessage": "",
+          "data": null
         }
       },
       "submitTodoSucceeded": {
-        "describe": "Called when the Submit Todo API call completes.",
+        "describe": "Called when the Submit Todo API call completes, passing info to data as a payload.",
         "set": {
           "isLoading": false,
-          "hasSucceeded": true
+          "hasSucceeded": true,
+          "data": "payload"
         }
       },
       "submitTodoFailed": {
