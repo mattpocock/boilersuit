@@ -26,7 +26,7 @@ module.exports = ({ buffer, cases, actions, initialState }) =>
         `// @suit-start`,
         `describe('${cases.camel}Reducer', () => {`,
         `  it('returns the initial state', () => {`,
-        `    expect(${cases.camel}Reducer(undefined, {}))`,
+        `    expect(${cases.camel}Reducer(undefined, { type: '' }))`,
         `      .toEqual(fromJS(${printObject(initialState, '      ')}),`,
         `    );`,
         `  });`,
