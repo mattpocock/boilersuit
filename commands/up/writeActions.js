@@ -27,11 +27,16 @@ module.exports = ({ buffer, cases, actions }) =>
         const index = newBuffer.indexOf(searchTerm) + searchTerm.length;
 
         let content = '';
-        const hasPayload = Object.values(set).includes('payload') || payloadOverride;
+        const hasPayload =
+          Object.values(set).filter(
+            value => `${value}`.indexOf('payload') !== -1,
+          ).length > 0 || payloadOverride;
         content += concat([
           ``,
           describe ? `// ${describe}` : null,
-          `export const ${actionCases.camel} = (${hasPayload ? 'payload' : ''}) => ({`,
+          `export const ${actionCases.camel} = (${
+            hasPayload ? 'payload' : ''
+          }) => ({`,
           `  type: ${actionCases.constant},`,
           hasPayload ? `  payload,` : null,
           `});`,
