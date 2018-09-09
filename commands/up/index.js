@@ -7,6 +7,7 @@ const writeActions = require('./writeActions');
 const writeConstants = require('./writeConstants');
 const writeReducer = require('./writeReducer');
 const writeSaga = require('./writeSaga');
+const writeReducerTests = require('./writeReducerTests');
 const printError = require('../../tools/printError');
 const checkIfNoAllSagas = require('../../tools/checkIfNoAllSagas');
 const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
@@ -181,7 +182,7 @@ const up = schemaFile => {
         key => actions[key].saga === true,
       );
       if (actionsWithSagas > 1) {
-        printWarning([
+        printError([
           concat([
             `More than one action in ${
               allDomainCases.display
@@ -208,10 +209,35 @@ const up = schemaFile => {
     }),
   ]);
 
+  /** Write reducer tests */
+
+  const reducerTestsBuffer = fs.existsSync(`${folder}/tests/reducer.test.js`)
+    ? fs.readFileSync(`${folder}/tests/reducer.test.js`).toString()
+    : '';
+
+  const newReducerTestBuffer = transforms(reducerTestsBuffer, [
+    cleanFile,
+    fixInlineImports,
+    ...arrayOfDomains.map(({ domainName, initialState, actions }) => b => {
+      const cases = new Cases(parseCamelCaseToArray(domainName));
+      const allDomainCases = cases.all();
+
+      return writeReducerTests({
+        buffer: b,
+        cases: allDomainCases,
+        actions,
+        initialState,
+      });
+    }),
+  ]);
+
   console.log('\nCHANGES:'.green);
 
   console.log('- writing reducers');
   fs.writeFileSync(reducersFile, newReducerBuffer);
+
+  console.log('- writing reducer tests');
+  fs.writeFileSync(`${folder}/tests/reducer.test.js`, newReducerTestBuffer);
 
   console.log('- writing actions');
   fs.writeFileSync(`${folder}/actions.js`, newActionsBuffer);

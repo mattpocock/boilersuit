@@ -11,6 +11,7 @@
     "implicit-arrow-linebreak": "off",
     "object-curly-newline": "off",
     "function-paren-newline": "off",
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "indent": "off"
   }
 }
