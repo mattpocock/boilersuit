@@ -5,7 +5,7 @@ const gaze = require('gaze');
 const up = require('./commands/up');
 const ajax = require('./commands/ajax');
 
-program.version('0.1.15');
+program.version('0.1.16');
 
 program.command('up').action(() => {
   gaze(['**/suit.json', '!node_modules/**/*'], (err, watcher) => {
