@@ -6,17 +6,16 @@ const {
   prettify,
   ensureImport,
   capitalize,
+  getDomainNameFromFolder,
 } = require('../../tools/utils');
 
 module.exports = ({ buffer, cases, initialState, folder }) => {
-  const domainName = folder
-    .split('/')
-    .reverse()
-    .filter(x => x !== '')[0];
+  const domainName = getDomainNameFromFolder(folder);
   const mainSelector = concat([
     `export const makeSelect${cases.pascal} = () =>`,
     `  createSelector(select${capitalize(domainName)}Domain, (substate) =>`,
-    `    fromJS(substate.${cases.camel}),`,
+    `    // this ternary checks if the domain is immutable, and parses it correctly`,
+    `    fromJS(substate.toJS ? substate.get('${cases.camel}') : substate.${cases.camel}),`,
     `  );`,
   ]);
 

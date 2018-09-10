@@ -2,7 +2,6 @@ const {
   transforms,
   prettify,
   concat,
-  removeSuitDoubling,
   ensureImport,
 } = require('../../tools/utils');
 
@@ -38,5 +37,4 @@ module.exports = ({ buffer, arrayOfActions }) =>
       ]),
     ),
     prettify,
-    removeSuitDoubling,
   ]);

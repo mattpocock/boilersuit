@@ -34,7 +34,7 @@ module.exports = ({
         describe ? ` * - ${describe}` : null,
         ` */`,
         ``,
-        `const initial${pascal}State = fromJS(${printObject(initialState)});`,
+        `export const initial${pascal}State = fromJS(${printObject(initialState)});`,
         ``,
         `export const ${camel}Reducer = (state = initial${pascal}State, { type${
           hasPayload ? ', payload' : ''

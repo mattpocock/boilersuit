@@ -2,6 +2,8 @@ const concat = array => array.filter(line => line !== null).join(`\n`);
 
 const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
+const unCapitalize = string => string.charAt(0).toLowerCase() + string.slice(1);
+
 const fixFolderName = string => {
   if (string.charAt(string.length - 1) !== '/') {
     return `${string}/`;
@@ -154,12 +156,27 @@ const correctCommentedOutImport = fileName => buffer =>
 
 const removeSuitDoubling = buffer =>
   buffer
-    .replace(concat([`// @suit-end`, `// @suit-start`]), '')
-    .replace(concat([`// @suit-end`, ``, `// @suit-start`]), '')
-    .replace(concat([`// @suit-end`, ``, ``, `// @suit-start`]), '')
-    .replace(concat([`// @suit-end`, ``, ``, ``, `// @suit-start`]), '')
-    .replace(concat([`    // @suit-end`, `    // @suit-start`, '']), '')
-    .replace(concat([`  // @suit-end`, `  // @suit-start`, '']), '');
+    .replace(new RegExp(concat([`// @suit-end`, `// @suit-start`]), 'g'), '')
+    .replace(
+      new RegExp(concat([`// @suit-end`, ``, `// @suit-start`]), 'g'),
+      '',
+    )
+    .replace(
+      new RegExp(concat([`// @suit-end`, ``, ``, `// @suit-start`]), 'g'),
+      '',
+    )
+    .replace(
+      new RegExp(concat([`// @suit-end`, ``, ``, ``, `// @suit-start`]), 'g'),
+      '',
+    )
+    .replace(
+      new RegExp(concat([`    // @suit-end`, `    // @suit-start`, '']), 'g'),
+      '',
+    )
+    .replace(
+      new RegExp(concat([`  // @suit-end`, `  // @suit-start`, '']), 'g'),
+      '',
+    );
 
 const correctInlineImports = buffer =>
   transforms(buffer, [
@@ -230,6 +247,12 @@ const actionHasPayload = actions =>
     );
   }).length > 0;
 
+const getDomainNameFromFolder = folder =>
+  folder
+    .split('/')
+    .reverse()
+    .filter(x => x !== '')[0];
+
 module.exports = {
   concat,
   fixFolderName,
@@ -246,4 +269,6 @@ module.exports = {
   fixInlineImports,
   actionHasPayload,
   eachIndexOf,
+  getDomainNameFromFolder,
+  unCapitalize,
 };

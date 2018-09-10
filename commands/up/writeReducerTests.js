@@ -30,6 +30,7 @@ module.exports = ({ buffer, cases, actions, initialState }) =>
         `      .toEqual(fromJS(${printObject(initialState, '      ')}),`,
         `    );`,
         `  });`,
+        /** Test each action in the reducer */
         ...Object.keys(actions)
           .map(key => ({ ...actions[key], name: key }))
           .map(action => {
@@ -52,9 +53,11 @@ module.exports = ({ buffer, cases, actions, initialState }) =>
             return concat([
               `  describe('${action.name}', () => {`,
               `    it('alters the state as expected', () => {`,
+              // if only passes one payload, only test one payload
               payloadValues.length === 1
                 ? `      const payload = 'dummyPayload';`
                 : null,
+              // If multiple payloads, define payload as an object and define properties
               payloadValues.length > 1 ? `      const payload = {};` : null,
               payloadValues.length > 1
                 ? concat([
@@ -65,6 +68,7 @@ module.exports = ({ buffer, cases, actions, initialState }) =>
                 : null,
               `      const newState = ${cases.camel}Reducer(`,
               `        undefined,`,
+              // If it has a payload, pass it to the action creator
               `        ${action.name}(${
                 payloadValues.length > 0 ? 'payload' : ''
               }),`,

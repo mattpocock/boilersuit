@@ -9,6 +9,7 @@ const writeReducer = require('./writeReducer');
 const writeSaga = require('./writeSaga');
 const writeReducerTests = require('./writeReducerTests');
 const writeActionTests = require('./writeActionTests');
+const writeSelectorTests = require('./writeSelectorTests');
 const printError = require('../../tools/printError');
 const checkIfNoAllSagas = require('../../tools/checkIfNoAllSagas');
 const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
@@ -234,8 +235,8 @@ const up = schemaFile => {
 
   /** Write actions tests */
 
-  const actionTestsBuffer = fs.existsSync(`${folder}/tests/action.test.js`)
-    ? fs.readFileSync(`${folder}/tests/action.test.js`).toString()
+  const actionTestsBuffer = fs.existsSync(`${folder}/tests/actions.test.js`)
+    ? fs.readFileSync(`${folder}/tests/actions.test.js`).toString()
     : '';
 
   const newActionTestsBuffer = transforms(actionTestsBuffer, [
@@ -260,6 +261,27 @@ const up = schemaFile => {
     }),
   ]);
 
+  /** Write selectors tests */
+
+  const selectorsTestsBuffer = fs.existsSync(`${folder}/tests/selectors.test.js`)
+    ? fs.readFileSync(`${folder}/tests/selectors.test.js`).toString()
+    : '';
+
+  const newSelectorsTestsBuffer = transforms(selectorsTestsBuffer, [
+    cleanFile,
+    fixInlineImports,
+    ...arrayOfDomains.map(({ domainName, initialState }) => b => {
+      const cases = new Cases(parseCamelCaseToArray(domainName)).all();
+
+      return writeSelectorTests({
+        buffer: b,
+        cases,
+        initialState,
+        folder,
+      });
+    }),
+  ]);
+
   console.log('\nCHANGES:'.green);
 
   console.log('- writing reducers');
@@ -279,6 +301,9 @@ const up = schemaFile => {
 
   console.log('- writing selectors');
   fs.writeFileSync(`${folder}/selectors.js`, newSelectorsBuffer);
+
+  console.log('- writing selectors tests');
+  fs.writeFileSync(`${folder}/tests/selectors.test.js`, newSelectorsTestsBuffer);
 
   console.log('- writing index');
   fs.writeFileSync(`${folder}/index.js`, newIndexBuffer);
