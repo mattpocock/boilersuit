@@ -1,6 +1,8 @@
 <div style="text-align: center"><img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/logo.png" height="240px" alt="boilerplate logo"/></div>
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/HHsyoCgzFGg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+## How To Use Boilersuit - Video
+
+[![how to use boilersuit](http://img.youtube.com/vi/HHsyoCgzFGg/0.jpg)](http://www.youtube.com/watch?v=HHsyoCgzFGg "How To Use Boilersuit")
 
 ## How To Install
 
