@@ -154,8 +154,10 @@ const correctCommentedOutImport = fileName => buffer =>
 
 const removeSuitDoubling = buffer =>
   buffer
-    .replace(concat([`// @suit-end`, ``, `// @suit-start`]), '')
     .replace(concat([`// @suit-end`, `// @suit-start`]), '')
+    .replace(concat([`// @suit-end`, ``, `// @suit-start`]), '')
+    .replace(concat([`// @suit-end`, ``, ``, `// @suit-start`]), '')
+    .replace(concat([`// @suit-end`, ``, ``, ``, `// @suit-start`]), '')
     .replace(concat([`    // @suit-end`, `    // @suit-start`, '']), '')
     .replace(concat([`  // @suit-end`, `  // @suit-start`, '']), '');
 
