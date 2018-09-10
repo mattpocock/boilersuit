@@ -215,3 +215,19 @@ Allows you to add a description which is added as comments to the code
   }
 }
 ```
+
+#### extends
+
+`type: string`
+
+Allows you to take a shortcut to writing out a whole suit file.
+
+Setting extends to "ajax" will generate an ajax call for you in the suit file. This is currently the only case we support.
+
+```json
+{
+  "getTweets": {
+    "extends": "ajax"
+  }
+}
+```

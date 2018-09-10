@@ -14,6 +14,12 @@ import {
   GET_ROUTES_STARTED,
   GET_ROUTES_FAILED,
   GET_ROUTES_SUCCEEDED,
+  GET_TWEETS_STARTED, // @suit-line
+  GET_TWEETS_SUCCEEDED, // @suit-line
+  GET_TWEETS_FAILED, // @suit-line
+  GET_TODOS_STARTED, // @suit-line
+  GET_TODOS_SUCCEEDED, // @suit-line
+  GET_TODOS_FAILED, // @suit-line
 } from './constants';
 
 const initialAssessmentsState = fromJS({
@@ -87,7 +93,91 @@ export const routesReducer = (state = initialRoutesState, action) => {
   }
 };
 
+// @suit-start
+/**
+ * Get Tweets Reducer
+ * - Makes a Get Tweets API call
+ */
+
+export const initialGetTweetsState = fromJS({
+  isLoading: false,
+  hasSucceeded: false,
+  hasError: false,
+  errorMessage: '',
+  data: null,
+});
+
+export const getTweetsReducer = (state = initialGetTweetsState, { type, payload }) => {
+  switch (type) {
+    // Begins the Get Tweets API Call. No payload.
+    case GET_TWEETS_STARTED:
+      return state
+        .set('isLoading', true)
+        .set('hasSucceeded', false)
+        .set('hasError', false)
+        .set('errorMessage', '')
+        .set('data', null);
+    // Called when the Get Tweets API call completes, passing the data as a payload.
+    case GET_TWEETS_SUCCEEDED:
+      return state
+        .set('isLoading', false)
+        .set('data', payload)
+        .set('hasSucceeded', true);
+    // Called when the Get Tweets API Call fails, delivering a standard error message.
+    case GET_TWEETS_FAILED:
+      return state
+        .set('isLoading', false)
+        .set('errorMessage', 'Get Tweets has failed')
+        .set('hasError', true);
+    default:
+      return state;
+  }
+};
+
+/**
+ * Get Todos Reducer
+ * - Makes a Get Todos API call
+ */
+
+export const initialGetTodosState = fromJS({
+  isLoading: false,
+  hasSucceeded: false,
+  hasError: false,
+  errorMessage: '',
+  data: null,
+});
+
+export const getTodosReducer = (state = initialGetTodosState, { type, payload }) => {
+  switch (type) {
+    // Begins the Get Todos API Call. No payload.
+    case GET_TODOS_STARTED:
+      return state
+        .set('isLoading', true)
+        .set('hasSucceeded', false)
+        .set('hasError', false)
+        .set('errorMessage', '')
+        .set('data', null);
+    // Called when the Get Todos API call completes, passing the data as a payload.
+    case GET_TODOS_SUCCEEDED:
+      return state
+        .set('isLoading', false)
+        .set('data', payload)
+        .set('hasSucceeded', true);
+    // Called when the Get Todos API Call fails, delivering a standard error message.
+    case GET_TODOS_FAILED:
+      return state
+        .set('isLoading', false)
+        .set('errorMessage', 'Get Todos has failed')
+        .set('hasError', true);
+    default:
+      return state;
+  }
+};
+// @suit-end
+
 export default combineReducers({
+  getTodos: getTodosReducer, // @suit-line
+  getTweets: getTweetsReducer, // @suit-line
   filters: filtersReducer,
   assessments: assessmentsReducer,
   routes: routesReducer,

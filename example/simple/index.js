@@ -26,6 +26,16 @@ import {
   makeSelectRoutesHasSucceeded,
   makeSelectRoutesErrorMessage,
   makeSelectRoutesList,
+  makeSelectGetTweetsIsLoading, // @suit-line
+  makeSelectGetTweetsHasSucceeded, // @suit-line
+  makeSelectGetTweetsHasError, // @suit-line
+  makeSelectGetTweetsErrorMessage, // @suit-line
+  makeSelectGetTweetsData, // @suit-line
+  makeSelectGetTodosIsLoading, // @suit-line
+  makeSelectGetTodosHasSucceeded, // @suit-line
+  makeSelectGetTodosHasError, // @suit-line
+  makeSelectGetTodosErrorMessage, // @suit-line
+  makeSelectGetTodosData, // @suit-line
 } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
@@ -34,6 +44,8 @@ import {
   getAssessmentsStarted,
   applyFilter,
   getRoutesStarted,
+  getTweetsStarted, // @suit-line
+  getTodosStarted, // @suit-line
 } from './actions';
 
 export class AdminManageAssessments extends React.Component {
@@ -89,6 +101,18 @@ AdminManageAssessments.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
+  // @suit-start
+  getTodosIsLoading: makeSelectGetTodosIsLoading(),
+  getTodosHasSucceeded: makeSelectGetTodosHasSucceeded(),
+  getTodosHasError: makeSelectGetTodosHasError(),
+  getTodosErrorMessage: makeSelectGetTodosErrorMessage(),
+  getTodosData: makeSelectGetTodosData(),
+  getTweetsIsLoading: makeSelectGetTweetsIsLoading(),
+  getTweetsHasSucceeded: makeSelectGetTweetsHasSucceeded(),
+  getTweetsHasError: makeSelectGetTweetsHasError(),
+  getTweetsErrorMessage: makeSelectGetTweetsErrorMessage(),
+  getTweetsData: makeSelectGetTweetsData(),
+  // @suit-end
   /** Filters */
   filters: makeSelectFilters(),
   /** Assessments */
@@ -107,6 +131,12 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
+    // @suit-start
+    /** Begins the Get Todos API Call. No payload. */
+    submitGetTodosStarted: () => dispatch(getTodosStarted()),
+    /** Begins the Get Tweets API Call. No payload. */
+    submitGetTweetsStarted: () => dispatch(getTweetsStarted()),
+    // @suit-end
     getAssessments: () => dispatch(getAssessmentsStarted()),
     applyFilter: code => dispatch(applyFilter(code)),
     getRoutes: () => dispatch(getRoutesStarted()),

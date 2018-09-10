@@ -1,5 +1,6 @@
 const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
+const ajax = require('../ajax');
 const Cases = require('../../tools/cases');
 const writeIndex = require('./writeIndex');
 const writeSelectors = require('./writeSelectors');
@@ -40,17 +41,51 @@ const up = schemaFile => {
   }
   if (!schema) return;
 
+  const arrayOfDomains = Object.keys(schema).map(key => ({
+    ...schema[key],
+    domainName: key,
+  }));
+
+  /** Checks for an 'extends' keyword */
+
+  let extendsFound = false;
+  arrayOfDomains.forEach(domain => {
+    if (domain.extends === 'ajax') {
+      let searchTerm = concat([
+        `,`,
+        `  "${domain.domainName}": {`,
+        `    "extends": "ajax"`,
+        `  }`,
+      ]);
+      let index = schemaBuf.indexOf(searchTerm);
+      if (index === -1) {
+        searchTerm = concat([
+          `  "${domain.domainName}": {`,
+          `    "extends": "ajax"`,
+          `  }`,
+        ]);
+        index = schemaBuf.indexOf(searchTerm);
+      }
+      if (index !== -1) {
+        extendsFound = true;
+        fs.writeFileSync(
+          schemaFile,
+          schemaBuf.slice(0, index) + schemaBuf.slice(index + searchTerm.length),
+        );
+        ajax(folder, domain.domainName);
+        up(schemaFile);
+      }
+    }
+  });
+
+  if (extendsFound) return;
+
   const errors = [...checkErrorsInSchema(schema), ...checkIfBadBuffer(folder)];
 
   if (errors.length) {
     printError(errors);
     return;
   }
-
-  const arrayOfDomains = Object.keys(schema).map(key => ({
-    ...schema[key],
-    domainName: key,
-  }));
 
   /** Write Reducers */
   const reducersFile = `${folder}/reducer.js`;
@@ -263,7 +298,9 @@ const up = schemaFile => {
 
   /** Write selectors tests */
 
-  const selectorsTestsBuffer = fs.existsSync(`${folder}/tests/selectors.test.js`)
+  const selectorsTestsBuffer = fs.existsSync(
+    `${folder}/tests/selectors.test.js`,
+  )
     ? fs.readFileSync(`${folder}/tests/selectors.test.js`).toString()
     : '';
 
@@ -303,7 +340,10 @@ const up = schemaFile => {
   fs.writeFileSync(`${folder}/selectors.js`, newSelectorsBuffer);
 
   console.log('- writing selectors tests');
-  fs.writeFileSync(`${folder}/tests/selectors.test.js`, newSelectorsTestsBuffer);
+  fs.writeFileSync(
+    `${folder}/tests/selectors.test.js`,
+    newSelectorsTestsBuffer,
+  );
 
   console.log('- writing index');
   fs.writeFileSync(`${folder}/index.js`, newIndexBuffer);
