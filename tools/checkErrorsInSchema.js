@@ -60,7 +60,7 @@ module.exports = schema => {
     }));
 
     arrayOfActions.forEach(action => {
-      if (!action.set) {
+      if (!action.set || !Object.keys(action.set).length) {
         errors.push(
           concat([
             `${

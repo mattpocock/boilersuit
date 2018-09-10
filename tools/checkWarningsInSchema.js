@@ -50,6 +50,26 @@ module.exports = schema => {
         );
       }
     });
+
+    const arrayOfPropertiesSet = Object.keys(
+      arrayOfActions
+        .map(({ set }) => set)
+        .reduce((a, b) => ({ ...a, ...b }), {}),
+    );
+    Object.keys(domain.initialState).forEach(field => {
+      if (!arrayOfPropertiesSet.includes(field)) {
+        warnings.push(
+          concat([
+            `Unused piece of state in ` +
+              `${domain.name}`.cyan +
+              `:` +
+              ` ${field}`.cyan +
+              ` is never changed by any action.`,
+            `- Use it or lose it, buddy.`,
+          ]),
+        );
+      }
+    });
   });
   return warnings;
 };

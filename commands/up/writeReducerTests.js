@@ -50,16 +50,20 @@ module.exports = ({ buffer, cases, actions, initialState }) =>
             const payloadValues = arrayOfSets
               .filter(({ hasPayload }) => hasPayload)
               .map(({ value }) => value);
+            // Checks if payload should be rendered as an object
+            const payloadIsObject =
+              payloadValues.length > 1 ||
+              payloadValues.filter(val => val.includes('.')).length;
             return concat([
               `  describe('${action.name}', () => {`,
               `    it('alters the state as expected', () => {`,
               // if only passes one payload, only test one payload
-              payloadValues.length === 1
+              payloadValues.length === 1 && !payloadIsObject
                 ? `      const payload = 'dummyPayload';`
                 : null,
               // If multiple payloads, define payload as an object and define properties
-              payloadValues.length > 1 ? `      const payload = {};` : null,
-              payloadValues.length > 1
+              payloadIsObject ? `      const payload = {};` : null,
+              payloadIsObject
                 ? concat([
                     ...payloadValues.map(
                       value => `      ${value} = 'dummyPayload';`,
