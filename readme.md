@@ -10,9 +10,9 @@
 
 `npm i boilersuit`
 
-Add `"suit": "suit"` to the `"scripts"` object in your package.json.
+Add `"suit": "suit up"` to the `"scripts"` object in your package.json.
 
-Then, you can run `npm run suit up` instead of `suit up` below.
+Then, you can run `npm run suit` instead of `suit up` below.
 
 ## How To Run It
 

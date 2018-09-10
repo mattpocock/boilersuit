@@ -5,10 +5,10 @@ const gaze = require('gaze');
 const up = require('./commands/up');
 const ajax = require('./commands/ajax');
 
-program.version('0.1.13');
+program.version('0.1.14');
 
 program.command('up').action(() => {
-  gaze('**/suit.json', (err, watcher) => {
+  gaze(['**/suit.json', '!node_modules/**/*'], (err, watcher) => {
     // Resets the console
     process.stdout.write('\x1Bc');
     const watchedFiles = Object.keys(watcher.relative()).length;
