@@ -70,22 +70,27 @@ const ensureImport = (property, fileName, { destructure = false }) => b =>
 
       /** If no imports from fileName, add it and the filename */
       if (!hasImportsFromFileName) {
-        const firstImportLineIndex = buffer.lastIndexOf('import');
+        /** We need to know if there are any imports. If not, add it to the top of the file */
+        const hasPrevImports = buffer.indexOf('import') !== -1;
+        let index = 0;
+        if (hasPrevImports) {
+          index = buffer.lastIndexOf('import');
+        }
         if (destructure) {
           return (
-            buffer.slice(0, firstImportLineIndex) +
+            buffer.slice(0, index) +
             concat([
               `import {`,
               `  ${property}, // @suit-line`,
               `} from '${fileName}';`,
-              buffer.slice(firstImportLineIndex),
+              buffer.slice(index),
             ])
           );
         }
         return concat([
-          buffer.slice(0, firstImportLineIndex),
+          buffer.slice(0, index),
           `import ${property} from '${fileName}'; // @suit-line`,
-          buffer.slice(firstImportLineIndex),
+          buffer.slice(index),
         ]);
       }
       /**

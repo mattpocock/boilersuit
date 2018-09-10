@@ -7,6 +7,9 @@ const {
 
 module.exports = ({ buffer, cases, actionCases, action }) =>
   transforms(buffer, [
+    ensureImport('takeLatest', 'redux-saga/effects', { destructure: true }),
+    ensureImport('call', 'redux-saga/effects', { destructure: true }),
+    ensureImport('put', 'redux-saga/effects', { destructure: true }),
     b => {
       const index = b.indexOf('{', b.indexOf('export default function*')) + 1;
       return concat([
@@ -16,13 +19,8 @@ module.exports = ({ buffer, cases, actionCases, action }) =>
         `  // @suit-end` + b.slice(index),
       ]);
     },
-    ensureImport(actionCases.constant, './constants', { destructure: true }),
-    ensureImport('takeLatest', 'redux-saga/effects', { destructure: true }),
-    ensureImport('call', 'redux-saga/effects', { destructure: true }),
-    ensureImport('put', 'redux-saga/effects', { destructure: true }),
     b => {
-      const sagaPresent =
-        b.indexOf(`export function* ${cases.camel}`) !== -1;
+      const sagaPresent = b.indexOf(`export function* ${cases.camel}`) !== -1;
       if (sagaPresent) {
         console.log(
           `\nSAGA:`.green +
@@ -49,10 +47,14 @@ module.exports = ({ buffer, cases, actionCases, action }) =>
         ` * That means you need to edit it yourself, and delete it yourself if your`,
         ` * actions, constants or reducer name changes.`,
         ` */`,
-        `export function* ${cases.camel}(${action.payload ? '{ payload }' : ''}) {`,
+        `export function* ${cases.camel}(${
+          action.payload ? '{ payload }' : ''
+        }) {`,
         `  let data = '';`,
         `  try {`,
-        `    data = yield call(${cases.camel}AjaxCall${action.payload ? ', payload' : ''});`,
+        `    data = yield call(${cases.camel}AjaxCall${
+          action.payload ? ', payload' : ''
+        });`,
         `  } catch (err) {`,
         `    console.log(err); // eslint-disable-line`,
         `    yield put(actionToFireWhen${cases.pascal}Fails());`,
@@ -69,5 +71,6 @@ module.exports = ({ buffer, cases, actionCases, action }) =>
         b.slice(index),
       ]);
     },
+    ensureImport(actionCases.constant, './constants', { destructure: true }),
     prettify,
   ]);

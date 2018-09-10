@@ -19,8 +19,9 @@ module.exports = ({
   describe,
 }) =>
   transforms(buffer, [
-    ensureImport('fromJS', 'immutable', { destructure: true }),
     /** Adds in boilerplate if domain does not exist */
+    ensureImport('fromJS', 'immutable', { destructure: true }),
+    ensureImport('combineReducers', 'redux', { destructure: true }),
     b => {
       const index = b.lastIndexOf('export default');
       const hasPayload = actionHasPayload(actions);
@@ -59,7 +60,6 @@ module.exports = ({
         ]) + b.slice(index)
       );
     },
-    ensureImport('combineReducers', 'redux', { destructure: true }),
     /** Adds actions */
     b => {
       if (!actions) {
