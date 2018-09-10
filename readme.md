@@ -18,7 +18,7 @@ Then, you can run `npm run suit up` instead of `suit up` below.
 
 Once it's installed, go into the folder of a container and add a `suit.json` file.
 
-`suit.json` files always belong in the FOLDER OF THE CONTAINER YOU WANT TO SUIT UP - alongside index.js, reducers.js, actions.js etc.
+`suit.json` files always belong in the **FOLDER OF THE CONTAINER YOU WANT TO SUIT UP** - alongside index.js, reducers.js, actions.js etc.
 
 ```
 actions.js
