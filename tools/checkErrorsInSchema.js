@@ -1,6 +1,7 @@
 const { concat } = require('./utils');
+const rm = require('../commands/rm');
 
-module.exports = schema => {
+module.exports = (schema, folder) => {
   const errors = [];
   if (!Object.keys(schema).length) {
     errors.push(
@@ -12,6 +13,7 @@ module.exports = schema => {
         '| }',
       ]),
     );
+    rm(folder, { silent: true });
     return errors;
   }
   const domains = Object.keys(schema).map(key => ({

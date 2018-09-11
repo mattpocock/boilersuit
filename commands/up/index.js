@@ -80,7 +80,7 @@ const up = schemaFile => {
 
   if (extendsFound) return;
 
-  const errors = [...checkErrorsInSchema(schema), ...checkIfBadBuffer(folder)];
+  const errors = [...checkErrorsInSchema(schema, folder), ...checkIfBadBuffer(folder)];
 
   if (errors.length) {
     printError(errors);

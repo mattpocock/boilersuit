@@ -4,8 +4,9 @@ const program = require('commander');
 const gaze = require('gaze');
 const up = require('./commands/up');
 const ajax = require('./commands/ajax');
+const rm = require('./commands/rm');
 
-program.version('0.2.3');
+program.version('0.2.4');
 
 program.command('up').action(() => {
   gaze(['**/suit.json', '!node_modules/**/*'], (err, watcher) => {
@@ -30,6 +31,7 @@ program.command('up').action(() => {
     watcher.on('changed', schemaFile => {
       // Resets the console
       process.stdout.write('\x1Bc');
+      // Gets the relative path
       const relativePath = Object.keys(relativePaths).filter(path =>
         schemaFile.includes(path),
       )[0];
@@ -41,6 +43,14 @@ program.command('up').action(() => {
 
 program.command('ajax <folder> <name>').action((folder, name) => {
   ajax(folder, name);
+});
+
+program.command('remove <folder>').action(folder => {
+  rm(folder);
+});
+
+program.command('rm <folder>').action(folder => {
+  rm(folder);
 });
 
 program.command('field').action(() => {
