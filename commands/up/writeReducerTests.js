@@ -43,9 +43,11 @@ module.exports = ({ buffer, cases, actions, initialState }) =>
               .map(set => ({
                 ...set,
                 value:
-                  typeof set.value !== 'string' || set.hasPayload
-                    ? set.value
-                    : `'${set.value}'`,
+                  typeof set.value === 'string' && !set.hasPayload
+                    ? `'${set.value}'`
+                    : typeof set.value === 'object' && set.value !== null
+                      ? printObject(set.value, '        ')
+                      : set.value,
               }));
             const payloadValues = arrayOfSets
               .filter(({ hasPayload }) => hasPayload)

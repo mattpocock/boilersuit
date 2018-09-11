@@ -31,7 +31,7 @@ const printObject = (object, indent = '') => {
     .split('\n')
     .map(line => {
       const lastChar = line[line.length - 1];
-      return line.length === 1 || lastChar === '{' || lastChar === ','
+      return (line.length === 1 || line.length === 2) || lastChar === '{' || lastChar === ','
         ? line
         : `${line},`;
     })
