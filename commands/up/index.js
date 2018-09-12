@@ -1,4 +1,5 @@
 const colors = require('colors'); // eslint-disable-line
+const { exec } = require('child_process');
 const fs = require('fs');
 const ajax = require('../ajax');
 const Cases = require('../../tools/cases');
@@ -70,7 +71,8 @@ const up = schemaFile => {
         extendsFound = true;
         fs.writeFileSync(
           schemaFile,
-          schemaBuf.slice(0, index) + schemaBuf.slice(index + searchTerm.length),
+          schemaBuf.slice(0, index) +
+            schemaBuf.slice(index + searchTerm.length),
         );
         ajax(folder, domain.domainName);
         up(schemaFile);
@@ -80,7 +82,10 @@ const up = schemaFile => {
 
   if (extendsFound) return;
 
-  const errors = [...checkErrorsInSchema(schema, folder), ...checkIfBadBuffer(folder)];
+  const errors = [
+    ...checkErrorsInSchema(schema, folder),
+    ...checkIfBadBuffer(folder),
+  ];
 
   if (errors.length) {
     printError(errors);
@@ -350,6 +355,29 @@ const up = schemaFile => {
 
   console.log('- writing saga');
   fs.writeFileSync(`${folder}/saga.js`, newSagaBuffer);
+
+  const prettierErrors = [];
+
+  if (fs.existsSync('./.prettierrc')) {
+    try {
+      exec(`prettier --config ./.prettierrc --write "${folder}/**/*.js"`);
+      console.log(`\nPRETTIER: `.green + `Running prettier on this folder from the root config.`);
+    } catch (e) {
+      console.log(
+        concat([
+          'No version of prettier found. This will make your files uglier.',
+          `- If you're running locally, `,
+        ]),
+      );
+    }
+  } else {
+    prettierErrors.push(
+      concat([
+        `I see you're not using prettier!`,
+        `- Try adding a .prettierrc to your root directory and suit will make things prettier :)`,
+      ]),
+    );
+  }
 
   printWarning([...checkWarningsInSchema(schema)]);
 };

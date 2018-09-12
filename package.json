@@ -1,7 +1,7 @@
 {
   "name": "boilersuit",
   "description": "A CLI tool for generating selectors, reducers, actions, constants and sagas in react-boilerplate",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "main": "index.js",
   "author": "matt <matt.pocock@thevirtualforge.com>",
   "repository": {
@@ -34,6 +34,9 @@
     "jest": "^23.5.0",
     "pre-commit": "^1.2.2",
     "prettier": "^1.14.2"
+  },
+  "peerDependencies": {
+    "prettier": "1.14.2"
   },
   "jest": {
     "coveragePathIgnorePatterns": [
