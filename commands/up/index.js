@@ -366,7 +366,8 @@ const up = schemaFile => {
       console.log(
         concat([
           'No version of prettier found. This will make your files uglier.',
-          `- If you're running locally, `,
+          `- If you're running suit from npm scripts, run npm i prettier`,
+          `- If you installed suit by typing npm i -g boilersuit, run npm i -g prettier`,
         ]),
       );
     }
