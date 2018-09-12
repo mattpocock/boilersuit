@@ -18,6 +18,7 @@ const printWarning = require('../../tools/printWarning');
 const checkErrorsInSchema = require('../../tools/checkErrorsInSchema');
 const checkWarningsInSchema = require('../../tools/checkWarningsInSchema');
 const checkIfDomainAlreadyPresent = require('../../tools/checkIfDomainAlreadyPresent');
+const checkForConfigFile = require('./checkForConfigFile');
 const runPrettier = require('./runPrettier');
 const {
   parseCamelCaseToArray,
@@ -69,6 +70,8 @@ const up = schemaFile => {
     printError(errors);
     return;
   }
+
+  const config = checkForConfigFile();
 
   /** Write Reducers */
   const reducersFile = `${folder}/reducer.js`;
@@ -302,7 +305,7 @@ const up = schemaFile => {
     }),
   ]);
 
-  const warnings = checkWarningsInSchema(schema);
+  const warnings = checkWarningsInSchema(schema, config);
 
   if (warnings.length) {
     console.log(`\n ${folder}suit.json `.bgYellow.black);
@@ -344,7 +347,7 @@ const up = schemaFile => {
 
   const prettierErrors = runPrettier(folder);
 
-  printWarning([...prettierErrors]);
+  printWarning([...warnings, ...prettierErrors]);
 };
 
 module.exports = up;

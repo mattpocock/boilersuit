@@ -2,7 +2,7 @@
 
 ## How To Use Boilersuit - Video
 
-[![how to use boilersuit](http://img.youtube.com/vi/HHsyoCgzFGg/0.jpg)](http://www.youtube.com/watch?v=HHsyoCgzFGg "How To Use Boilersuit")
+[![how to use boilersuit](http://img.youtube.com/vi/HHsyoCgzFGg/0.jpg)](http://www.youtube.com/watch?v=HHsyoCgzFGg 'How To Use Boilersuit')
 
 ## How To Install
 
@@ -233,5 +233,15 @@ Setting extends to "ajax" will generate an ajax call for you in the suit file. T
   "getTweets": {
     "extends": "ajax"
   }
+}
+```
+
+## Configuration
+
+You can add a .suitrc (or .suitrc.json) file to the root of your folder to configure boilersuit. We're planning on making this a lot more extensible, but for now:
+
+```json
+{
+  "stopDescribeWarnings": true
 }
 ```
