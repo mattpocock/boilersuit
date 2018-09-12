@@ -1,5 +1,4 @@
 const colors = require('colors'); // eslint-disable-line
-const { exec } = require('child_process');
 const fs = require('fs');
 const ajax = require('../ajax');
 const Cases = require('../../tools/cases');
@@ -19,6 +18,7 @@ const printWarning = require('../../tools/printWarning');
 const checkErrorsInSchema = require('../../tools/checkErrorsInSchema');
 const checkWarningsInSchema = require('../../tools/checkWarningsInSchema');
 const checkIfDomainAlreadyPresent = require('../../tools/checkIfDomainAlreadyPresent');
+const runPrettier = require('./runPrettier');
 const {
   parseCamelCaseToArray,
   cleanFile,
@@ -359,34 +359,9 @@ const up = schemaFile => {
   console.log('- writing saga');
   fs.writeFileSync(`${folder}/saga.js`, newSagaBuffer);
 
-  const prettierErrors = [];
+  const prettierErrors = runPrettier(folder);
 
-  if (fs.existsSync('./.prettierrc')) {
-    try {
-      exec(`prettier --config ./.prettierrc --write "${folder}/**/*.js"`);
-      console.log(
-        `\nPRETTIER: `.green +
-          `Running prettier on this folder from the root config.`,
-      );
-    } catch (e) {
-      console.log(
-        concat([
-          'No version of prettier found. This will make your files uglier.',
-          `- If you're running suit from npm scripts, run npm i prettier`,
-          `- If you installed suit by typing npm i -g boilersuit, run npm i -g prettier`,
-        ]),
-      );
-    }
-  } else {
-    prettierErrors.push(
-      concat([
-        `I see you're not using prettier!`,
-        `- Try adding a .prettierrc to your root directory and suit will make things prettier :)`,
-      ]),
-    );
-  }
-
-  printWarning([...checkWarningsInSchema(schema)]);
+  printWarning([...checkWarningsInSchema(schema), prettierErrors]);
 };
 
 module.exports = up;
