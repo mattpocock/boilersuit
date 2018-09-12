@@ -1,6 +1,5 @@
 const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
-const ajax = require('../ajax');
 const Cases = require('../../tools/cases');
 const writeIndex = require('./writeIndex');
 const writeSelectors = require('./writeSelectors');
@@ -11,6 +10,7 @@ const writeSaga = require('./writeSaga');
 const writeReducerTests = require('./writeReducerTests');
 const writeActionTests = require('./writeActionTests');
 const writeSelectorTests = require('./writeSelectorTests');
+const checkExtends = require('./checkExtends');
 const printError = require('../../tools/printError');
 const checkIfNoAllSagas = require('../../tools/checkIfNoAllSagas');
 const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
@@ -35,8 +35,6 @@ const up = schemaFile => {
     // This replaces all backslashes with forward slashes on Windows
     .replace(/\\/g, '/');
 
-  console.log(`\n ${folder}suit.json `.black.bgGreen);
-
   let schema;
   try {
     schema = JSON.parse(schemaBuf.toString());
@@ -52,35 +50,11 @@ const up = schemaFile => {
 
   /** Checks for an 'extends' keyword */
 
-  let extendsFound = false;
-  arrayOfDomains.forEach(domain => {
-    if (domain.extends === 'ajax') {
-      let searchTerm = concat([
-        `,`,
-        `  "${domain.domainName}": {`,
-        `    "extends": "ajax"`,
-        `  }`,
-      ]);
-      let index = schemaBuf.indexOf(searchTerm);
-      if (index === -1) {
-        searchTerm = concat([
-          `  "${domain.domainName}": {`,
-          `    "extends": "ajax"`,
-          `  }`,
-        ]);
-        index = schemaBuf.indexOf(searchTerm);
-      }
-      if (index !== -1) {
-        extendsFound = true;
-        fs.writeFileSync(
-          schemaFile,
-          schemaBuf.slice(0, index) +
-            schemaBuf.slice(index + searchTerm.length),
-        );
-        ajax(folder, domain.domainName);
-        up(schemaFile);
-      }
-    }
+  const extendsFound = checkExtends({
+    arrayOfDomains,
+    folder,
+    schemaFile,
+    schemaBuf,
   });
 
   if (extendsFound) return;
@@ -91,6 +65,7 @@ const up = schemaFile => {
   ];
 
   if (errors.length) {
+    console.log(`\n ${folder}suit.json `.white.bgRed);
     printError(errors);
     return;
   }
@@ -327,6 +302,14 @@ const up = schemaFile => {
     }),
   ]);
 
+  const warnings = checkWarningsInSchema(schema);
+
+  if (warnings.length) {
+    console.log(`\n ${folder}suit.json `.bgYellow.black);
+  } else {
+    console.log(`\n ${folder}suit.json `.bgGreen.black);
+  }
+
   console.log('\nCHANGES:'.green);
 
   console.log('- writing reducers');
@@ -361,7 +344,7 @@ const up = schemaFile => {
 
   const prettierErrors = runPrettier(folder);
 
-  printWarning([...checkWarningsInSchema(schema), prettierErrors]);
+  printWarning([...prettierErrors]);
 };
 
 module.exports = up;
