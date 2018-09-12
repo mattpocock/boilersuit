@@ -30,7 +30,10 @@ const {
 const up = schemaFile => {
   const schemaBuf = fs.readFileSync(schemaFile).toString();
   /** Gives us the folder where the schema file lives */
-  const folder = schemaFile.slice(0, -9);
+  const folder = schemaFile
+    .slice(0, -9)
+    // This replaces all backslashes with forward slashes on Windows
+    .replace(/\\/g, '/');
 
   console.log(`\n ${folder}suit.json `.black.bgGreen);
 
@@ -361,7 +364,10 @@ const up = schemaFile => {
   if (fs.existsSync('./.prettierrc')) {
     try {
       exec(`prettier --config ./.prettierrc --write "${folder}/**/*.js"`);
-      console.log(`\nPRETTIER: `.green + `Running prettier on this folder from the root config.`);
+      console.log(
+        `\nPRETTIER: `.green +
+          `Running prettier on this folder from the root config.`,
+      );
     } catch (e) {
       console.log(
         concat([
