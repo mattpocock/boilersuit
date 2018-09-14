@@ -35,6 +35,7 @@ const up = schemaFile => {
     .slice(0, -9)
     // This replaces all backslashes with forward slashes on Windows
     .replace(/\\/g, '/');
+  const dotSuitFolder = folder.replace(/\//g, '-');
 
   let schema;
   try {
@@ -72,6 +73,29 @@ const up = schemaFile => {
   }
 
   const config = checkForConfigFile();
+
+  const warnings = checkWarningsInSchema(schema, config);
+
+  if (warnings.length) {
+    console.log(`\n ${folder}suit.json `.bgYellow.black);
+  } else {
+    console.log(`\n ${folder}suit.json `.bgGreen.black);
+  }
+
+  /** Check for a previous suit file in folder */
+
+  if (fs.existsSync(`./.suit/${dotSuitFolder}/suit.old.json`)) {
+    if (
+      fs.readFileSync(`./.suit/${dotSuitFolder}/suit.old.json`).toString() ===
+      schemaBuf
+    ) {
+      console.log(
+        `\n NO CHANGES:`.green +
+          ` No changes found in suit file from previous version. Not editing files.`,
+      );
+      return;
+    }
+  }
 
   /** Write Reducers */
   const reducersFile = `${folder}/reducer.js`;
@@ -305,14 +329,6 @@ const up = schemaFile => {
     }),
   ]);
 
-  const warnings = checkWarningsInSchema(schema, config);
-
-  if (warnings.length) {
-    console.log(`\n ${folder}suit.json `.bgYellow.black);
-  } else {
-    console.log(`\n ${folder}suit.json `.bgGreen.black);
-  }
-
   console.log('\nCHANGES:'.green);
 
   console.log('- writing reducers');
@@ -344,6 +360,12 @@ const up = schemaFile => {
 
   console.log('- writing saga');
   fs.writeFileSync(`${folder}/saga.js`, newSagaBuffer);
+
+  console.log('- saving old suit file in .suit directory');
+  if (!fs.existsSync(`./.suit/${dotSuitFolder}`)) {
+    fs.mkdirSync(`./.suit/${dotSuitFolder}`);
+  }
+  fs.writeFileSync(`./.suit/${dotSuitFolder}/suit.old.json`, schemaBuf);
 
   const prettierErrors = runPrettier(folder);
 

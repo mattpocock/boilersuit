@@ -1,6 +1,6 @@
 const fs = require('fs');
 const ajax = require('../ajax');
-const up = require('./index');
+const up = require('./');
 const { concat } = require('../../tools/utils');
 
 module.exports = ({ arrayOfDomains, schemaBuf, schemaFile, folder }) => {
