@@ -28,7 +28,7 @@ const {
   concat,
 } = require('../../tools/utils');
 
-const up = schemaFile => {
+const up = (schemaFile, { quiet = false } = {}) => {
   const schemaBuf = fs.readFileSync(schemaFile).toString();
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile
@@ -76,12 +76,6 @@ const up = schemaFile => {
 
   const warnings = checkWarningsInSchema(schema, config);
 
-  if (warnings.length) {
-    console.log(`\n ${folder}suit.json `.bgYellow.black);
-  } else {
-    console.log(`\n ${folder}suit.json `.bgGreen.black);
-  }
-
   /** Check for a previous suit file in folder */
 
   if (fs.existsSync(`./.suit/${dotSuitFolder}/suit.old.json`)) {
@@ -89,12 +83,24 @@ const up = schemaFile => {
       fs.readFileSync(`./.suit/${dotSuitFolder}/suit.old.json`).toString() ===
       schemaBuf
     ) {
-      console.log(
-        `\n NO CHANGES:`.green +
-          ` No changes found in suit file from previous version. Not editing files.`,
-      );
+      if (warnings.length) {
+        console.log(`\n ${folder}suit.json `.bgYellow.black);
+        printWarning(warnings);
+      } else if (!quiet) {
+        console.log(`\n ${folder}suit.json `.bgGreen.black);
+        console.log(
+          `\n NO CHANGES:`.green +
+            ` No changes found in suit file from previous version. Not editing files.`,
+        );
+      }
       return;
     }
+  }
+
+  if (warnings.length) {
+    console.log(`\n ${folder}suit.json `.bgYellow.black);
+  } else {
+    console.log(`\n ${folder}suit.json `.bgGreen.black);
   }
 
   /** Write Reducers */

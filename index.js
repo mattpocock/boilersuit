@@ -6,7 +6,7 @@ const up = require('./commands/up');
 const ajax = require('./commands/ajax');
 const rm = require('./commands/rm');
 
-program.version('0.2.7');
+program.version('0.2.8');
 
 program.command('up').action(() => {
   gaze(['**/suit.json', '!node_modules/**/*'], (err, watcher) => {
@@ -15,7 +15,7 @@ program.command('up').action(() => {
     const watchedFiles = Object.keys(watcher.relative()).length;
     console.log(
       `Watching ${watchedFiles} suit.json ${
-        watchedFiles > 1 ? 'files' : 'file'
+        watchedFiles > 1 && watchedFiles !== 0 ? 'files' : 'file'
       }...`.yellow,
     );
     /** This does it the first time */
@@ -28,15 +28,21 @@ program.command('up').action(() => {
     const relativePaths = watcher.relative();
 
     /** Then this watches further changes */
-    watcher.on('changed', schemaFile => {
+    watcher.on('changed', () => {
       // Resets the console
       process.stdout.write('\x1Bc');
+      console.log(
+        `Watching ${watchedFiles} suit.json ${
+          watchedFiles > 1 && watchedFiles !== 0 ? 'files' : 'file'
+        }...`.yellow,
+      );
       // Gets the relative path
-      const relativePath = Object.keys(relativePaths).filter(path =>
-        schemaFile.includes(path),
-      )[0];
-
-      up((relativePath === '.' ? './' : relativePath) + 'suit.json');
+      /** This does it the first time */
+      Object.entries(relativePaths).forEach(entry => {
+        // This bit of fidgeting allows for suiting up from the same folder
+        const schemaFile = (entry[0] === '.' ? './' : entry[0]) + entry[1][0];
+        up(schemaFile, { quiet: true });
+      });
     });
   });
 });
