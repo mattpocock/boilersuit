@@ -5,13 +5,15 @@ const {
   parseCamelCaseToArray,
   prettify,
   ensureImport,
+  capitalize,
 } = require('../../tools/utils');
 
-module.exports = ({ buffer, cases, initialState, actions }) => {
-  if (!actions || !initialState) return buffer;
+module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
+  /** Checks if the passAsProp keyword is present */
   const hasPropFiltering = Object.values(actions).filter(actionValues =>
     Object.keys(actionValues).includes('passAsProp'),
   ).length;
+
   return transforms(buffer, [
     /** Import all selectors */
     b =>
@@ -90,10 +92,14 @@ module.exports = ({ buffer, cases, initialState, actions }) => {
                   `${value}`.includes('payload'),
                 ).length || actions[key].payload;
               return concat([
-                actions[key].describe ? `    /** ${actions[key].describe} */` : null,
-                `    submit${actionCases.pascal}: (${hasPayload ? 'payload' : ''}) => dispatch(${
-                  actionCases.camel
-                }(${hasPayload ? 'payload' : ''})),`,
+                actions[key].describe
+                  ? `    /** ${actions[key].describe} */`
+                  : null,
+                `    submit${actionCases.pascal}: (${
+                  hasPayload ? 'payload' : ''
+                }) => dispatch(${actionCases.camel}(${
+                  hasPayload ? 'payload' : ''
+                })),`,
               ]);
             }),
           '    // @suit-end',
@@ -101,6 +107,100 @@ module.exports = ({ buffer, cases, initialState, actions }) => {
         ])
       );
     },
+    /** Writes propTypes */
+    b => {
+      const startIndex = b.indexOf('propTypes = {') + 'propTypes = {'.length;
+      const endIndex = b.indexOf('\n};', startIndex);
+      const propTypesSlice = b.slice(startIndex, endIndex);
+
+      const noPreviousPropTypes =
+        propTypesSlice.indexOf('// @suit-name-only-start') === -1;
+
+      if (noPreviousPropTypes) {
+        const propTypesToAdd = Object.keys(initialState)
+          .map(key => ({
+            key,
+            value: initialState[key],
+            fieldCases: new Cases(parseCamelCaseToArray(key)).all(),
+          }))
+          // If the user has already added it to prop types, don't double add it
+          .filter(
+            ({ fieldCases }) =>
+              propTypesSlice.indexOf(`${cases.camel}${fieldCases.pascal}`) ===
+              -1,
+          )
+          .map(
+            ({ value, fieldCases }) =>
+              `// ${cases.camel}${
+                fieldCases.pascal
+              }: PropTypes.${propTypeFromTypeOf(typeof value)},`,
+          );
+        // If any valid prop types to add, adds them
+        if (propTypesToAdd.length) {
+          return concat([
+            b.slice(0, startIndex),
+            `  // @suit-name-only-start`,
+            ...propTypesToAdd,
+            `  // @suit-name-only-end` + b.slice(startIndex),
+          ]);
+        }
+        return b;
+      }
+      return transforms(b, [
+        // Removes old keys and adds in the new
+        ...keyChanges
+          .filter(
+            ({ removed }) =>
+              removed.includes(cases.camel) && removed.includes('initialState'),
+          )
+          .map(({ removedCases, addedCases }) => buf => {
+            const startOfCaseToRemove = buf.indexOf(
+              removedCases.pascal,
+              startIndex,
+            );
+            return (
+              buf.slice(0, startOfCaseToRemove) +
+              addedCases.pascal +
+              buf.slice(startOfCaseToRemove + removedCases.pascal.length)
+            );
+          }),
+        // If key still not present, adds it
+        ...Object.keys(initialState).map(key => buf => {
+          const newPropTypesSlice = buf.slice(
+            startIndex,
+            buf.indexOf('\n};', startIndex),
+          );
+          if (newPropTypesSlice.indexOf(capitalize(key)) === -1) {
+            const buffArr = buf.split('\n');
+            buffArr.splice(
+              buffArr.findIndex(line =>
+                line.includes('// @suit-name-only-start'),
+              ) + 1,
+              0,
+              `// ${cases.camel}${capitalize(
+                key,
+              )}: PropTypes.${propTypeFromTypeOf(typeof value)},`,
+            );
+            return buffArr.join('\n');
+          }
+          return buf;
+        }),
+      ]);
+    },
     prettify,
   ]);
+};
+
+const propTypeFromTypeOf = type => {
+  switch (type) {
+    case 'function':
+      return 'func';
+    case 'undefined':
+    case 'object':
+      return 'any';
+    case 'boolean':
+      return 'bool';
+    default:
+      return type;
+  }
 };

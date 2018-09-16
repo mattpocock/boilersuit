@@ -13,6 +13,7 @@
     "function-paren-newline": "off",
     "no-use-before-define": "off",
     "indent": "off",
-    "no-nested-ternary": "off"
+    "no-nested-ternary": "off",
+    "no-confusing-arrow": "off"
   }
 }

@@ -31,7 +31,10 @@ const printObject = (object, indent = '') => {
     .split('\n')
     .map(line => {
       const lastChar = line[line.length - 1];
-      return (line.length === 1 || line.length === 2) || lastChar === '{' || lastChar === ','
+      return line.length === 1 ||
+        line.length === 2 ||
+        lastChar === '{' ||
+        lastChar === ','
         ? line
         : `${line},`;
     })
@@ -157,6 +160,20 @@ const correctCommentedOutImport = fileName => buffer =>
 const removeSuitDoubling = buffer =>
   buffer
     .replace(new RegExp(concat([`// @suit-end`, `// @suit-start`]), 'g'), '')
+    .replace(
+      new RegExp(
+        concat([`// @suit-name-only-end`, `// @suit-name-only-start`]),
+        'g',
+      ),
+      '',
+    )
+    .replace(
+      new RegExp(
+        concat([`  // @suit-name-only-start`, `  // @suit-name-only-end`]),
+        'g',
+      ),
+      '',
+    )
     .replace(
       new RegExp(concat([`// @suit-end`, ``, `// @suit-start`]), 'g'),
       '',

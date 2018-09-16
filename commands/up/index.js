@@ -1,5 +1,6 @@
 const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
+const diff = require('deep-diff');
 const Cases = require('../../tools/cases');
 const writeIndex = require('./writeIndex');
 const writeSelectors = require('./writeSelectors');
@@ -76,6 +77,7 @@ const up = (schemaFile, { quiet = false } = {}) => {
   /** Check for a previous suit file in folder */
 
   if (fs.existsSync(`./.suit/${dotSuitFolder}/suit.old.json`)) {
+    /** If previous suit file is identical to current, don't edit */
     if (
       fs.readFileSync(`./.suit/${dotSuitFolder}/suit.old.json`).toString() ===
       schemaBuf
@@ -99,6 +101,36 @@ const up = (schemaFile, { quiet = false } = {}) => {
   } else {
     console.log(`\n ${folder}suit.json `.bgGreen.black);
   }
+
+  /** Get a more detailed diff of the changes */
+
+  const oldSchemaBuf = fs
+    .readFileSync(`./.suit/${dotSuitFolder}/suit.old.json`)
+    .toString();
+
+  const differences = diff(JSON.parse(oldSchemaBuf), JSON.parse(schemaBuf));
+  const keyChanges = differences
+    .filter(({ kind }) => kind === 'D' || kind === 'N')
+    .map(({ path }, index) => {
+      if (!differences[index + 1]) return null;
+      const newPath = differences[index + 1].path;
+      return JSON.stringify(path.slice(0, path.length - 1)) ===
+        JSON.stringify(newPath.slice(0, newPath.length - 1))
+        ? {
+            removed: path,
+            added: newPath,
+            removedCases: new Cases(
+              parseCamelCaseToArray(path[path.length - 1]),
+            ).all(),
+            addedCases: new Cases(
+              parseCamelCaseToArray(newPath[newPath.length - 1]),
+            ).all(),
+          }
+        : null;
+    })
+    .filter(n => n !== null);
+  // console.log(keyChanges);
+  // return;
 
   /** Write reducer */
 
@@ -161,6 +193,7 @@ const up = (schemaFile, { quiet = false } = {}) => {
         buffer: b,
         cases: allDomainCases,
         initialState,
+        keyChanges,
         actions,
       });
     }),
