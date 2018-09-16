@@ -1,7 +1,7 @@
 {
   "name": "boilersuit",
   "description": "A CLI tool for generating selectors, reducers, actions, constants and sagas in react-boilerplate",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "main": "index.js",
   "author": "matt <matt.pocock@thevirtualforge.com>",
   "repository": {
