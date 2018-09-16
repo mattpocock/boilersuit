@@ -1,6 +1,5 @@
 const fs = require('fs');
 const ajax = require('../ajax');
-const up = require('./');
 const { concat } = require('../../tools/utils');
 
 module.exports = ({ arrayOfDomains, schemaBuf, schemaFile, folder }) => {
@@ -30,7 +29,6 @@ module.exports = ({ arrayOfDomains, schemaBuf, schemaFile, folder }) => {
             schemaBuf.slice(index + searchTerm.length),
         );
         ajax(folder, domain.domainName);
-        up(schemaFile);
       }
     }
   });
