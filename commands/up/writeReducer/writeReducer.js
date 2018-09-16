@@ -1,5 +1,5 @@
-const Parser = require('../../tools/parser');
-const Cases = require('../../tools/cases');
+const Parser = require('../../../tools/parser');
+const Cases = require('../../../tools/cases');
 const writeActionsInReducer = require('./writeActionsInReducer');
 const {
   concat,
@@ -9,7 +9,7 @@ const {
   prettify,
   ensureImport,
   actionHasPayload,
-} = require('../../tools/utils');
+} = require('../../../tools/utils');
 
 module.exports = ({
   buffer,
@@ -34,7 +34,9 @@ module.exports = ({
         describe ? ` * - ${describe}` : null,
         ` */`,
         ``,
-        `export const initial${pascal}State = fromJS(${printObject(initialState)});`,
+        `export const initial${pascal}State = fromJS(${printObject(
+          initialState,
+        )});`,
         ``,
         `export const ${camel}Reducer = (state = initial${pascal}State, { type${
           hasPayload ? ', payload' : ''

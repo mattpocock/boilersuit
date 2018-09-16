@@ -3,7 +3,7 @@ const {
   transforms,
   prettify,
   ensureImport,
-} = require('../../tools/utils');
+} = require('../../../tools/utils');
 
 module.exports = ({ buffer, cases, actionCases, action }) =>
   transforms(buffer, [

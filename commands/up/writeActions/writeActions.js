@@ -1,11 +1,11 @@
-const Cases = require('../../tools/cases');
+const Cases = require('../../../tools/cases');
 const {
   concat,
   transforms,
   parseCamelCaseToArray,
   ensureImport,
   prettify,
-} = require('../../tools/utils');
+} = require('../../../tools/utils');
 
 module.exports = ({ buffer, cases, actions }) =>
   transforms(buffer, [

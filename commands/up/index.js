@@ -12,12 +12,10 @@ const writeActionTests = require('./writeActionTests');
 const writeSelectorTests = require('./writeSelectorTests');
 const checkExtends = require('./checkExtends');
 const printError = require('../../tools/printError');
-const checkIfNoAllSagas = require('../../tools/checkIfNoAllSagas');
 const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
 const printWarning = require('../../tools/printWarning');
 const checkErrorsInSchema = require('../../tools/checkErrorsInSchema');
 const checkWarningsInSchema = require('../../tools/checkWarningsInSchema');
-const checkIfDomainAlreadyPresent = require('../../tools/checkIfDomainAlreadyPresent');
 const checkForConfigFile = require('./checkForConfigFile');
 const runPrettier = require('./runPrettier');
 const {
@@ -25,7 +23,6 @@ const {
   cleanFile,
   fixInlineImports,
   transforms,
-  concat,
 } = require('../../tools/utils');
 
 const up = (schemaFile, { quiet = false } = {}) => {
@@ -103,32 +100,12 @@ const up = (schemaFile, { quiet = false } = {}) => {
     console.log(`\n ${folder}suit.json `.bgGreen.black);
   }
 
-  /** Write Reducers */
-  const reducersFile = `${folder}/reducer.js`;
-  const reducerBuffer = cleanFile(fs.readFileSync(reducersFile).toString());
-  let domainErrors = [];
-  const newReducerBuffer = transforms(reducerBuffer, [
-    cleanFile,
-    fixInlineImports,
-    ...arrayOfDomains.map(
-      ({ domainName, initialState, actions, describe }) => b => {
-        const cases = new Cases(parseCamelCaseToArray(domainName));
-        const allDomainCases = cases.all();
-        domainErrors = [
-          ...domainErrors,
-          ...checkIfDomainAlreadyPresent(folder, allDomainCases, actions),
-        ];
+  /** Write reducer */
 
-        return writeReducer({
-          buffer: b,
-          cases: allDomainCases,
-          initialState,
-          actions,
-          describe,
-        });
-      },
-    ),
-  ]);
+  const { buffer: newReducerBuffer, errors: domainErrors } = writeReducer({
+    folder,
+    arrayOfDomains,
+  });
 
   if (domainErrors.length) {
     printError(domainErrors);
@@ -137,42 +114,17 @@ const up = (schemaFile, { quiet = false } = {}) => {
 
   /** Write Actions */
 
-  const actionsBuffer = fs.readFileSync(`${folder}/actions.js`).toString();
-
-  const newActionsBuffer = transforms(actionsBuffer, [
-    cleanFile,
-    fixInlineImports,
-    ...arrayOfDomains.map(({ domainName, actions }) => b => {
-      const cases = new Cases(parseCamelCaseToArray(domainName));
-      const allDomainCases = cases.all();
-
-      return writeActions({
-        buffer: b,
-        cases: allDomainCases,
-        actions,
-      });
-    }),
-  ]);
+  const { buffer: newActionsBuffer } = writeActions({
+    folder,
+    arrayOfDomains,
+  });
 
   /** Write Constants */
 
-  const constantsBuffer = fs.readFileSync(`${folder}/constants.js`).toString();
-
-  const newConstantsBuffer = transforms(constantsBuffer, [
-    cleanFile,
-    fixInlineImports,
-    ...arrayOfDomains.map(({ domainName, actions }) => b => {
-      const cases = new Cases(parseCamelCaseToArray(domainName));
-      const allDomainCases = cases.all();
-
-      return writeConstants({
-        buffer: b,
-        cases: allDomainCases,
-        actions,
-        folder,
-      });
-    }),
-  ]);
+  const { buffer: newConstantsBuffer } = writeConstants({
+    folder,
+    arrayOfDomains,
+  });
 
   /** Write Selectors */
 
@@ -216,51 +168,15 @@ const up = (schemaFile, { quiet = false } = {}) => {
 
   /** Write Saga */
 
-  const sagaBuffer = fs.readFileSync(`${folder}/saga.js`).toString();
-
-  const sagaErrors = checkIfNoAllSagas(sagaBuffer);
+  const { errors: sagaErrors, buffer: newSagaBuffer } = writeSaga({
+    folder,
+    arrayOfDomains,
+  });
 
   if (sagaErrors.length) {
     printError(sagaErrors);
     return;
   }
-
-  const newSagaBuffer = transforms(sagaBuffer, [
-    cleanFile,
-    fixInlineImports,
-    ...arrayOfDomains.map(({ domainName, actions }) => b => {
-      const cases = new Cases(parseCamelCaseToArray(domainName));
-      const allDomainCases = cases.all();
-      const actionsWithSagas = Object.keys(actions).filter(
-        key => actions[key].saga === true,
-      );
-      if (actionsWithSagas > 1) {
-        printError([
-          concat([
-            `More than one action in ${
-              allDomainCases.display
-            } has been given an attribute of "saga": true`,
-            `- Only one action can be assigned a saga per reducer.`,
-          ]),
-        ]);
-        return b;
-      }
-
-      if (actionsWithSagas < 1) {
-        return b;
-      }
-
-      const actionCases = new Cases(parseCamelCaseToArray(actionsWithSagas[0]));
-      const allActionCases = actionCases.all();
-
-      return writeSaga({
-        buffer: b,
-        cases: allDomainCases,
-        actionCases: allActionCases,
-        action: actions[actionsWithSagas[0]],
-      });
-    }),
-  ]);
 
   /** Write reducer tests */
 
@@ -338,7 +254,7 @@ const up = (schemaFile, { quiet = false } = {}) => {
   console.log('\nCHANGES:'.green);
 
   console.log('- writing reducers');
-  fs.writeFileSync(reducersFile, newReducerBuffer);
+  fs.writeFileSync(`${folder}/reducer.js`, newReducerBuffer);
 
   console.log('- writing reducer tests');
   fs.writeFileSync(`${folder}/tests/reducer.test.js`, newReducerTestBuffer);
@@ -372,6 +288,8 @@ const up = (schemaFile, { quiet = false } = {}) => {
     fs.mkdirSync(`./.suit/${dotSuitFolder}`);
   }
   fs.writeFileSync(`./.suit/${dotSuitFolder}/suit.old.json`, schemaBuf);
+
+  /** Runs prettier and checks for errors */
 
   const prettierErrors = runPrettier(folder);
 
