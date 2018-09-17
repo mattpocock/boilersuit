@@ -18,7 +18,8 @@ module.exports = (folder, camelCase) => {
   }
   console.log(` ${fixedFolder}suit.json `.bgGreen.black);
   console.log(
-    'SUIT: '.green + (includeComma ? 'writing existing suit.json' : 'writing new suit.json'),
+    'SUIT: '.green +
+      (includeComma ? 'writing existing suit.json' : 'writing new suit.json'),
   );
   fs.writeFileSync(
     `${fixedFolder}suit.json`,
@@ -32,11 +33,13 @@ module.exports = (folder, camelCase) => {
         `      "hasSucceeded": false,`,
         `      "hasError": false,`,
         `      "errorMessage": "",`,
-        `      "data": null`,
+        `      "data": {}`,
         `    },`,
         `    "actions": {`,
         `      "${cases.camel}Started": {`,
-        `        "describe": "Begins the ${cases.display} API Call. No payload.",`,
+        `        "describe": "Begins the ${
+          cases.display
+        } API Call. No payload.",`,
         `        "saga": true,`,
         `        "passAsProp": true,`,
         `        "set": {`,
@@ -44,11 +47,13 @@ module.exports = (folder, camelCase) => {
         `          "hasSucceeded": false,`,
         `          "hasError": false,`,
         `          "errorMessage": "",`,
-        `          "data": null`,
+        `          "data": {}`,
         `        }`,
         `      },`,
         `      "${cases.camel}Succeeded": {`,
-        `        "describe": "Called when the ${cases.display} API call completes, passing the data as a payload.",`,
+        `        "describe": "Called when the ${
+          cases.display
+        } API call completes, passing the data as a payload.",`,
         `        "set": {`,
         `          "isLoading": false,`,
         `          "data": "payload",`,
@@ -56,7 +61,9 @@ module.exports = (folder, camelCase) => {
         `        }`,
         `      },`,
         `      "${cases.camel}Failed": {`,
-        `        "describe": "Called when the ${cases.display} API Call fails, delivering a standard error message.",`,
+        `        "describe": "Called when the ${
+          cases.display
+        } API Call fails, delivering a standard error message.",`,
         `        "set": {`,
         `          "isLoading": false,`,
         `          "errorMessage": "${cases.display} has failed",`,
