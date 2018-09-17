@@ -26,7 +26,7 @@ const {
   transforms,
 } = require('../../tools/utils');
 
-const up = (schemaFile, { quiet = false } = {}) => {
+const up = (schemaFile, { quiet = false, force = false } = {}) => {
   const schemaBuf = fs.readFileSync(schemaFile).toString();
   /** Gives us the folder where the schema file lives */
   const folder = schemaFile
@@ -74,10 +74,9 @@ const up = (schemaFile, { quiet = false } = {}) => {
 
   const warnings = checkWarningsInSchema(schema, config);
 
-  /** Check for a previous suit file in folder */
+  /** Check for a previous suit file in folder - force prevents this check */
 
-  if (fs.existsSync(`./.suit/${dotSuitFolder}/suit.old.json`)) {
-    /** If previous suit file is identical to current, don't edit */
+  if (fs.existsSync(`./.suit/${dotSuitFolder}/suit.old.json`) && !force) {
     if (
       fs.readFileSync(`./.suit/${dotSuitFolder}/suit.old.json`).toString() ===
       schemaBuf

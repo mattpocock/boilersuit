@@ -13,10 +13,13 @@ module.exports = ({ buffer, cases, initialState, folder }) => {
   const domainName = getDomainNameFromFolder(folder);
   const mainSelector = concat([
     `export const makeSelect${cases.pascal} = () =>`,
-    `  createSelector(select${capitalize(domainName)}Domain, (substate) =>`,
-    `    // this ternary checks if the domain is immutable, and parses it correctly`,
-    `    fromJS(substate.toJS ? substate.get('${cases.camel}') : substate.${cases.camel}),`,
-    `  );`,
+    `  createSelector(select${capitalize(domainName)}Domain, (substate) => {`,
+    `    if (!substate) return fromJS({});`,
+    `    // checks if the domain is immutable, and parses it correctly`,
+    `    return fromJS(substate.toJS ? substate.get('${
+      cases.camel
+    }') : substate.${cases.camel});`,
+    `  });`,
   ]);
 
   return transforms(buffer, [
