@@ -110,7 +110,8 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
       .readFileSync(`./.suit/${dotSuitFolder}/suit.old.json`)
       .toString();
 
-    const differences = diff(JSON.parse(oldSchemaBuf), JSON.parse(schemaBuf));
+    const differences =
+      diff(JSON.parse(oldSchemaBuf), JSON.parse(schemaBuf)) || [];
     keyChanges = differences
       .filter(({ kind }) => kind === 'D' || kind === 'N')
       .map(({ path }, index) => {

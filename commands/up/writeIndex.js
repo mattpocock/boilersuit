@@ -108,11 +108,13 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
     b => {
       const startIndex = b.indexOf('propTypes = {') + 'propTypes = {'.length;
       const endIndex = b.indexOf('\n};', startIndex);
+      // Makes a slice of the proptypes to check if keys already exist
       const propTypesSlice = b.slice(startIndex, endIndex);
 
       const noPreviousPropTypes =
         propTypesSlice.indexOf('// @suit-name-only-start') === -1;
 
+      // If we've not put in a // @suit-name-only section
       if (noPreviousPropTypes) {
         const propTypesToAdd = [
           ...Object.keys(initialState)
@@ -140,6 +142,7 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
               if (!hasPropFiltering) return true;
               return actions[key].passAsProp;
             })
+            // Filters out actions that have already been included
             .filter(
               actionKey =>
                 propTypesSlice.indexOf(`submit${capitalize(actionKey)}`) === -1,
@@ -148,7 +151,6 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
               actionKey => `// submit${capitalize(actionKey)}: PropTypes.func,`,
             ),
         ];
-        // If any valid prop types to add, adds them
         if (propTypesToAdd.length) {
           return concat([
             b.slice(0, startIndex),
@@ -159,26 +161,46 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
         }
         return b;
       }
+      // At this point, we know that there are keys that need to
+      // be replaced in the proptypes slice
       return transforms(b, [
-        // Removes old keys and adds in the new
+        // Checks the list of new changes for any relevant ones for PropTypes
         ...keyChanges
           .filter(
             ({ removed }) =>
               removed.includes(cases.camel) &&
-              // If key is in initialstate, or is the name of an action
+              // If key is in initialstate, or is the name of an action, include it
               (removed.includes('initialState') ||
                 removed[removed.length - 2] === 'actions'),
           )
-          .map(({ removedCases, addedCases }) => buf => {
-            const startOfCaseToRemove = buf.indexOf(
-              removedCases.pascal,
-              startIndex,
+          // There are both actions and initialState bits in this area
+          .map(({ removed, removedCases, addedCases }) => buf => {
+            const startOfNameOnly =
+              buf.indexOf('// @suit-name-only-start\n') +
+              '// @suit-name-only-start\n'.length;
+            const endOfNameOnly = buf.indexOf(
+              '// @suit-name-only-end',
+              startOfNameOnly,
             );
-            return (
-              buf.slice(0, startOfCaseToRemove) +
-              addedCases.pascal +
-              buf.slice(startOfCaseToRemove + removedCases.pascal.length)
-            );
+            const nameOnlySlice = buf.slice(startOfNameOnly, endOfNameOnly);
+            // If is a state field, and is in the name only section
+            const prefix = removed.includes('initialState')
+              ? cases.camel
+              : 'submit';
+            // If the propType is in the nameOnlySlice, change it
+            if (
+              nameOnlySlice.indexOf(`${prefix}${removedCases.pascal}` !== -1)
+            ) {
+              return (
+                buf.slice(0, startOfNameOnly) +
+                nameOnlySlice.replace(
+                  new RegExp(`${prefix}${removedCases.pascal}`, 'g'),
+                  `${prefix}${addedCases.pascal}`,
+                ) +
+                buf.slice(endOfNameOnly)
+              );
+            }
+            return buf;
           }),
         // If key still not present, adds it
         ...Object.keys(initialState).map(key => buf => {
@@ -186,6 +208,7 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
             startIndex,
             buf.indexOf('\n};', startIndex),
           );
+          console.log(initialState[key]);
           if (
             newPropTypesSlice.indexOf(`${cases.camel}${capitalize(key)}`) === -1
           ) {
@@ -195,9 +218,9 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
                 line.includes('// @suit-name-only-start'),
               ) + 1,
               0,
-              `// ${cases.camel}${capitalize(
+              `  // ${cases.camel}${capitalize(
                 key,
-              )}: PropTypes.${propTypeFromTypeOf(typeof value)},`,
+              )}: PropTypes.${propTypeFromTypeOf(typeof initialState[key])},`,
             );
             return buffArr.join('\n');
           }
@@ -222,7 +245,7 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
                   line.includes('// @suit-name-only-start'),
                 ) + 1,
                 0,
-                `// submit${capitalize(key)}: PropTypes.func,`,
+                `  // submit${capitalize(key)}: PropTypes.func,`,
               );
               return buffArr.join('\n');
             }
