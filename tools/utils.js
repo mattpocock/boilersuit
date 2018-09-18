@@ -270,8 +270,20 @@ const getDomainNameFromFolder = folder =>
     .reverse()
     .filter(x => x !== '')[0];
 
+const indexesOf = (needle, haystack, modifier = 0) => {
+  const instances = haystack.match(new RegExp(needle, 'g'));
+  if (instances === null) return [];
+  let lastIndex = 0;
+  return instances.map(() => {
+    const index = haystack.indexOf(needle, lastIndex) + modifier;
+    lastIndex = index + 1;
+    return index;
+  });
+};
+
 module.exports = {
   concat,
+  indexesOf,
   fixFolderName,
   transforms,
   isCapital,

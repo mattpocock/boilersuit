@@ -112,28 +112,35 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
 
     const differences =
       diff(JSON.parse(oldSchemaBuf), JSON.parse(schemaBuf)) || [];
-    keyChanges = differences
-      .filter(({ kind }) => kind === 'D' || kind === 'N')
-      .map(({ path }, index) => {
-        if (!differences[index + 1]) return null;
-        const newPath = differences[index + 1].path;
-        return JSON.stringify(path.slice(0, path.length - 1)) ===
-          JSON.stringify(newPath.slice(0, newPath.length - 1))
-          ? {
-              removed: path,
-              added: newPath,
-              removedCases: new Cases(
-                parseCamelCaseToArray(path[path.length - 1]),
-              ).all(),
-              addedCases: new Cases(
-                parseCamelCaseToArray(newPath[newPath.length - 1]),
-              ).all(),
-            }
-          : null;
-      })
-      .filter(n => n !== null);
-    // console.log(keyChanges);
-    // return;
+    keyChanges = [
+      ...differences
+        .filter(({ kind }) => kind === 'D' || kind === 'N')
+        .map(({ path }, index) => {
+          if (!differences[index + 1]) return null;
+          const newPath = differences[index + 1].path;
+          return JSON.stringify(path.slice(0, path.length - 1)) ===
+            JSON.stringify(newPath.slice(0, newPath.length - 1))
+            ? {
+                removed: path,
+                added: newPath,
+                removedCases: new Cases(
+                  parseCamelCaseToArray(path[path.length - 1]),
+                ).all(),
+                addedCases: new Cases(
+                  parseCamelCaseToArray(newPath[newPath.length - 1]),
+                ).all(),
+              }
+            : null;
+        })
+        .filter(n => n !== null),
+      ...differences
+        .filter(({ path }) => path.includes('saga'))
+        .map(({ lhs, rhs, path }) => ({
+          removed: path,
+          removedCases: new Cases(parseCamelCaseToArray(lhs)).all(),
+          addedCases: new Cases(parseCamelCaseToArray(rhs)).all(),
+        })),
+    ];
   }
 
   /** Write reducer */
@@ -208,6 +215,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
   const { errors: sagaErrors, buffer: newSagaBuffer } = writeSaga({
     folder,
     arrayOfDomains,
+    keyChanges,
   });
 
   if (sagaErrors.length) {

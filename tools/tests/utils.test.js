@@ -1,13 +1,11 @@
 const { expect } = require('chai');
 const fs = require('fs');
-const { fixInlineImports, concat } = require('../utils');
+const { indexesOf } = require('../utils');
 
-const file = fs
-  .readFileSync('./tools/tests/mocks/withInlineImports.js')
-  .toString();
+const file = fs.readFileSync('./tools/tests/mocks/nameOnly.2.js').toString();
 
-describe('fixInlineImports', () => {
-  it('Must have certain methods', () => {
-    // console.log(fixInlineImports(file));
+describe('indexesOf', () => {
+  it('Must work', () => {
+    expect(indexesOf('// @suit-name-only-start', file)[0]).to.equal(675);
   });
 });

@@ -4,9 +4,20 @@ const {
   prettify,
   ensureImport,
 } = require('../../../tools/utils');
+const replaceInNameOnly = require('../../../tools/replaceInNameOnly');
 
-module.exports = ({ buffer, cases, actionCases, action }) =>
+module.exports = ({
+  buffer,
+  domainCases,
+  actionCases,
+  action,
+  failCases,
+  successCases,
+  keyChanges,
+}) =>
   transforms(buffer, [
+    ensureImport(failCases.camel, './actions', { destructure: true }),
+    ensureImport(successCases.camel, './actions', { destructure: true }),
     ensureImport('takeLatest', 'redux-saga/effects', { destructure: true }),
     ensureImport('call', 'redux-saga/effects', { destructure: true }),
     ensureImport('put', 'redux-saga/effects', { destructure: true }),
@@ -15,17 +26,29 @@ module.exports = ({ buffer, cases, actionCases, action }) =>
       return concat([
         b.slice(0, index),
         `  // @suit-start`,
-        `  yield takeLatest(${actionCases.constant}, ${cases.camel});`,
+        `  yield takeLatest(${actionCases.constant}, ${domainCases.camel});`,
         `  // @suit-end` + b.slice(index),
       ]);
     },
+    // Change sagas if already present
+    b =>
+      transforms(b, [
+        ...keyChanges
+          .filter(
+            ({ removed }) =>
+              removed.includes('saga') && removed.includes('actions'),
+          )
+          .map(({ removedCases, addedCases }) =>
+            replaceInNameOnly(removedCases.camel, addedCases.camel),
+          ),
+      ]),
     b => {
-      const sagaPresent = b.indexOf(`function* ${cases.camel}`) !== -1;
+      const sagaPresent = b.indexOf(`function* ${domainCases.camel}`) !== -1;
       if (sagaPresent) {
         console.log(
           `\nSAGA:`.green +
             ` ${
-              cases.camel
+              domainCases.camel
             } saga already present in file. No edits have been made.`,
         );
         return b;
@@ -34,35 +57,33 @@ module.exports = ({ buffer, cases, actionCases, action }) =>
 
       console.log(
         concat([
-          `\nSAGA:`.green + ` ${cases.camel} saga not found in file.`,
+          `\nSAGA:`.green + ` ${domainCases.camel} saga not found in file.`,
           `- Adding a basic skeleton of a saga. This needs to be updated manually.`,
         ]),
       );
 
       return concat([
         b.slice(0, index),
-        `/**`,
-        ` * ${cases.display} Saga`,
-        ` * This saga was added by boilersuit, but is not managed by boilersuit.`,
-        ` * That means you need to edit it yourself, and delete it yourself if your`,
-        ` * actions, constants or reducer name changes.`,
-        ` */`,
-        `function* ${cases.camel}(${action.payload ? '{ payload }' : ''}) {`,
+        `// @suit-name-only-start`,
+        `function* ${domainCases.camel}(${
+          action.payload ? '{ payload }' : ''
+        }) {`,
         `  let data = '';`,
         `  try {`,
         `    data = yield call(null${action.payload ? ', payload' : ''});`,
         `  } catch (err) {`,
         `    console.log(err); // eslint-disable-line`,
-        `    yield put(actionToFireWhen${cases.pascal}Fails());`,
+        `    yield put(${failCases.camel}());`,
         `  }`,
         `  if (!data) {`,
-        `    yield put(actionToFireWhen${cases.pascal}Fails());`,
+        `    yield put(${failCases.camel}());`,
         `  } else if (!data.error) {`,
-        `    yield put(actionToFireWhen${cases.pascal}Succeeds(data.body));`,
+        `    yield put(${successCases.camel}(data.body));`,
         `  } else {`,
-        `    yield put(actionToFireWhen${cases.pascal}Fails());`,
+        `    yield put(${failCases.camel}());`,
         `  }`,
         `}`,
+        `// @suit-name-only-end`,
         ``,
         b.slice(index),
       ]);

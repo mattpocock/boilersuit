@@ -97,7 +97,38 @@ module.exports = (schema, folder) => {
           }
         });
       }
+      if (action.saga && (action.saga.onFail && action.saga.onSuccess)) {
+        if (!actionExists(action.saga.onFail, domain)) {
+          errors.push(
+            concat([
+              `The saga in ` +
+                `${action.name}`.cyan +
+                ` is referencing an action, ` +
+                `${action.saga.onFail}`.cyan +
+                `, does not exist.`,
+              `- Your choices are:`,
+              ...arrayOfActions.map(({ name }) => `- ${name}`),
+            ]),
+          );
+        }
+        if (!actionExists(action.saga.onSuccess, domain)) {
+          errors.push(
+            concat([
+              `The saga in ` +
+                `${action.name}`.cyan +
+                ` is referencing an action, ` +
+                `${action.saga.onSuccess}`.cyan +
+                `, does not exist.`,
+              `- Your choices are:`,
+              ...arrayOfActions.map(({ name }) => `- ${name}`),
+            ]),
+          );
+        }
+      }
     });
   });
   return errors;
 };
+
+const actionExists = (action, domain) =>
+  typeof domain.actions[action] !== 'undefined';

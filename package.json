@@ -1,7 +1,7 @@
 {
   "name": "boilersuit",
   "description": "A CLI tool for generating selectors, reducers, actions, constants and sagas in react-boilerplate",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "main": "index.js",
   "author": "matt <matt.pocock@thevirtualforge.com>",
   "repository": {
@@ -22,7 +22,7 @@
     "suit": "./index.js"
   },
   "scripts": {
-    "test": "jest --watchAll",
+    "test": "jest --watch -o",
     "lint": "eslint . -c ./.eslintrc --fix"
   },
   "devDependencies": {

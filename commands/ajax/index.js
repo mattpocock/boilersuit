@@ -39,9 +39,13 @@ module.exports = (folder, camelCase) => {
         `      "${cases.camel}Started": {`,
         `        "describe": "Begins the ${
           cases.display
-        } API Call. No payload.",`,
-        `        "saga": true,`,
+        } API Call. Passes a payload to the saga.",`,
+        `        "saga": {`,
+        `          "onFail": "${cases.camel}Failed",`,
+        `          "onSuccess": "${cases.camel}Succeeded"`,
+        `        },`,
         `        "passAsProp": true,`,
+        `        "payload": true,`,
         `        "set": {`,
         `          "isLoading": true,`,
         `          "hasSucceeded": false,`,
