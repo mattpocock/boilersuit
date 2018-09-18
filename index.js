@@ -6,7 +6,7 @@ const up = require('./commands/up');
 const ajax = require('./commands/ajax');
 const rm = require('./commands/rm');
 
-program.version('0.2.12');
+program.version('0.2.13');
 
 program
   .command('up')

@@ -39,7 +39,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
   try {
     schema = JSON.parse(schemaBuf.toString());
   } catch (e) {
-    console.log(e);
+    console.log('Error: ', e);
   }
   if (!schema) return;
 

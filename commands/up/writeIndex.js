@@ -208,7 +208,6 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
             startIndex,
             buf.indexOf('\n};', startIndex),
           );
-          console.log(initialState[key]);
           if (
             newPropTypesSlice.indexOf(`${cases.camel}${capitalize(key)}`) === -1
           ) {
