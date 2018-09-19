@@ -9,8 +9,8 @@ module.exports = (schema, config) => {
 
   domains.forEach(domain => {
     if (
-      typeof config.stopDescribeWarning === 'undefined' ||
-      !config.stopDescribeWarning
+      typeof config.showDescribeWarnings !== 'undefined' ||
+      config.showDescribeWarnings
     ) {
       if (!domain.describe) {
         warnings.push(
