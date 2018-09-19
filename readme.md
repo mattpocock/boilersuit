@@ -48,12 +48,15 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
       "hasSucceeded": false,
       "hasError": false,
       "errorMessage": "",
-      "data": null
+      "data": {}
     },
     "actions": {
       "submitTodoStarted": {
         "describe": "Begins the Submit Todo API Call. Passes the todo as the payload to the saga.",
-        "saga": true,
+        "saga": {
+          "onFail": "submitTodoFailed",
+          "onSuccess": "submitTodoSucceeded"
+        },
         "passAsProp": true,
         "payload": true,
         "set": {
@@ -61,7 +64,7 @@ Once it's set up, run `suit up` in the root directory of your project. It will w
           "hasSucceeded": false,
           "hasError": false,
           "errorMessage": "",
-          "data": null
+          "data": {}
         }
       },
       "submitTodoSucceeded": {
@@ -145,26 +148,26 @@ These are defined as keys on the main json object. For example, if you needed th
 {
   "getConfig": {
     "initialState": {
-      ...
+      //...
     },
     "actions": {
-      ...
+      //...
     }
   },
   "getPosts": {
     "initialState": {
-      ...
+      //...
     },
     "actions": {
-      ...
+      //...
     }
   },
   "getImages": {
     "initialState": {
-      ...
+      //...
     },
     "actions": {
-      ...
+      //...
     }
   }
 }
@@ -189,7 +192,7 @@ Suit will create a selector for each of these fields on the initialState, and pu
       "hasError": false
     },
     "actions": {
-      ...
+      //...
     }
   }
 }
@@ -259,7 +262,7 @@ Sometimes, you'll need to pass a payload in an action that won't affect the stat
 {
   "getImages": {
     "initialState": {
-      ...
+      //...
     },
     "actions": {
       "getImagesStarted": {
@@ -281,7 +284,7 @@ Defines how you want the data to be changed after the action is run.
 {
   "getImages": {
     "initialState": {
-      ...
+      //...
     },
     "actions": {
       "getImagesStarted": {
@@ -321,20 +324,26 @@ You pass this as an object, as in the example below:
 {
   "actions": {
     "initialState": {
-      ...
+      //...
     },
     "getImagesStarted": {
       "saga": {
         "onFail": "getImagesFailed",
         "onSuccess": "getImagesSucceeded"
       },
-      "set": { ... }
+      "set": {
+        //...
+      }
     },
     "getImagesFailed": {
-      "set": { ... }
+      "set": {
+        //...
+      }
     },
     "getImagesSucceeded": {
-      "set": { ... }
+      "set": {
+        //...
+      }
     }
   }
 }
