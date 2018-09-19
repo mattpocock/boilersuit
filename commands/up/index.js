@@ -74,6 +74,11 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
 
   const warnings = checkWarningsInSchema(schema, config);
 
+  // If no .suit folder exists, create one
+  if (!fs.existsSync('./.suit')) {
+    fs.mkdirSync('./.suit');
+  }
+
   /** Check for a previous suit file in folder - force prevents this check */
 
   if (fs.existsSync(`./.suit/${dotSuitFolder}/suit.old.json`) && !force) {
@@ -134,11 +139,11 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
         })
         .filter(n => n !== null),
       ...differences
-        .filter(({ path }) => path.includes('saga'))
+        .filter(({ path, lhs, rhs }) => path.includes('saga') && lhs && rhs)
         .map(({ lhs, rhs, path }) => ({
           removed: path,
-          removedCases: new Cases(parseCamelCaseToArray(lhs)).all(),
-          addedCases: new Cases(parseCamelCaseToArray(rhs)).all(),
+          removedCases: new Cases(parseCamelCaseToArray(`${lhs}`)).all(),
+          addedCases: new Cases(parseCamelCaseToArray(`${rhs}`)).all(),
         })),
     ];
   }
