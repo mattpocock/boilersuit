@@ -175,6 +175,13 @@ const removeSuitDoubling = buffer =>
       '',
     )
     .replace(
+      new RegExp(
+        concat([`// @suit-name-only-end`, ``, `// @suit-name-only-start`]),
+        'g',
+      ),
+      '',
+    )
+    .replace(
       new RegExp(concat([`// @suit-end`, ``, `// @suit-start`]), 'g'),
       '',
     )

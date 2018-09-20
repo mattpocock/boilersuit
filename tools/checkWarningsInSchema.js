@@ -9,7 +9,7 @@ module.exports = (schema, config) => {
 
   domains.forEach(domain => {
     if (
-      typeof config.showDescribeWarnings !== 'undefined' ||
+      typeof config.showDescribeWarnings !== 'undefined' &&
       config.showDescribeWarnings
     ) {
       if (!domain.describe) {
@@ -38,8 +38,8 @@ module.exports = (schema, config) => {
           ({ passAsProp }) => typeof passAsProp !== 'undefined',
         ).length === 0;
       if (
-        typeof config.stopDescribeWarning === 'undefined' ||
-        !config.stopDescribeWarning
+        typeof config.showDescribeWarnings !== 'undefined' &&
+        config.showDescribeWarnings
       ) {
         if (!action.describe && (action.passAsProp || notUsingPassAsProp)) {
           warnings.push(

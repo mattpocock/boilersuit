@@ -1,4 +1,24 @@
-<div style="text-align: center"><img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/logo.png" height="240px" alt="boilerplate logo"/></div>
+<div style="text-align: center"><img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/logo.png" max-height="240px" alt="boilerplate logo"/></div>
+
+## What Is Boilersuit?
+
+Ever felt like you were writing too much boring, repetitive code just to get react-boilerplate working?
+
+Ever wasted hours on a debug in a reducer caused by a typo?
+
+Ever wished that you could edit just one file, instead of ten?
+
+Enter boilersuit, the blazingly-fast, bug-proof way of working with Redux in react-boilerplate.
+
+**Don't write ten files, write one.** Define your state and actions in a JSON file and watch as your code writes itself.
+
+**Instant updates.** Typing `suit up` in your root directory makes boilersuit watch your files for changes. Need to change the name of an action? Just change it in the `suit.json` file and watch it change across your file system.
+
+**Automagical unit tests.** Working, comprehensive unit tests appear automatically as your JSON file changes.
+
+**Prevent stupid mistakes.** Suit knows if you've done a silly. Trying to change a piece of state that doesn't exist? Boilersuit will catch it. Got an action that doesn't do anything? Boilersuit will catch it.
+
+**Instant documentation.** Need to know how a reducer works? Just check the JSON file in the directory. Boilersuit can even be configured to request code comments, enforcing amazing documentation on large projects.
 
 ## How To Use Boilersuit - Video
 
