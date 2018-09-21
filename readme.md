@@ -8,7 +8,7 @@ Ever wasted hours on a debug in a reducer caused by a typo?
 
 Ever wished that you could edit just one file, instead of ten?
 
-Enter boilersuit, the blazingly-fast, bug-proof way of working with Redux in react-boilerplate.
+**Enter Boilersuit**, the blazingly-fast, bug-proof way of working with Redux in react-boilerplate.
 
 **Don't write ten files, write one.** Define your state and actions in a JSON file and watch as your code writes itself.
 
@@ -403,6 +403,49 @@ Setting extends to "ajax" will generate an ajax call for you in the suit file. T
 }
 ```
 
+### Compose
+
+If you feel like your suit file is getting too big, you can split it up into smaller chunks with `compose`.
+
+Imagine a file structure that looks like this:
+
+- suits
+  - getTweets.json
+  - getTodos.json
+- index.js
+- reducer.js
+- actions.js
+- constants.js
+- selectors.js
+- suit.json
+
+```json
+// suit.json
+{
+  "compose": ["suits/getTweets", "suits/getTodos"]
+}
+```
+
+```json
+// suits/getTweets.json
+{
+  "getTweets": {
+    //...
+  }
+}
+```
+
+```json
+// suits/getTodos.json
+{
+  "getTodos": {
+    //...
+  }
+}
+```
+
+`compose` breaks your suit file down into more manageable chunks to help keep things navigable and modular.
+
 ## Configuration
 
 You can add a .suitrc (or .suitrc.json) file to the root of your folder to configure boilersuit. We're planning on making this a lot more extensible.
@@ -419,7 +462,7 @@ You can configure suit to give you warnings if you don't specify a 'describe' ke
 
 ### include
 
-You can speed up suit like crazy by specifying which folders you have placed your suit files in.
+By default, suit looks in `app/containers` for suit files, but you can change this by adding this to the `.suitrc` config.
 
 ```json
 {
