@@ -1,10 +1,5 @@
-const Cases = require('../../../tools/cases');
-const {
-  concat,
-  transforms,
-  parseCamelCaseToArray,
-  prettify,
-} = require('../../../tools/utils');
+const { concat, transforms, prettify } = require('../../../tools/utils');
+const writeOneConstant = require('./writeOneConstant');
 
 module.exports = ({ buffer, cases, actions, folder }) =>
   transforms(buffer, [
@@ -14,24 +9,6 @@ module.exports = ({ buffer, cases, actions, folder }) =>
     ...Object.keys(actions)
       .map(key => ({ name: key, ...actions[key] }))
       .reverse()
-      .map(({ name }, i) => b => {
-        const c = new Cases(parseCamelCaseToArray(name));
-        const actionCases = c.all();
-
-        const searchTerm = `/** ${cases.display} constants */`;
-        const index = b.indexOf(searchTerm) + searchTerm.length;
-
-        let content = '';
-        content += concat([
-          ``,
-          `export const ${actionCases.constant} =`,
-          `  '${folder}${actionCases.constant}';`,
-        ]);
-        if (i === 0) {
-          content += '\n\n// @suit-end';
-        }
-
-        return concat([b.slice(0, index), content, b.slice(index)]);
-      }),
+      .map(writeOneConstant({ cases, folder })),
     prettify,
   ]);
