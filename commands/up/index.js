@@ -47,8 +47,8 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       schema = JSON.parse(schemaBuf.toString());
     } catch (e) {
       console.log('Error: ', e);
+      return;
     }
-    if (!schema) return;
 
     let extendsFound = checkExtends({
       arrayOfDomains: Object.keys(schema).map(key => ({

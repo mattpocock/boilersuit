@@ -22,10 +22,10 @@ program
           config.include.map(path => `${path}/**/suit.json`),
         ];
       } else {
-        watchedDirectories.push(['**/suit.json']);
+        watchedDirectories.push(['app/containers/**/suit.json']);
       }
     } else {
-      watchedDirectories.push(['**/suit.json']);
+      watchedDirectories.push(['app/containers/**/suit.json']);
     }
     gaze(watchedDirectories, (err, watcher) => {
       // Resets the console
