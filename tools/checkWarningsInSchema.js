@@ -2,10 +2,12 @@ const { concat } = require('./utils');
 
 module.exports = (schema, config) => {
   const warnings = [];
-  const domains = Object.keys(schema).map(key => ({
-    name: key,
-    ...schema[key],
-  }));
+  const domains = Object.keys(schema)
+    .filter(domain => !['compose'].includes(domain))
+    .map(key => ({
+      name: key,
+      ...schema[key],
+    }));
 
   domains.forEach(domain => {
     if (

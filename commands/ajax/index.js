@@ -2,30 +2,37 @@ const fs = require('fs');
 const { concat, parseCamelCaseToArray } = require('../../tools/utils');
 const Cases = require('../../tools/cases');
 
-module.exports = (folder, camelCase) => {
+module.exports = (folder, camelCase, file) => {
+  let fileToChange = file;
   const array = parseCamelCaseToArray(camelCase);
   const cases = new Cases(array).all();
 
-  let fixedFolder = folder;
-  if (folder[folder.length - 1] !== '/') {
-    fixedFolder += '/';
+  if (!fileToChange) {
+    let fixedFolder = folder;
+    if (folder[folder.length - 1] !== '/') {
+      fixedFolder += '/';
+    }
+    fileToChange = `${fixedFolder}suit.json`;
   }
-  let buffer = concat(['{', '}']);
+
+  let buffer = concat(['{', ' ', '}']);
   let includeComma = false;
-  if (fs.existsSync(`${fixedFolder}suit.json`)) {
-    buffer = fs.readFileSync(`${fixedFolder}suit.json`).toString();
-    includeComma = true;
+  if (fs.existsSync(fileToChange)) {
+    const newSchema = fs.readFileSync(fileToChange).toString();
+    const anyContent = Object.keys(JSON.parse(newSchema)).length;
+    includeComma = anyContent;
+    if (anyContent) buffer = newSchema;
   }
-  console.log(` ${fixedFolder}suit.json `.bgGreen.black);
+  console.log(` ${fileToChange} `.bgGreen.black);
   console.log(
-    'SUIT: '.green +
+    '\n SUIT: '.green +
       (includeComma ? 'writing existing suit.json' : 'writing new suit.json'),
   );
   fs.writeFileSync(
-    `${fixedFolder}suit.json`,
-    buffer.slice(0, -2) +
+    fileToChange,
+    buffer.slice(0, -3) +
       concat([
-        includeComma ? ',' : undefined,
+        includeComma ? ',' : null,
         `  "${cases.camel}": {`,
         `    "describe": "Makes a ${cases.display} API call",`,
         `    "initialState": {`,
@@ -77,6 +84,6 @@ module.exports = (folder, camelCase) => {
         `    }`,
         `  }`,
       ]) +
-      buffer.slice(-2),
+      buffer.slice(-3),
   );
 };
