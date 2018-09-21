@@ -40,7 +40,7 @@ program
       Object.entries(watcher.relative()).forEach(entry => {
         // This bit of fidgeting allows for suiting up from the same folder
         const schemaFile = (entry[0] === '.' ? './' : entry[0]) + entry[1][0];
-        up(schemaFile, { force: cmd.force });
+        up(schemaFile, { force: cmd.force }, watcher);
       });
 
       let relativePaths = watcher.relative();
@@ -64,7 +64,7 @@ program
         Object.entries(relativePaths).forEach(entry => {
           // This bit of fidgeting allows for suiting up from the same folder
           const schemaFile = (entry[0] === '.' ? './' : entry[0]) + entry[1][0];
-          up(schemaFile, { quiet: true, force: cmd.force });
+          up(schemaFile, { quiet: true, force: cmd.force }, watcher);
         });
       });
     });

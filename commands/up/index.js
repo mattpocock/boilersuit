@@ -26,10 +26,12 @@ const {
   cleanFile,
   fixInlineImports,
   transforms,
+  concat,
 } = require('../../tools/utils');
 
-const up = (schemaFile, { quiet = false, force = false } = {}) => {
+const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
   fs.readFile(schemaFile, (err, s) => {
+    let errors = [];
     const schemaBuf = s.toString();
     /** Gives us the folder where the schema file lives */
     const folder = schemaFile
@@ -46,13 +48,44 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
     }
     if (!schema) return;
 
-    const arrayOfDomains = Object.keys(schema).map(key => ({
-      ...schema[key],
-      domainName: key,
-    }));
+    /** Look for a compose object on the schema */
+    if (schema.compose && schema.compose.length) {
+      /** For each of the 'compose' array */
+      schema.compose.forEach(c => {
+        const file = `${c}`.includes('.json') ? c : `${c}.json`;
+        if (fs.existsSync(`${folder}/${file}`)) {
+          const otherSchema = JSON.parse(
+            fs.readFileSync(`${folder}/${file}`).toString(),
+          );
+          schema = {
+            ...schema,
+            ...otherSchema,
+          };
+          // Adds it to the watcher
+          watcher.add([`${folder}/${file}`]);
+        } else {
+          errors.push(concat([`Could not find suit.json file ` + `${c}`.cyan]));
+        }
+      });
+    }
 
-    /** Checks for an 'extends' keyword */
+    const arrayOfDomains = Object.keys(schema)
+      .filter(
+        key =>
+          ![
+            // Add keys to this list to reserve them
+            'compose',
+          ].includes(key),
+      )
+      .map(key => ({
+        ...schema[key],
+        domainName: key,
+      }));
 
+    /**
+     * Checks for an 'extends' keyword
+     * TODO: re-enable
+     */
     const extendsFound = checkExtends({
       arrayOfDomains,
       folder,
@@ -62,7 +95,8 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
 
     if (extendsFound) return;
 
-    const errors = [
+    errors = [
+      ...errors,
       ...checkErrorsInSchema(schema, folder),
       ...checkIfBadBuffer(folder),
     ];
@@ -77,6 +111,8 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
 
     const warnings = checkWarningsInSchema(schema, config);
 
+    const newSchemaBuf = JSON.stringify(schema, null, 2);
+
     // If no .suit folder exists, create one
     if (!fs.existsSync('./.suit')) {
       fs.mkdirSync('./.suit');
@@ -88,7 +124,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
       quiet,
       force,
       folder,
-      schemaBuf,
+      schemaBuf: newSchemaBuf,
       warnings,
     });
     if (!shouldContinue) return;
@@ -100,7 +136,10 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
     }
 
     /** Get a more detailed diff of the changes */
-    const keyChanges = detectDiff({ dotSuitFolder, schemaBuf });
+    const keyChanges = detectDiff({
+      dotSuitFolder,
+      schemaBuf: newSchemaBuf,
+    });
 
     /** Write reducer */
     const { buffer: newReducerBuffer, errors: domainErrors } = writeReducer({
@@ -288,7 +327,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
     if (!fs.existsSync(`./.suit/${dotSuitFolder}`)) {
       fs.mkdirSync(`./.suit/${dotSuitFolder}`);
     }
-    fs.writeFileSync(`./.suit/${dotSuitFolder}/suit.old.json`, schemaBuf);
+    fs.writeFileSync(`./.suit/${dotSuitFolder}/suit.old.json`, newSchemaBuf);
 
     /** Runs prettier and checks for prettier warnings */
     const prettierWarnings = runPrettier(folder);

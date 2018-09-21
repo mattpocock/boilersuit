@@ -3,7 +3,10 @@ const rm = require('../commands/rm');
 
 module.exports = (schema, folder) => {
   const errors = [];
-  if (!Object.keys(schema).length) {
+  const domainKeys = Object.keys(schema).filter(
+    domain => !['compose'].includes(domain),
+  );
+  if (!domainKeys.length) {
     errors.push(
       concat([
         'No domains defined within suit.json.',
@@ -16,7 +19,7 @@ module.exports = (schema, folder) => {
     rm(folder, { silent: true });
     return errors;
   }
-  const domains = Object.keys(schema).map(key => ({
+  const domains = domainKeys.map(key => ({
     name: key,
     ...schema[key],
   }));
