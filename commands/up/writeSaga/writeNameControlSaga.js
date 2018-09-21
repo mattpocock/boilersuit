@@ -14,8 +14,9 @@ module.exports = ({
   failCases,
   successCases,
   keyChanges,
-}) =>
-  transforms(buffer, [
+}) => {
+  const messages = [];
+  const newBuffer = transforms(buffer, [
     ensureImport(failCases.camel, './actions', { destructure: true }),
     ensureImport(successCases.camel, './actions', { destructure: true }),
     ensureImport('takeLatest', 'redux-saga/effects', { destructure: true }),
@@ -45,7 +46,7 @@ module.exports = ({
     b => {
       const sagaPresent = b.indexOf(`function* ${domainCases.camel}`) !== -1;
       if (sagaPresent) {
-        console.log(
+        messages.push(
           `\nSAGA:`.green +
             ` ${
               domainCases.camel
@@ -55,7 +56,7 @@ module.exports = ({
       }
       const index = b.indexOf(`export default`);
 
-      console.log(
+      messages.push(
         concat([
           `\nSAGA:`.green + ` ${domainCases.camel} saga not found in file.`,
           `- Adding a basic skeleton of a saga. This needs to be updated manually.`,
@@ -91,3 +92,9 @@ module.exports = ({
     ensureImport(actionCases.constant, './constants', { destructure: true }),
     prettify,
   ]);
+  return {
+    buffer: newBuffer,
+    messages,
+    errors: [],
+  };
+};

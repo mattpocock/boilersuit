@@ -5,8 +5,9 @@ const {
   ensureImport,
 } = require('../../../tools/utils');
 
-module.exports = ({ buffer, cases, actionCases, action }) =>
-  transforms(buffer, [
+module.exports = ({ buffer, cases, actionCases, action }) => {
+  const messages = [];
+  const newBuffer = transforms(buffer, [
     ensureImport('takeLatest', 'redux-saga/effects', { destructure: true }),
     ensureImport('call', 'redux-saga/effects', { destructure: true }),
     ensureImport('put', 'redux-saga/effects', { destructure: true }),
@@ -22,7 +23,7 @@ module.exports = ({ buffer, cases, actionCases, action }) =>
     b => {
       const sagaPresent = b.indexOf(`function* ${cases.camel}`) !== -1;
       if (sagaPresent) {
-        console.log(
+        messages.push(
           `\nSAGA:`.green +
             ` ${
               cases.camel
@@ -32,7 +33,7 @@ module.exports = ({ buffer, cases, actionCases, action }) =>
       }
       const index = b.indexOf(`export default`);
 
-      console.log(
+      messages.push(
         concat([
           `\nSAGA:`.green + ` ${cases.camel} saga not found in file.`,
           `- Adding a basic skeleton of a saga. This needs to be updated manually.`,
@@ -70,3 +71,9 @@ module.exports = ({ buffer, cases, actionCases, action }) =>
     ensureImport(actionCases.constant, './constants', { destructure: true }),
     prettify,
   ]);
+  return {
+    buffer: newBuffer,
+    messages,
+    errors: [],
+  };
+};
