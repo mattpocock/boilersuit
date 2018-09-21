@@ -28,7 +28,7 @@ module.exports = ({ arrayOfDomains, schemaBuf, schemaFile, folder }) => {
           schemaBuf.slice(0, index) +
             schemaBuf.slice(index + searchTerm.length),
         );
-        ajax(folder, domain.domainName);
+        ajax(folder, domain.domainName, schemaFile);
       }
     }
   });

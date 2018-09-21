@@ -30,6 +30,8 @@ const {
 } = require('../../tools/utils');
 
 const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
+  /** If this is not a suit.json file, return */
+  if (!schemaFile.includes('suit.json')) return;
   fs.readFile(schemaFile, (err, s) => {
     let errors = [];
     const schemaBuf = s.toString();
@@ -48,21 +50,50 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
     }
     if (!schema) return;
 
+    let extendsFound = checkExtends({
+      arrayOfDomains: Object.keys(schema).map(key => ({
+        ...schema[key],
+        domainName: key,
+      })),
+      folder,
+      schemaFile,
+      schemaBuf,
+    });
+
+    if (extendsFound) return;
+
     /** Look for a compose object on the schema */
     if (schema.compose && schema.compose.length) {
       /** For each of the 'compose' array */
       schema.compose.forEach(c => {
         const file = `${c}`.includes('.json') ? c : `${c}.json`;
         if (fs.existsSync(`${folder}/${file}`)) {
-          const otherSchema = JSON.parse(
-            fs.readFileSync(`${folder}/${file}`).toString(),
-          );
+          const buf = fs.readFileSync(`${folder}/${file}`).toString();
+          const otherSchema = JSON.parse(buf);
           schema = {
             ...schema,
             ...otherSchema,
           };
+
+          extendsFound =
+            extendsFound ||
+            checkExtends({
+              arrayOfDomains: Object.keys(otherSchema).map(key => ({
+                ...otherSchema[key],
+                domainName: key,
+              })),
+              folder,
+              schemaFile: `${folder}/${file}`,
+              schemaBuf: buf,
+            });
           // Adds it to the watcher
-          watcher.add([`${folder}/${file}`]);
+          const allWatchedPaths = Object.values(watcher.watched()).reduce(
+            (a, b) => [...a, ...b],
+            [],
+          );
+          if (!allWatchedPaths.includes(`${folder}${file}`)) {
+            watcher.add(`${folder}${file}`);
+          }
         } else {
           errors.push(concat([`Could not find suit.json file ` + `${c}`.cyan]));
         }
@@ -81,17 +112,6 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
         ...schema[key],
         domainName: key,
       }));
-
-    /**
-     * Checks for an 'extends' keyword
-     * TODO: re-enable
-     */
-    const extendsFound = checkExtends({
-      arrayOfDomains,
-      folder,
-      schemaFile,
-      schemaBuf,
-    });
 
     if (extendsFound) return;
 
