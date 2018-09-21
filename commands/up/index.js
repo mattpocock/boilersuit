@@ -1,7 +1,5 @@
 const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
-const diff = require('deep-diff');
-const Cases = require('../../tools/cases');
 const writeIndex = require('./writeIndex');
 const writeSelectors = require('./writeSelectors');
 const writeActions = require('./writeActions');
@@ -18,7 +16,10 @@ const printWarning = require('../../tools/printWarning');
 const checkErrorsInSchema = require('../../tools/checkErrorsInSchema');
 const checkWarningsInSchema = require('../../tools/checkWarningsInSchema');
 const checkForConfigFile = require('./checkForConfigFile');
+const checkForChanges = require('./checkForChanges');
+const detectDiff = require('./detectDiff');
 const runPrettier = require('./runPrettier');
+const Cases = require('../../tools/cases');
 const {
   parseCamelCaseToArray,
   cleanFile,
@@ -80,25 +81,15 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
   }
 
   /** Check for a previous suit file in folder - force prevents this check */
-
-  if (fs.existsSync(`./.suit/${dotSuitFolder}/suit.old.json`) && !force) {
-    if (
-      fs.readFileSync(`./.suit/${dotSuitFolder}/suit.old.json`).toString() ===
-      schemaBuf
-    ) {
-      if (warnings.length) {
-        console.log(`\n ${folder}suit.json `.bgYellow.black);
-        printWarning(warnings);
-      } else if (!quiet) {
-        console.log(`\n ${folder}suit.json `.bgGreen.black);
-        console.log(
-          `\n NO CHANGES:`.green +
-            ` No changes found in suit file from previous version. Not editing files.`,
-        );
-      }
-      return;
-    }
-  }
+  const shouldContinue = checkForChanges({
+    dotSuitFolder,
+    quiet,
+    force,
+    folder,
+    schemaBuf,
+    warnings,
+  });
+  if (!shouldContinue) return;
 
   if (warnings.length) {
     console.log(`\n ${folder}suit.json `.bgYellow.black);
@@ -107,46 +98,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}) => {
   }
 
   /** Get a more detailed diff of the changes */
-
-  let keyChanges = [];
-
-  if (fs.existsSync(`./.suit/${dotSuitFolder}/suit.old.json`)) {
-    const oldSchemaBuf = fs
-      .readFileSync(`./.suit/${dotSuitFolder}/suit.old.json`)
-      .toString();
-
-    const differences =
-      diff(JSON.parse(oldSchemaBuf), JSON.parse(schemaBuf)) || [];
-    keyChanges = [
-      ...differences
-        .filter(({ kind }) => kind === 'D' || kind === 'N')
-        .map(({ path }, index) => {
-          if (!differences[index + 1]) return null;
-          const newPath = differences[index + 1].path;
-          return JSON.stringify(path.slice(0, path.length - 1)) ===
-            JSON.stringify(newPath.slice(0, newPath.length - 1))
-            ? {
-                removed: path,
-                added: newPath,
-                removedCases: new Cases(
-                  parseCamelCaseToArray(path[path.length - 1]),
-                ).all(),
-                addedCases: new Cases(
-                  parseCamelCaseToArray(newPath[newPath.length - 1]),
-                ).all(),
-              }
-            : null;
-        })
-        .filter(n => n !== null),
-      ...differences
-        .filter(({ path, lhs, rhs }) => path.includes('saga') && lhs && rhs)
-        .map(({ lhs, rhs, path }) => ({
-          removed: path,
-          removedCases: new Cases(parseCamelCaseToArray(`${lhs}`)).all(),
-          addedCases: new Cases(parseCamelCaseToArray(`${rhs}`)).all(),
-        })),
-    ];
-  }
+  const keyChanges = detectDiff({ dotSuitFolder, schemaBuf });
 
   /** Write reducer */
 
