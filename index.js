@@ -2,6 +2,7 @@
 
 const program = require('commander');
 const gaze = require('gaze');
+const fs = require('fs');
 const up = require('./commands/up');
 const ajax = require('./commands/ajax');
 const rm = require('./commands/rm');
@@ -12,7 +13,21 @@ program
   .command('up')
   .option('-f, --force', 'Force suit to re-render')
   .action(cmd => {
-    gaze(['**/suit.json', '!node_modules/**/*'], (err, watcher) => {
+    let watchedDirectories = ['!node_modules/**/*'];
+    if (fs.existsSync('./.suitrc')) {
+      const config = JSON.parse(fs.readFileSync('./.suitrc').toString());
+      if (config.include && config.include.length) {
+        watchedDirectories = [
+          ...watchedDirectories,
+          config.include.map(path => `${path}/**/suit.json`),
+        ];
+      } else {
+        watchedDirectories.push(['**/suit.json']);
+      }
+    } else {
+      watchedDirectories.push(['**/suit.json']);
+    }
+    gaze(watchedDirectories, (err, watcher) => {
       // Resets the console
       process.stdout.write('\x1Bc');
       const watchedFiles = Object.keys(watcher.relative()).length;

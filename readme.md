@@ -405,10 +405,24 @@ Setting extends to "ajax" will generate an ajax call for you in the suit file. T
 
 ## Configuration
 
-You can add a .suitrc (or .suitrc.json) file to the root of your folder to configure boilersuit. We're planning on making this a lot more extensible, but for now:
+You can add a .suitrc (or .suitrc.json) file to the root of your folder to configure boilersuit. We're planning on making this a lot more extensible.
+
+### showDescribeWarnings
+
+You can configure suit to give you warnings if you don't specify a 'describe' key. Handy for keeping discipline on large codebases.
 
 ```json
 {
   "showDescribeWarnings": true
+}
+```
+
+### include
+
+You can speed up suit like crazy by specifying which folders you have placed your suit files in.
+
+```json
+{
+  "include": ["app/containers"]
 }
 ```
