@@ -38,7 +38,7 @@ module.exports = ({
   errors = [
     ...errors,
     ...checkErrorsInSchema(schema, folder),
-    ...checkIfBadBuffer(folder),
+    ...checkIfBadBuffer(buffers),
   ];
 
   if (errors.length) {
