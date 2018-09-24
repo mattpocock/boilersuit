@@ -5,10 +5,17 @@ const printError = require('../../tools/printError');
 const printWarning = require('../../tools/printWarning');
 const printMessages = require('../../tools/printMessages');
 const runPrettier = require('./runPrettier');
+const checkForChanges = require('./checkForChanges');
 const writeAllFiles = require('./writeAllFiles');
 const { concat } = require('../../tools/utils');
+const checkForConfigFile = require('./checkForConfigFile');
 
 const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
+  // If no .suit folder exists at the root, create one
+  if (!fs.existsSync('./.suit')) {
+    fs.mkdirSync('./.suit');
+  }
+
   /** If this is not a suit.json file, return */
   if (!schemaFile.includes('suit.json')) return;
   fs.readFile(schemaFile, (err, s) => {
@@ -81,6 +88,26 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
 
     if (extendsFound) return;
 
+    const newSchemaBuf = JSON.stringify(schema, null, 2);
+
+    /** Check for a previous suit file in folder - force prevents this check */
+    const {
+      shouldContinue: anyChanges,
+      messages: changeMessages,
+    } = checkForChanges({
+      dotSuitFolder,
+      quiet,
+      force,
+      schemaBuf: newSchemaBuf,
+    });
+    if (!anyChanges) {
+      if (!quiet) {
+        console.log(`\n ${folder}suit.json `.bgGreen.black);
+        printMessages(changeMessages);
+      }
+      return;
+    }
+
     const {
       newReducerBuffer,
       newReducerTestBuffer,
@@ -91,7 +118,6 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       newSelectorsTestsBuffer,
       newIndexBuffer,
       saga,
-      newSchemaBuf,
       shouldContinue,
       errors: newErrors,
       warnings,
@@ -100,9 +126,28 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       schema,
       errors,
       folder,
+      newSchemaBuf,
+      config: checkForConfigFile(),
       dotSuitFolder,
       quiet,
       force,
+      buffers: {
+        reducer: fs.readFileSync(`${folder}/reducer.js`).toString(),
+        actions: fs.readFileSync(`${folder}/actions.js`).toString(),
+        constants: fs.readFileSync(`${folder}/constants.js`).toString(),
+        selectors: fs.readFileSync(`${folder}/selectors.js`).toString(),
+        index: fs.readFileSync(`${folder}/index.js`).toString(),
+        saga: fs.readFileSync(`${folder}/saga.js`).toString(),
+        reducerTests: fs.existsSync(`${folder}/tests/reducer.test.js`)
+          ? fs.readFileSync(`${folder}/tests/reducer.test.js`).toString()
+          : '',
+        actionTests: fs.existsSync(`${folder}/tests/actions.test.js`)
+          ? fs.readFileSync(`${folder}/tests/actions.test.js`).toString()
+          : '',
+        selectorsTests: fs.existsSync(`${folder}/tests/selectors.test.js`)
+          ? fs.readFileSync(`${folder}/tests/selectors.test.js`).toString()
+          : '',
+      },
     });
     if (newErrors.length) {
       console.log(`\n ${folder}suit.json `.white.bgRed);
@@ -152,7 +197,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
     /** Runs prettier and checks for prettier warnings */
     const prettierWarnings = runPrettier(folder);
 
-    printWarning([...warnings, ...prettierWarnings]);
+    printWarning(prettierWarnings);
   });
 };
 

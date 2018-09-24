@@ -1,4 +1,3 @@
-const fs = require('fs');
 const writeIndex = require('./writeIndex');
 const writeSelectors = require('./writeSelectors');
 const writeActions = require('./writeActions');
@@ -11,18 +10,16 @@ const writeSelectorTests = require('./writeSelectorTests');
 const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
 const checkErrorsInSchema = require('../../tools/checkErrorsInSchema');
 const checkWarningsInSchema = require('../../tools/checkWarningsInSchema');
-const checkForConfigFile = require('./checkForConfigFile');
-const checkForChanges = require('./checkForChanges');
 const detectDiff = require('./detectDiff');
-const { cleanFile } = require('../../tools/utils');
 
 module.exports = ({
   schema,
   errors: passedErrors = [],
   folder,
   dotSuitFolder,
-  quiet,
-  force,
+  buffers,
+  config = {},
+  newSchemaBuf,
 }) => {
   let errors = passedErrors;
   const arrayOfDomains = Object.keys(schema)
@@ -48,25 +45,7 @@ module.exports = ({
     return { errors, shouldContinue: false };
   }
 
-  const config = checkForConfigFile();
-
   const warnings = checkWarningsInSchema(schema, config);
-
-  const newSchemaBuf = JSON.stringify(schema, null, 2);
-
-  // If no .suit folder exists, create one
-  if (!fs.existsSync('./.suit')) {
-    fs.mkdirSync('./.suit');
-  }
-
-  /** Check for a previous suit file in folder - force prevents this check */
-  const { shouldContinue, messages } = checkForChanges({
-    dotSuitFolder,
-    quiet,
-    force,
-    schemaBuf: newSchemaBuf,
-  });
-  if (!shouldContinue) return { errors, warnings, messages, shouldContinue };
 
   /** Get a more detailed diff of the changes */
   const keyChanges = detectDiff({
@@ -79,16 +58,16 @@ module.exports = ({
     folder,
     arrayOfDomains,
     keyChanges,
-    buffer: cleanFile(fs.readFileSync(`${folder}/reducer.js`).toString()),
+    buffer: buffers.reducer,
   });
 
   if (domainErrors.length) {
-    return { errors: domainErrors, warnings, messages, shouldContinue: false };
+    return { errors: domainErrors, warnings, shouldContinue: false };
   }
 
   /** Write Actions */
   const { buffer: newActionsBuffer } = writeActions({
-    buffer: fs.readFileSync(`${folder}/actions.js`).toString(),
+    buffer: buffers.actions,
     arrayOfDomains,
   });
 
@@ -96,26 +75,26 @@ module.exports = ({
   const { buffer: newConstantsBuffer } = writeConstants({
     folder,
     arrayOfDomains,
-    buffer: fs.readFileSync(`${folder}/constants.js`).toString(),
+    buffer: buffers.constants,
   });
 
   /** Write Selectors */
   const newSelectorsBuffer = writeSelectors({
-    buffer: fs.readFileSync(`${folder}/selectors.js`).toString(),
+    buffer: buffers.selectors,
     folder,
     arrayOfDomains,
   });
 
   /** Write Index */
   const newIndexBuffer = writeIndex({
-    indexBuffer: fs.readFileSync(`${folder}/index.js`).toString(),
+    indexBuffer: buffers.index,
     arrayOfDomains,
     keyChanges,
   });
 
   /** Write Saga */
   const saga = writeSaga({
-    sagaBuffer: fs.readFileSync(`${folder}/saga.js`).toString(),
+    sagaBuffer: buffers.saga,
     arrayOfDomains,
     keyChanges,
   });
@@ -125,25 +104,19 @@ module.exports = ({
 
   /** Write reducer tests */
   const newReducerTestBuffer = writeReducerTests({
-    buffer: fs.existsSync(`${folder}/tests/reducer.test.js`)
-      ? fs.readFileSync(`${folder}/tests/reducer.test.js`).toString()
-      : '',
+    buffer: buffers.reducerTests,
     arrayOfDomains,
   });
 
   /** Write actions tests */
   const newActionTestsBuffer = writeActionTests({
-    buffer: fs.existsSync(`${folder}/tests/actions.test.js`)
-      ? fs.readFileSync(`${folder}/tests/actions.test.js`).toString()
-      : '',
+    buffer: buffers.actionTests,
     arrayOfDomains,
   });
 
   /** Write selectors tests */
   const newSelectorsTestsBuffer = writeSelectorTests({
-    buffer: fs.existsSync(`${folder}/tests/selectors.test.js`)
-      ? fs.readFileSync(`${folder}/tests/selectors.test.js`).toString()
-      : '',
+    buffer: buffers.selectorsTests,
     arrayOfDomains,
     folder,
   });
@@ -159,9 +132,8 @@ module.exports = ({
     newSelectorsBuffer,
     newConstantsBuffer,
     newActionsBuffer,
-    newSchemaBuf,
     warnings,
     errors,
-    messages,
+    messages: [],
   };
 };

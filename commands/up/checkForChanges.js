@@ -15,7 +15,7 @@ module.exports = ({ dotSuitFolder, force, quiet, schemaBuf }) => {
     ) {
       if (!quiet) {
         messages.push(
-          `\n NO CHANGES:`.green +
+          `\nNO CHANGES:`.green +
             ` No changes found in suit file from previous version. Not editing files.`,
         );
       }
