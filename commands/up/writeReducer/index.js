@@ -13,6 +13,7 @@ module.exports = ({
   arrayOfDomains,
   buffer,
   checkForErrors = true,
+  keyChanges,
 }) => {
   /** Write Reducers */
   let domainErrors = [];
@@ -36,6 +37,7 @@ module.exports = ({
           cases: allDomainCases,
           initialState,
           actions,
+          keyChanges,
           describe,
         });
       },

@@ -12,6 +12,7 @@ module.exports = ({
   initialState,
   actions,
   describe,
+  keyChanges,
 }) =>
   transforms(buffer, [
     /** Adds in boilerplate if domain does not exist */
@@ -31,6 +32,6 @@ module.exports = ({
     addActionsToInitialReducer({ camel, actions }),
     /** Imports constants */
     importConstants(actions),
-    addCustomFunctions(actions),
+    addCustomFunctions({ actions, keyChanges }),
     prettify,
   ]);

@@ -2,7 +2,11 @@ const { concat, printObject } = require('../../../tools/utils');
 
 module.exports = ({ action }) => {
   if (action.customFunction) {
-    return concat([`      return(${action.name}CustomFunction(state))`]);
+    return concat([
+      `      return(${action.name}CustomFunction(state${
+        action.payload ? ', payload' : ''
+      }))`,
+    ]);
   }
 
   if (!action.set) {

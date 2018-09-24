@@ -165,6 +165,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
     const { buffer: newReducerBuffer, errors: domainErrors } = writeReducer({
       folder,
       arrayOfDomains,
+      keyChanges,
       buffer: cleanFile(fs.readFileSync(`${folder}/reducer.js`).toString()),
     });
 

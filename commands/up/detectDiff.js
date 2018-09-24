@@ -36,6 +36,7 @@ module.exports = ({ dotSuitFolder, schemaBuf }) => {
             : null;
         })
         .filter(n => n !== null),
+      // Saga changes in actions
       ...differences
         .filter(({ path, lhs, rhs }) => path.includes('saga') && lhs && rhs)
         .map(({ lhs, rhs, path }) => ({
