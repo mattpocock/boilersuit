@@ -10,10 +10,10 @@ module.exports = (schema, folder) => {
     errors.push(
       concat([
         'No domains defined within suit.json.',
-        '| Try this:',
-        '| {',
-        '|   "getTweets": {}',
-        '| }',
+        'Try this:',
+        '{',
+        '  "getTweets": {}',
+        '}',
       ]),
     );
     rm(folder, { silent: true });
@@ -28,14 +28,14 @@ module.exports = (schema, folder) => {
       errors.push(
         concat([
           `No initialState defined on ${domain.name}`,
-          `| Try this:`.green,
-          `| {`,
-          `|   "${domain.name}": {`,
-          `|     "initialState": {`,
-          `|       "isLoading": true`,
-          `|     }`,
-          `|   }`,
-          `| }`,
+          `Try this:`.green,
+          `{`,
+          `  "${domain.name}": {`,
+          `    "initialState": {`,
+          `      "isLoading": true`,
+          `    }`,
+          `  }`,
+          `}`,
         ]),
       );
     }
@@ -43,18 +43,18 @@ module.exports = (schema, folder) => {
       errors.push(
         concat([
           `No actions defined on ${domain.name}`,
-          `| Try this:`.green,
-          `| {`,
-          `|   "${domain.name}": {`,
-          `|     "actions": {`,
-          `|       "${domain.name}FirstAction: {`,
-          `|         "set": {`,
-          `|           "isFirstAction": true`,
-          `|         }`,
-          `|       }`,
-          `|     }`,
-          `|   }`,
-          `| }`,
+          `Try this:`.green,
+          `{`,
+          `  "${domain.name}": {`,
+          `    "actions": {`,
+          `      "${domain.name}FirstAction: {`,
+          `        "set": {`,
+          `          "isFirstAction": true`,
+          `        }`,
+          `      }`,
+          `    }`,
+          `  }`,
+          `}`,
         ]),
       );
     }
@@ -74,12 +74,12 @@ module.exports = (schema, folder) => {
             `${
               action.name
             } has no 'set' property defined. That means it won't do anything.`,
-            `| Try this:`.green,
-            `| ${action.name}: {`,
-            `|   "set": {`,
-            `|     "isFirstAction": true`,
-            `|   }`,
-            `| }`,
+            `Try this:`.green,
+            `${action.name}: {`,
+            `  "set": {`,
+            `    "isFirstAction": true`,
+            `  }`,
+            `}`,
           ]),
         );
       }
