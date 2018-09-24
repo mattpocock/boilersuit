@@ -1,4 +1,4 @@
-const Cases = require('../../tools/cases');
+const Cases = require('../../../tools/cases');
 const {
   concat,
   transforms,
@@ -7,7 +7,7 @@ const {
   ensureImport,
   capitalize,
   getDomainNameFromFolder,
-} = require('../../tools/utils');
+} = require('../../../tools/utils');
 
 module.exports = ({ buffer, cases, initialState, folder }) => {
   const domainName = getDomainNameFromFolder(folder);

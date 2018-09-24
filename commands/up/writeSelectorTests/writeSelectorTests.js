@@ -7,8 +7,8 @@ const {
   getDomainNameFromFolder,
   printObject,
   unCapitalize,
-} = require('../../tools/utils');
-const Cases = require('../../tools/cases');
+} = require('../../../tools/utils');
+const Cases = require('../../../tools/cases');
 
 module.exports = ({ buffer, cases, initialState, folder }) =>
   transforms(buffer, [
@@ -55,7 +55,9 @@ module.exports = ({ buffer, cases, initialState, folder }) =>
         `  it('should return the correct value', () => {`,
         `    const selector = makeSelect${cases.pascal}();`,
         `    expect(selector(mockedState))`,
-        `      .toEqual(fromJS(mockedState.get('${unCapitalize(getDomainNameFromFolder(folder))}').get('${cases.camel}')));`,
+        `      .toEqual(fromJS(mockedState.get('${unCapitalize(
+          getDomainNameFromFolder(folder),
+        )}').get('${cases.camel}')));`,
         `  });`,
         `});`,
         `// @suit-end`,
@@ -76,7 +78,8 @@ module.exports = ({ buffer, cases, initialState, folder }) =>
           /* eslint-disable no-nested-ternary */
           typeof initialState[key] === 'string'
             ? `'${initialState[key]}'`
-            : typeof initialState[key] === 'object' && initialState[key] !== null
+            : typeof initialState[key] === 'object' &&
+              initialState[key] !== null
               ? `fromJS(${printObject(initialState[key], '      ')})`
               : initialState[key],
         cases: new Cases(parseCamelCaseToArray(key)).all(),

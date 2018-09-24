@@ -20,14 +20,7 @@ const checkForConfigFile = require('./checkForConfigFile');
 const checkForChanges = require('./checkForChanges');
 const detectDiff = require('./detectDiff');
 const runPrettier = require('./runPrettier');
-const Cases = require('../../tools/cases');
-const {
-  parseCamelCaseToArray,
-  cleanFile,
-  fixInlineImports,
-  transforms,
-  concat,
-} = require('../../tools/utils');
+const { cleanFile, concat } = require('../../tools/utils');
 
 const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
   /** If this is not a suit.json file, return */
@@ -187,31 +180,15 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
     });
 
     /** Write Selectors */
-    const selectorsBuffer = fs
-      .readFileSync(`${folder}/selectors.js`)
-      .toString();
-
-    const newSelectorsBuffer = transforms(selectorsBuffer, [
-      cleanFile,
-      fixInlineImports,
-      ...arrayOfDomains.map(({ domainName, initialState }) => b => {
-        const cases = new Cases(parseCamelCaseToArray(domainName));
-        const allDomainCases = cases.all();
-
-        return writeSelectors({
-          buffer: b,
-          cases: allDomainCases,
-          initialState,
-          folder,
-        });
-      }),
-    ]);
+    const newSelectorsBuffer = writeSelectors({
+      buffer: fs.readFileSync(`${folder}/selectors.js`).toString(),
+      folder,
+      arrayOfDomains,
+    });
 
     /** Write Index */
-    const indexBuffer = fs.readFileSync(`${folder}/index.js`).toString();
-
     const newIndexBuffer = writeIndex({
-      indexBuffer,
+      indexBuffer: fs.readFileSync(`${folder}/index.js`).toString(),
       arrayOfDomains,
       keyChanges,
     });
@@ -222,85 +199,36 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       arrayOfDomains,
       keyChanges,
     });
-
     if (saga.errors.length) {
       printError(saga.errors);
       return;
     }
-
-    if (saga.messages.length) {
-      printMessages(saga.messages);
-    }
+    if (saga.messages.length) printMessages(saga.messages);
 
     /** Write reducer tests */
-    const reducerTestsBuffer = fs.existsSync(`${folder}/tests/reducer.test.js`)
-      ? fs.readFileSync(`${folder}/tests/reducer.test.js`).toString()
-      : '';
-
-    const newReducerTestBuffer = transforms(reducerTestsBuffer, [
-      cleanFile,
-      fixInlineImports,
-      ...arrayOfDomains.map(({ domainName, initialState, actions }) => b => {
-        const cases = new Cases(parseCamelCaseToArray(domainName));
-        const allDomainCases = cases.all();
-
-        return writeReducerTests({
-          buffer: b,
-          cases: allDomainCases,
-          actions,
-          initialState,
-        });
-      }),
-    ]);
+    const newReducerTestBuffer = writeReducerTests({
+      buffer: fs.existsSync(`${folder}/tests/reducer.test.js`)
+        ? fs.readFileSync(`${folder}/tests/reducer.test.js`).toString()
+        : '',
+      arrayOfDomains,
+    });
 
     /** Write actions tests */
-    const actionTestsBuffer = fs.existsSync(`${folder}/tests/actions.test.js`)
-      ? fs.readFileSync(`${folder}/tests/actions.test.js`).toString()
-      : '';
-
-    const newActionTestsBuffer = transforms(actionTestsBuffer, [
-      cleanFile,
-      fixInlineImports,
-      ...arrayOfDomains.map(({ domainName, initialState, actions }) => b => {
-        const cases = new Cases(parseCamelCaseToArray(domainName));
-        const allDomainCases = cases.all();
-
-        const arrayOfActions = Object.keys(actions).map(key => ({
-          ...actions[key],
-          name: key,
-          cases: new Cases(parseCamelCaseToArray(key)).all(),
-        }));
-
-        return writeActionTests({
-          buffer: b,
-          domainCases: allDomainCases,
-          arrayOfActions,
-          initialState,
-        });
-      }),
-    ]);
+    const newActionTestsBuffer = writeActionTests({
+      buffer: fs.existsSync(`${folder}/tests/actions.test.js`)
+        ? fs.readFileSync(`${folder}/tests/actions.test.js`).toString()
+        : '',
+      arrayOfDomains,
+    });
 
     /** Write selectors tests */
-    const selectorsTestsBuffer = fs.existsSync(
-      `${folder}/tests/selectors.test.js`,
-    )
-      ? fs.readFileSync(`${folder}/tests/selectors.test.js`).toString()
-      : '';
-
-    const newSelectorsTestsBuffer = transforms(selectorsTestsBuffer, [
-      cleanFile,
-      fixInlineImports,
-      ...arrayOfDomains.map(({ domainName, initialState }) => b => {
-        const cases = new Cases(parseCamelCaseToArray(domainName)).all();
-
-        return writeSelectorTests({
-          buffer: b,
-          cases,
-          initialState,
-          folder,
-        });
-      }),
-    ]);
+    const newSelectorsTestsBuffer = writeSelectorTests({
+      buffer: fs.existsSync(`${folder}/tests/selectors.test.js`)
+        ? fs.readFileSync(`${folder}/tests/selectors.test.js`).toString()
+        : '',
+      arrayOfDomains,
+      folder,
+    });
 
     console.log('\nCHANGES:'.green);
 

@@ -5,8 +5,8 @@ const {
   printObject,
   ensureImport,
   parseCamelCaseToArray,
-} = require('../../tools/utils');
-const Cases = require('../../tools/cases');
+} = require('../../../tools/utils');
+const Cases = require('../../../tools/cases');
 
 module.exports = ({ buffer, cases, actions, initialState }) =>
   transforms(buffer, [

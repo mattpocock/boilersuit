@@ -3,7 +3,7 @@ const {
   prettify,
   concat,
   ensureImport,
-} = require('../../tools/utils');
+} = require('../../../tools/utils');
 
 module.exports = ({ buffer, arrayOfActions }) =>
   transforms(buffer, [
