@@ -169,7 +169,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
 
     /** Write Actions */
     const { buffer: newActionsBuffer } = writeActions({
-      folder,
+      buffer: fs.readFileSync(`${folder}/actions.js`).toString(),
       arrayOfDomains,
     });
 
@@ -177,6 +177,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
     const { buffer: newConstantsBuffer } = writeConstants({
       folder,
       arrayOfDomains,
+      buffer: fs.readFileSync(`${folder}/constants.js`).toString(),
     });
 
     /** Write Selectors */
@@ -195,7 +196,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
 
     /** Write Saga */
     const saga = writeSaga({
-      folder,
+      sagaBuffer: fs.readFileSync(`${folder}/saga.js`).toString(),
       arrayOfDomains,
       keyChanges,
     });
@@ -230,39 +231,31 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       folder,
     });
 
-    console.log('\nCHANGES:'.green);
-
-    console.log('- writing reducers');
+    printMessages([
+      '\nCHANGES:'.green,
+      '- writing reducers',
+      '- writing reducer tests',
+      '- writing actions',
+      '- writing action tests',
+      '- writing constants',
+      '- writing selectors',
+      '- writing selectors tests',
+      '- writing index',
+      '- writing saga',
+      '- saving old suit file in .suit directory',
+    ]);
     fs.writeFileSync(`${folder}/reducer.js`, newReducerBuffer);
-
-    console.log('- writing reducer tests');
     fs.writeFileSync(`${folder}/tests/reducer.test.js`, newReducerTestBuffer);
-
-    console.log('- writing actions');
     fs.writeFileSync(`${folder}/actions.js`, newActionsBuffer);
-
-    console.log('- writing action tests');
     fs.writeFileSync(`${folder}/tests/actions.test.js`, newActionTestsBuffer);
-
-    console.log('- writing constants');
     fs.writeFileSync(`${folder}/constants.js`, newConstantsBuffer);
-
-    console.log('- writing selectors');
     fs.writeFileSync(`${folder}/selectors.js`, newSelectorsBuffer);
-
-    console.log('- writing selectors tests');
     fs.writeFileSync(
       `${folder}/tests/selectors.test.js`,
       newSelectorsTestsBuffer,
     );
-
-    console.log('- writing index');
     fs.writeFileSync(`${folder}/index.js`, newIndexBuffer);
-
-    console.log('- writing saga');
     fs.writeFileSync(`${folder}/saga.js`, saga.buffer);
-
-    console.log('- saving old suit file in .suit directory');
     if (!fs.existsSync(`./.suit/${dotSuitFolder}`)) {
       fs.mkdirSync(`./.suit/${dotSuitFolder}`);
     }

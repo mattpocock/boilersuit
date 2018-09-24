@@ -1,4 +1,3 @@
-const fs = require('fs');
 const writeConstants = require('./writeConstants');
 const Cases = require('../../../tools/cases');
 const {
@@ -8,10 +7,8 @@ const {
   parseCamelCaseToArray,
 } = require('../../../tools/utils');
 
-module.exports = ({ folder, arrayOfDomains }) => {
-  const constantsBuffer = fs.readFileSync(`${folder}/constants.js`).toString();
-
-  const newConstantsBuffer = transforms(constantsBuffer, [
+module.exports = ({ folder, arrayOfDomains, buffer }) => {
+  const newConstantsBuffer = transforms(buffer, [
     cleanFile,
     fixInlineImports,
     ...arrayOfDomains.map(({ domainName, actions }) => b => {

@@ -1,4 +1,3 @@
-const fs = require('fs');
 const writeActions = require('./writeActions');
 const Cases = require('../../../tools/cases');
 const {
@@ -8,10 +7,8 @@ const {
   parseCamelCaseToArray,
 } = require('../../../tools/utils');
 
-module.exports = ({ folder, arrayOfDomains }) => {
-  const actionsBuffer = fs.readFileSync(`${folder}/actions.js`).toString();
-
-  const newActionsBuffer = transforms(actionsBuffer, [
+module.exports = ({ arrayOfDomains, buffer }) => {
+  const newActionsBuffer = transforms(buffer, [
     cleanFile,
     fixInlineImports,
     ...arrayOfDomains.map(({ domainName, actions }) => b => {

@@ -1,4 +1,3 @@
-const fs = require('fs');
 const writeSaga = require('./writeSaga');
 const writeNameControlSaga = require('./writeNameControlSaga');
 const Cases = require('../../../tools/cases');
@@ -11,9 +10,7 @@ const {
 } = require('../../../tools/utils');
 const checkIfNoAllSagas = require('../../../tools/checkIfNoAllSagas');
 
-module.exports = ({ folder, arrayOfDomains, keyChanges }) => {
-  const sagaBuffer = fs.readFileSync(`${folder}/saga.js`).toString();
-
+module.exports = ({ sagaBuffer, arrayOfDomains, keyChanges }) => {
   let sagaErrors = checkIfNoAllSagas(sagaBuffer);
   let sagaMessages = [];
   const newBuffer = transforms(sagaBuffer, [
