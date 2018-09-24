@@ -1,4 +1,4 @@
-const Cases = require('../../tools/cases');
+const Cases = require('../../../tools/cases');
 const {
   concat,
   transforms,
@@ -6,7 +6,7 @@ const {
   prettify,
   ensureImport,
   capitalize,
-} = require('../../tools/utils');
+} = require('../../../tools/utils');
 
 module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
   /** Checks if the passAsProp keyword is present */

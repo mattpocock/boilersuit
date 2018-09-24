@@ -165,6 +165,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
     const { buffer: newReducerBuffer, errors: domainErrors } = writeReducer({
       folder,
       arrayOfDomains,
+      buffer: cleanFile(fs.readFileSync(`${folder}/reducer.js`).toString()),
     });
 
     if (domainErrors.length) {
@@ -208,22 +209,11 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
     /** Write Index */
     const indexBuffer = fs.readFileSync(`${folder}/index.js`).toString();
 
-    const newIndexBuffer = transforms(indexBuffer, [
-      cleanFile,
-      fixInlineImports,
-      ...arrayOfDomains.map(({ domainName, actions, initialState }) => b => {
-        const cases = new Cases(parseCamelCaseToArray(domainName));
-        const allDomainCases = cases.all();
-
-        return writeIndex({
-          buffer: b,
-          cases: allDomainCases,
-          initialState,
-          keyChanges,
-          actions,
-        });
-      }),
-    ]);
+    const newIndexBuffer = writeIndex({
+      indexBuffer,
+      arrayOfDomains,
+      keyChanges,
+    });
 
     /** Write Saga */
     const saga = writeSaga({

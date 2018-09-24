@@ -39,6 +39,13 @@ const printObject = (object, indent = '') => {
         : `${line},`;
     })
     .map((line, index) => (index === 0 ? `${line}` : `${indent}${line}`))
+    // Sorts out any payloads
+    .map(
+      line =>
+        line.includes('payload') && (line.includes(`"`) || line.includes(`'`))
+          ? line.replace(/'/g, '').replace(/"/g, '')
+          : line,
+    )
     .join(`\n`);
   return newObject.slice(0, -2) + newObject.slice(-2);
 };

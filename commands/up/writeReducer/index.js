@@ -1,4 +1,3 @@
-const fs = require('fs');
 const writeOneReducer = require('./writeOneReducer');
 const Cases = require('../../../tools/cases');
 const {
@@ -9,12 +8,15 @@ const {
 } = require('../../../tools/utils');
 const checkIfDomainAlreadyPresent = require('../../../tools/checkIfDomainAlreadyPresent');
 
-module.exports = ({ folder, arrayOfDomains }) => {
+module.exports = ({
+  folder,
+  arrayOfDomains,
+  buffer,
+  checkForErrors = true,
+}) => {
   /** Write Reducers */
-  const reducersFile = `${folder}/reducer.js`;
-  const reducerBuffer = cleanFile(fs.readFileSync(reducersFile).toString());
   let domainErrors = [];
-  const newReducerBuffer = transforms(reducerBuffer, [
+  const newReducerBuffer = transforms(buffer, [
     cleanFile,
     fixInlineImports,
     /** Writes a reducer for each domain */
@@ -22,10 +24,12 @@ module.exports = ({ folder, arrayOfDomains }) => {
       ({ domainName, initialState, actions, describe }) => b => {
         const cases = new Cases(parseCamelCaseToArray(domainName));
         const allDomainCases = cases.all();
-        domainErrors = [
-          ...domainErrors,
-          ...checkIfDomainAlreadyPresent(folder, allDomainCases, actions),
-        ];
+        if (checkForErrors) {
+          domainErrors = [
+            ...domainErrors,
+            ...checkIfDomainAlreadyPresent(folder, allDomainCases, actions),
+          ];
+        }
 
         return writeOneReducer({
           buffer: b,
