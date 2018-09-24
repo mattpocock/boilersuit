@@ -4,6 +4,7 @@ const writeInitialReducer = require('./writeInitialReducer');
 const addToCombineReducers = require('./addToCombineReducers');
 const addActionsToInitialReducer = require('./addActionsToInitialReducer');
 const importConstants = require('./importConstants');
+const addCustomFunctions = require('./addCustomFunctions');
 
 module.exports = ({
   buffer,
@@ -30,5 +31,6 @@ module.exports = ({
     addActionsToInitialReducer({ camel, actions }),
     /** Imports constants */
     importConstants(actions),
+    addCustomFunctions(actions),
     prettify,
   ]);

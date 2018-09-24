@@ -25,8 +25,10 @@ module.exports = domainCases => (
 
   let content = '';
   const hasPayload =
-    Object.values(set).filter(value => `${value}`.indexOf('payload') !== -1)
-      .length > 0 || payloadOverride;
+    (set &&
+      Object.values(set).filter(value => `${value}`.indexOf('payload') !== -1)
+        .length > 0) ||
+    payloadOverride;
   content += concat([
     ``,
     describe ? `// ${describe}` : null,

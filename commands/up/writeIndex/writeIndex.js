@@ -85,9 +85,11 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
             .map(key => {
               const actionCases = new Cases(parseCamelCaseToArray(key)).all();
               const hasPayload =
-                Object.values(actions[key].set).filter(value =>
-                  `${value}`.includes('payload'),
-                ).length || actions[key].payload;
+                (actions[key].set &&
+                  Object.values(actions[key].set).filter(value =>
+                    `${value}`.includes('payload'),
+                  ).length) ||
+                actions[key].payload;
               return concat([
                 actions[key].describe
                   ? `    /** ${actions[key].describe} */`

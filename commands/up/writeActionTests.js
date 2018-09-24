@@ -21,13 +21,18 @@ module.exports = ({ buffer, arrayOfActions }) =>
         `// @suit-start`,
         `describe('${action.cases.camel}', () => {`,
         `  it('should have the correct type', () => {`,
-        `    expect(${action.cases.camel}().type).toEqual(${action.cases.constant});`,
+        `    expect(${action.cases.camel}().type).toEqual(${
+          action.cases.constant
+        });`,
         `  });`,
+        action.set &&
         Object.values(action.set).filter(val => `${val}`.includes('payload'))
           .length > 0
           ? concat([
               `  it('should return the correct payload', () => {`,
-              `    expect(${action.cases.camel}('dummyPayload').payload).toEqual('dummyPayload');`,
+              `    expect(${
+                action.cases.camel
+              }('dummyPayload').payload).toEqual('dummyPayload');`,
               `  });`,
             ])
           : null,

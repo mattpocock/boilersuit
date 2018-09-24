@@ -34,6 +34,8 @@ module.exports = ({ buffer, cases, actions, initialState }) =>
         ...Object.keys(actions)
           .map(key => ({ ...actions[key], name: key }))
           .map(action => {
+            /** TODO: make this better */
+            if (!action.set) return ``;
             const arrayOfSets = Object.keys(action.set)
               .map(key => ({
                 key,

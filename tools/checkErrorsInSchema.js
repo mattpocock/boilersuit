@@ -65,7 +65,10 @@ module.exports = (schema, folder) => {
     }));
 
     arrayOfActions.forEach(action => {
-      if (!action.set || !Object.keys(action.set).length) {
+      if (
+        (!action.set || !Object.keys(action.set).length) &&
+        !action.customFunction
+      ) {
         errors.push(
           concat([
             `${
@@ -79,7 +82,8 @@ module.exports = (schema, folder) => {
             `| }`,
           ]),
         );
-      } else {
+      }
+      if (action.set) {
         Object.keys(action.set).forEach(actionSetKey => {
           if (!Object.keys(domain.initialState).includes(actionSetKey)) {
             errors.push(
