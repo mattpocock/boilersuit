@@ -270,13 +270,20 @@ const fixInlineImports = buffer => {
   return newBuffer;
 };
 
-const actionHasPayload = actions =>
-  Object.values(actions).filter(({ set }) => {
-    if (!set) return false;
-    return (
-      Object.values(set).filter(val => `${val}`.includes('payload')).length > 0
-    );
-  }).length > 0;
+const actionHasPayload = actions => {
+  if (Object.keys(actions).filter(key => actions[key].payload).length) {
+    return true;
+  }
+  return (
+    Object.values(actions).filter(({ set }) => {
+      if (!set) return false;
+      return (
+        Object.values(set).filter(val => `${val}`.includes('payload')).length >
+        0
+      );
+    }).length > 0
+  );
+};
 
 const getDomainNameFromFolder = folder =>
   folder
