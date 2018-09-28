@@ -271,7 +271,11 @@ const fixInlineImports = buffer => {
 };
 
 const actionHasPayload = actions => {
-  if (Object.keys(actions).filter(key => actions[key].payload).length) {
+  if (
+    Object.keys(actions).filter(
+      key => actions[key].payload && actions[key].customFunction,
+    ).length
+  ) {
     return true;
   }
   return (
