@@ -3,9 +3,9 @@ const { concat, printObject } = require('../../../tools/utils');
 module.exports = ({ action }) => {
   if (action.customFunction) {
     return concat([
-      `      return(${action.name}CustomFunction(state${
+      `      return ${action.name}CustomFunction(state${
         action.payload ? ', payload' : ''
-      }))`,
+      });`,
     ]);
   }
 

@@ -22,7 +22,10 @@ module.exports = ({ actions, keyChanges }) => buffer =>
           b,
           `// @suit-name-only-start`,
           describe ? `// ${describe}` : null,
-          `const ${name}CustomFunction = (state) => state;`,
+          `const ${name}CustomFunction = (state, payload) => {`,
+          `  console.log('${name}CustomFunctionPayload', payload);`,
+          `  return state;`,
+          `};`,
           `// @suit-name-only-end`,
           ``,
         ]);
