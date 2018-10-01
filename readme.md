@@ -403,6 +403,27 @@ Setting extends to "ajax" will generate an ajax call for you in the suit file. T
 }
 ```
 
+#### customFunction
+
+`"customFunction": true`
+
+Sometimes, you don't want to just `set` values in a reducer. You may want to manipulate them in more interesting ways, such as merging to objects, or concatenating two arrays.
+
+Adding `"customFunction": true` to an action will give you a function extracted out from the reducer to manipulate the state however you want. It'll appear in your `reducer.js` file, like this:
+
+```javascript
+// @suit-name-only-start
+const changeSomeValueCustomFunction = (state, payload) => {
+  console.log('changeSomeValueCustomFunctionPayload', payload);
+  return state;
+};
+// @suit-name-only-end
+```
+
+As with any `// @suit-name-only` tags, you can change anything inside the function, but suit will update the name of the function if the action name changes.
+
+One final note: `"customFunction"` cannot be combined with `"set"` - though this may change in the future if it seems useful.
+
 ### Compose
 
 If you feel like your suit file is getting too big, you can split it up into smaller chunks with `compose`.
