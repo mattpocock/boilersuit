@@ -1,9 +1,13 @@
 const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
+const path = require('path');
 const { cleanFile } = require('../../tools/utils');
 
 const removeSuitFromFile = filename => {
-  fs.writeFileSync(filename, cleanFile(fs.readFileSync(filename).toString()));
+  fs.writeFileSync(
+    filename,
+    cleanFile(fs.readFileSync(path.resolve(filename)).toString()),
+  );
 };
 
 const rm = (folder, { silent = false } = {}) => {

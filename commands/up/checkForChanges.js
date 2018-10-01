@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 /**
  * Checks if there has been any changes between this suit file
@@ -8,10 +9,14 @@ const fs = require('fs');
  */
 module.exports = ({ dotSuitFolder, force, quiet, schemaBuf }) => {
   const messages = [];
-  if (fs.existsSync(`./.suit/${dotSuitFolder}/suit.old.json`) && !force) {
+  if (
+    fs.existsSync(path.resolve(`./.suit/${dotSuitFolder}/suit.old.json`)) &&
+    !force
+  ) {
     if (
-      fs.readFileSync(`./.suit/${dotSuitFolder}/suit.old.json`).toString() ===
-      schemaBuf
+      fs
+        .readFileSync(path.resolve(`./.suit/${dotSuitFolder}/suit.old.json`))
+        .toString() === schemaBuf
     ) {
       if (!quiet) {
         messages.push(

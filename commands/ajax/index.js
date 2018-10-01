@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const { concat, parseCamelCaseToArray } = require('../../tools/utils');
 const Cases = require('../../tools/cases');
 
@@ -12,7 +13,7 @@ module.exports = (folder, camelCase, file) => {
     if (folder[folder.length - 1] !== '/') {
       fixedFolder += '/';
     }
-    fileToChange = `${fixedFolder}suit.json`;
+    fileToChange = path.resolve(`${fixedFolder}suit.json`);
   }
 
   let buffer = concat(['{', ' ', '}']);

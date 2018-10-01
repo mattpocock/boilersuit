@@ -1,8 +1,11 @@
 const { expect } = require('chai');
 const fs = require('fs');
+const path = require('path');
 const { indexesOf } = require('../utils');
 
-const file = fs.readFileSync('./tools/tests/mocks/nameOnly.2.js').toString();
+const file = fs
+  .readFileSync(path.resolve('./tools/tests/mocks/nameOnly.2.js'))
+  .toString();
 
 describe('indexesOf', () => {
   it('Must work', () => {

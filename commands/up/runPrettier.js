@@ -1,10 +1,11 @@
 const fs = require('fs');
+const path = require('path');
 const { exec } = require('child_process');
 const { concat } = require('../../tools/utils');
 
 module.exports = folder => {
   const prettierErrors = [];
-  if (fs.existsSync('./.prettierrc')) {
+  if (fs.existsSync(path.resolve('./.prettierrc'))) {
     try {
       exec(`prettier --config ./.prettierrc --write "${folder}/**/*.js"`);
       console.log(

@@ -1,5 +1,6 @@
 const colors = require('colors'); // eslint-disable-line
 const fs = require('fs');
+const path = require('path');
 const checkExtends = require('./checkExtends');
 const printError = require('../../tools/printError');
 const printWarning = require('../../tools/printWarning');
@@ -12,8 +13,8 @@ const checkForConfigFile = require('./checkForConfigFile');
 
 const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
   // If no .suit folder exists at the root, create one
-  if (!fs.existsSync('./.suit')) {
-    fs.mkdirSync('./.suit');
+  if (!fs.existsSync(path.resolve('./.suit'))) {
+    fs.mkdirSync(path.resolve('./.suit'));
   }
 
   /** If this is not a suit.json file, return */
@@ -53,8 +54,10 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       /** For each of the 'compose' array */
       schema.compose.forEach(c => {
         const file = `${c}`.includes('.json') ? c : `${c}.json`;
-        if (fs.existsSync(`${folder}/${file}`)) {
-          const buf = fs.readFileSync(`${folder}/${file}`).toString();
+        if (fs.existsSync(path.resolve(`${folder}/${file}`))) {
+          const buf = fs
+            .readFileSync(path.resolve(`${folder}/${file}`))
+            .toString();
           const otherSchema = JSON.parse(buf);
           schema = {
             ...schema,
@@ -69,7 +72,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
                 domainName: key,
               })),
               folder,
-              schemaFile: `${folder}/${file}`,
+              schemaFile: path.resolve(`${folder}/${file}`),
               schemaBuf: buf,
             });
           // Adds it to the watcher
@@ -77,8 +80,8 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
             (a, b) => [...a, ...b],
             [],
           );
-          if (!allWatchedPaths.includes(`${folder}${file}`)) {
-            watcher.add(`${folder}${file}`);
+          if (!allWatchedPaths.includes(path.resolve(`${folder}${file}`))) {
+            watcher.add(path.resolve(`${folder}${file}`));
           }
         } else {
           errors.push(concat([`Could not find suit.json file ` + `${c}`.cyan]));
@@ -132,20 +135,40 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       quiet,
       force,
       buffers: {
-        reducer: fs.readFileSync(`${folder}/reducer.js`).toString(),
-        actions: fs.readFileSync(`${folder}/actions.js`).toString(),
-        constants: fs.readFileSync(`${folder}/constants.js`).toString(),
-        selectors: fs.readFileSync(`${folder}/selectors.js`).toString(),
-        index: fs.readFileSync(`${folder}/index.js`).toString(),
-        saga: fs.readFileSync(`${folder}/saga.js`).toString(),
-        reducerTests: fs.existsSync(`${folder}/tests/reducer.test.js`)
-          ? fs.readFileSync(`${folder}/tests/reducer.test.js`).toString()
+        reducer: fs
+          .readFileSync(path.resolve(`${folder}/reducer.js`))
+          .toString(),
+        actions: fs
+          .readFileSync(path.resolve(`${folder}/actions.js`))
+          .toString(),
+        constants: fs
+          .readFileSync(path.resolve(`${folder}/constants.js`))
+          .toString(),
+        selectors: fs
+          .readFileSync(path.resolve(`${folder}/selectors.js`))
+          .toString(),
+        index: fs.readFileSync(path.resolve(`${folder}/index.js`)).toString(),
+        saga: fs.readFileSync(path.resolve(`${folder}/saga.js`)).toString(),
+        reducerTests: fs.existsSync(
+          path.resolve(`${folder}/tests/reducer.test.js`),
+        )
+          ? fs
+              .readFileSync(path.resolve(`${folder}/tests/reducer.test.js`))
+              .toString()
           : '',
-        actionTests: fs.existsSync(`${folder}/tests/actions.test.js`)
-          ? fs.readFileSync(`${folder}/tests/actions.test.js`).toString()
+        actionTests: fs.existsSync(
+          path.resolve(`${folder}/tests/actions.test.js`),
+        )
+          ? fs
+              .readFileSync(path.resolve(`${folder}/tests/actions.test.js`))
+              .toString()
           : '',
-        selectorsTests: fs.existsSync(`${folder}/tests/selectors.test.js`)
-          ? fs.readFileSync(`${folder}/tests/selectors.test.js`).toString()
+        selectorsTests: fs.existsSync(
+          path.resolve(`${folder}/tests/selectors.test.js`),
+        )
+          ? fs
+              .readFileSync(path.resolve(`${folder}/tests/selectors.test.js`))
+              .toString()
           : '',
       },
     });
@@ -177,22 +200,37 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       '\nCHANGES:'.green,
       'writing reducers, reducer tests, actions, action tests, constants, selectors, selectors tests, index, saga, saving old suit file in .suit directory',
     ]);
-    fs.writeFileSync(`${folder}/reducer.js`, newReducerBuffer);
-    fs.writeFileSync(`${folder}/tests/reducer.test.js`, newReducerTestBuffer);
-    fs.writeFileSync(`${folder}/actions.js`, newActionsBuffer);
-    fs.writeFileSync(`${folder}/tests/actions.test.js`, newActionTestsBuffer);
-    fs.writeFileSync(`${folder}/constants.js`, newConstantsBuffer);
-    fs.writeFileSync(`${folder}/selectors.js`, newSelectorsBuffer);
+    fs.writeFileSync(path.resolve(`${folder}/reducer.js`), newReducerBuffer);
     fs.writeFileSync(
-      `${folder}/tests/selectors.test.js`,
+      path.resolve(`${folder}/tests/reducer.test.js`),
+      newReducerTestBuffer,
+    );
+    fs.writeFileSync(path.resolve(`${folder}/actions.js`), newActionsBuffer);
+    fs.writeFileSync(
+      path.resolve(`${folder}/tests/actions.test.js`),
+      newActionTestsBuffer,
+    );
+    fs.writeFileSync(
+      path.resolve(`${folder}/constants.js`),
+      newConstantsBuffer,
+    );
+    fs.writeFileSync(
+      path.resolve(`${folder}/selectors.js`),
+      newSelectorsBuffer,
+    );
+    fs.writeFileSync(
+      path.resolve(`${folder}/tests/selectors.test.js`),
       newSelectorsTestsBuffer,
     );
-    fs.writeFileSync(`${folder}/index.js`, newIndexBuffer);
-    fs.writeFileSync(`${folder}/saga.js`, saga.buffer);
-    if (!fs.existsSync(`./.suit/${dotSuitFolder}`)) {
-      fs.mkdirSync(`./.suit/${dotSuitFolder}`);
+    fs.writeFileSync(path.resolve(`${folder}/index.js`), newIndexBuffer);
+    fs.writeFileSync(path.resolve(`${folder}/saga.js`), saga.buffer);
+    if (!fs.existsSync(path.resolve(`./.suit/${dotSuitFolder}`))) {
+      fs.mkdirSync(path.resolve(`./.suit/${dotSuitFolder}`));
     }
-    fs.writeFileSync(`./.suit/${dotSuitFolder}/suit.old.json`, newSchemaBuf);
+    fs.writeFileSync(
+      path.resolve(`./.suit/${dotSuitFolder}/suit.old.json`),
+      newSchemaBuf,
+    );
 
     /** Runs prettier and checks for prettier warnings */
     const prettierWarnings = runPrettier(folder);

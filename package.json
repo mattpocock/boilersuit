@@ -3,7 +3,7 @@
   "description": "A CLI tool for generating selectors, reducers, actions, constants and sagas in react-boilerplate",
   "version": "0.3.5",
   "main": "index.js",
-  "author": "matt <matt.pocock@thevirtualforge.com>",
+  "author": "Matt Pocock <matt.pocock@thevirtualforge.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/mattpocock/boilersuit"
@@ -19,7 +19,7 @@
     "lint"
   ],
   "bin": {
-    "suit": "./index.js"
+    "suit": "node index.js"
   },
   "scripts": {
     "test": "jest --watch -o",
