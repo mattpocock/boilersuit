@@ -422,6 +422,8 @@ const changeSomeValueCustomFunction = (state, payload) => {
 
 As with any `// @suit-name-only` tags, you can change anything inside the function, but suit will update the name of the function if the action name changes.
 
+You'll need to add `"payload": true` if you want the action to carry a payload, and the `customFunction` to receive that payload.
+
 One final note: `"customFunction"` cannot be combined with `"set"` - though this may change in the future if it seems useful.
 
 ### Compose
