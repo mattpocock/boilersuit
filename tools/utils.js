@@ -72,8 +72,9 @@ const ensureImport = (property, fileName, { destructure = false }) => b =>
     buffer => {
       /** Checks if already loaded */
       const isImported =
-        buffer.slice(0, buffer.lastIndexOf(' from ')).indexOf(`${property}`) !==
-        -1;
+        buffer
+          .slice(0, buffer.lastIndexOf(` from '`))
+          .indexOf(`${property}`) !== -1;
       if (isImported) {
         return buffer;
       }
