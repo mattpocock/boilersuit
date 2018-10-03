@@ -7,8 +7,9 @@ const path = require('path');
 const up = require('./commands/up');
 const ajax = require('./commands/ajax');
 const rm = require('./commands/rm');
+const { version } = require('./package.json');
 
-program.version('0.3.6');
+program.version(version);
 
 program
   .command('up')
