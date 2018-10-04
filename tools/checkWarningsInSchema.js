@@ -1,9 +1,10 @@
 const { concat } = require('./utils');
+const reservedKeywords = require('./constants/reservedKeywords');
 
 module.exports = (schema, config) => {
   const warnings = [];
   const domains = Object.keys(schema)
-    .filter(domain => !['compose'].includes(domain))
+    .filter(domain => !reservedKeywords.includes(domain))
     .map(key => ({
       name: key,
       ...schema[key],

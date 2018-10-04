@@ -11,6 +11,7 @@ const checkIfBadBuffer = require('../../tools/checkIfBadBuffer');
 const checkErrorsInSchema = require('../../tools/checkErrorsInSchema');
 const checkWarningsInSchema = require('../../tools/checkWarningsInSchema');
 const detectDiff = require('./detectDiff');
+const reservedKeywords = require('../../tools/constants/reservedKeywords');
 
 module.exports = ({
   schema,
@@ -23,13 +24,7 @@ module.exports = ({
 }) => {
   let errors = passedErrors;
   const arrayOfDomains = Object.keys(schema)
-    .filter(
-      key =>
-        ![
-          // Add keys to this list to reserve them
-          'compose',
-        ].includes(key),
-    )
+    .filter(key => !reservedKeywords.includes(key))
     .map(key => ({
       ...schema[key],
       domainName: key,

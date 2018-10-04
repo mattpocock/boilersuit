@@ -1,10 +1,11 @@
 const { concat } = require('./utils');
 const rm = require('../commands/rm');
+const reservedKeywords = require('../tools/constants/reservedKeywords');
 
 module.exports = (schema, folder) => {
   const errors = [];
   const domainKeys = Object.keys(schema).filter(
-    domain => !['compose'].includes(domain),
+    domain => !reservedKeywords.includes(domain),
   );
   if (!domainKeys.length) {
     errors.push(
