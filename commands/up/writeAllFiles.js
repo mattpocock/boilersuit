@@ -21,6 +21,7 @@ module.exports = ({
   buffers,
   config = {},
   newSchemaBuf,
+  imports,
 }) => {
   let errors = passedErrors;
   const arrayOfDomains = Object.keys(schema)
@@ -85,6 +86,7 @@ module.exports = ({
     indexBuffer: buffers.index,
     arrayOfDomains,
     keyChanges,
+    imports,
   });
 
   /** Write Saga */

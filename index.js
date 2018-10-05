@@ -14,9 +14,13 @@ program.version(version);
 program
   .command('up')
   .option('-f, --force', 'Force suit to re-render')
+  .option('-o, --one <folder>', 'Only render one suit')
   .action(cmd => {
+    /** Calculate directories to watch */
     let watchedDirectories = ['!node_modules/**/*'];
-    if (fs.existsSync(path.resolve('./.suitrc'))) {
+    if (cmd.one) {
+      watchedDirectories = [`${path.resolve(cmd.one)}/**/suit.json`];
+    } else if (fs.existsSync(path.resolve('./.suitrc'))) {
       const config = JSON.parse(
         fs.readFileSync(path.resolve('./.suitrc')).toString(),
       );

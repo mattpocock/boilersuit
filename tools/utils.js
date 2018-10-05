@@ -111,6 +111,16 @@ const ensureImport = (property, fileName, { destructure = false }) => b =>
        * it's just whether it's destructured or not
        */
       if (destructure) {
+        const singleDestructureIndex = buffer.indexOf(
+          `import {} from '${fileName}';`,
+        );
+        if (singleDestructureIndex !== -1) {
+          return (
+            buffer.slice(0, singleDestructureIndex + 8) +
+            `\n  ${property}, // @suit-line\n` +
+            buffer.slice(singleDestructureIndex + 8)
+          );
+        }
         const isOnNewLine =
           buffer
             .split('\n')

@@ -8,7 +8,7 @@ const {
   transforms,
 } = require('../../../tools/utils');
 
-module.exports = ({ indexBuffer, arrayOfDomains, keyChanges = [] }) =>
+module.exports = ({ indexBuffer, arrayOfDomains, keyChanges = [], imports }) =>
   transforms(indexBuffer, [
     cleanFile,
     fixInlineImports,
@@ -18,6 +18,7 @@ module.exports = ({ indexBuffer, arrayOfDomains, keyChanges = [] }) =>
 
       return writeIndex({
         buffer: b,
+        imports,
         cases: allDomainCases,
         initialState,
         keyChanges,

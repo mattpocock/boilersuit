@@ -8,7 +8,14 @@ const {
   capitalize,
 } = require('../../../tools/utils');
 
-module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
+module.exports = ({
+  buffer,
+  cases,
+  initialState,
+  actions,
+  keyChanges,
+  imports,
+}) => {
   /** Checks if the passAsProp keyword is present */
   const hasPropFiltering = Object.values(actions).filter(actionValues =>
     Object.keys(actionValues).includes('passAsProp'),
@@ -29,6 +36,12 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
             },
           );
         }),
+      ]),
+    b =>
+      transforms(b, [
+        ...imports.map(({ property, fileName }) =>
+          ensureImport(property, fileName, { destructure: true }),
+        ),
       ]),
     /** Import actions */
     b =>
@@ -60,6 +73,15 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
               cases.pascal
             }${fieldCases.pascal}(),`;
           }),
+          ...imports
+            .filter(({ type }) => type === 'selector')
+            .filter(
+              ({ selector, value }) =>
+                b.indexOf(`  ${value}: ${selector}(),`) === -1,
+            )
+            .map(({ selector, value }) =>
+              concat([`  ${value}: ${selector}(),`]),
+            ),
           '  // @suit-end',
           b.slice(index),
         ])
@@ -76,6 +98,23 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
         b.slice(0, index) +
         concat([
           '    // @suit-start',
+          ...imports
+            .filter(({ type }) => type === 'action')
+            .filter(
+              ({ action }) =>
+                b.indexOf(
+                  `submit${capitalize(action)}: (`,
+                  b.indexOf('mapDispatchToProps'),
+                ) === -1,
+            )
+            .map(({ action, describe, payload }) =>
+              concat([
+                describe ? `    /** ${describe} */` : null,
+                `    submit${capitalize(action)}: (${
+                  payload ? 'payload' : ''
+                }) => dispatch(${action}(${payload ? 'payload' : ''})),`,
+              ]),
+            ),
           ...Object.keys(actions)
             .filter(key => {
               /** If no prop filtering, give all props */
@@ -106,7 +145,7 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
         ])
       );
     },
-    /** Writes propTypes, using @suit-name-only // */
+    /** Adds a suit-name-only area to the PropTypes if it doesn't already exist */
     b => {
       const startIndex = b.indexOf('propTypes = {') + 'propTypes = {'.length;
       const endIndex = b.indexOf('\n};', startIndex);
@@ -118,54 +157,17 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
 
       // If we've not put in a // @suit-name-only section
       if (noPreviousPropTypes) {
-        const propTypesToAdd = [
-          ...Object.keys(initialState)
-            .map(key => ({
-              key,
-              value: initialState[key],
-              fieldCases: new Cases(parseCamelCaseToArray(key)).all(),
-            }))
-            // If the user has already added it to prop types, don't double add it
-            .filter(
-              ({ fieldCases }) =>
-                propTypesSlice.indexOf(`${cases.camel}${fieldCases.pascal}`) ===
-                -1,
-            )
-            .map(
-              ({ value, fieldCases }) =>
-                `// ${cases.camel}${
-                  fieldCases.pascal
-                }: PropTypes.${propTypeFromTypeOf(typeof value)},`,
-            ),
-          // Adds functions from dispatchToProps
-          ...Object.keys(actions)
-            .filter(key => {
-              /** If no prop filtering, give all props */
-              if (!hasPropFiltering) return true;
-              return actions[key].passAsProp;
-            })
-            // Filters out actions that have already been included
-            .filter(
-              actionKey =>
-                propTypesSlice.indexOf(`submit${capitalize(actionKey)}`) === -1,
-            )
-            .map(
-              actionKey => `// submit${capitalize(actionKey)}: PropTypes.func,`,
-            ),
-        ];
-        if (propTypesToAdd.length) {
-          return concat([
-            b.slice(0, startIndex),
-            `  // @suit-name-only-start`,
-            ...propTypesToAdd,
-            `  // @suit-name-only-end` + b.slice(startIndex),
-          ]);
-        }
-        return b;
+        return concat([
+          b.slice(0, startIndex),
+          `  // @suit-name-only-start`,
+          `  // @suit-name-only-end` + b.slice(startIndex),
+        ]);
       }
-      // At this point, we know that there are keys that need to
-      // be replaced in the proptypes slice
-      return transforms(b, [
+      return b;
+    },
+    /** Makes changes to proptypes based on keyChanges */
+    b =>
+      transforms(b, [
         // Checks the list of new changes for any relevant ones for PropTypes
         ...keyChanges
           .filter(
@@ -204,55 +206,74 @@ module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
             }
             return buf;
           }),
-        // If key still not present, adds it
-        ...Object.keys(initialState).map(key => buf => {
-          const newPropTypesSlice = buf.slice(
-            startIndex,
-            buf.indexOf('\n};', startIndex),
-          );
-          if (
-            newPropTypesSlice.indexOf(`${cases.camel}${capitalize(key)}`) === -1
-          ) {
-            const buffArr = buf.split('\n');
-            buffArr.splice(
-              buffArr.findIndex(line =>
-                line.includes('// @suit-name-only-start'),
-              ) + 1,
-              0,
+      ]),
+    /** Writes any remaining propTypes between the // @suit-name-only tags */
+    b => {
+      const startIndex = b.indexOf('propTypes = {') + 'propTypes = {'.length;
+      const endIndex = b.indexOf('\n};', startIndex);
+      const propTypesSlice = b.slice(startIndex, endIndex);
+      const propTypesToAdd = [
+        ...Object.keys(initialState)
+          .map(key => ({
+            key,
+            value: initialState[key],
+          }))
+          // If the user has already added it to prop types, don't double add it
+          .filter(
+            ({ key }) =>
+              propTypesSlice.indexOf(`${cases.camel}${capitalize(key)}`) === -1,
+          )
+          .map(
+            ({ value, key }) =>
               `  // ${cases.camel}${capitalize(
                 key,
-              )}: PropTypes.${propTypeFromTypeOf(typeof initialState[key])},`,
-            );
-            return buffArr.join('\n');
-          }
-          return buf;
-        }),
-        // This adds action propTypes
+              )}: PropTypes.${propTypeFromTypeOf(typeof value)},`,
+          ),
+        // Adds functions from dispatchToProps
         ...Object.keys(actions)
           .filter(key => {
             /** If no prop filtering, give all props */
             if (!hasPropFiltering) return true;
             return actions[key].passAsProp;
           })
-          .map(key => buf => {
-            const newPropTypesSlice = buf.slice(
-              startIndex,
-              buf.indexOf('\n};', startIndex),
-            );
-            if (newPropTypesSlice.indexOf(`submit${capitalize(key)}`) === -1) {
-              const buffArr = buf.split('\n');
-              buffArr.splice(
-                buffArr.findIndex(line =>
-                  line.includes('// @suit-name-only-start'),
-                ) + 1,
-                0,
-                `  // submit${capitalize(key)}: PropTypes.func,`,
-              );
-              return buffArr.join('\n');
-            }
-            return buf;
-          }),
-      ]);
+          // Filters out actions that have already been included
+          .filter(
+            key => propTypesSlice.indexOf(`submit${capitalize(key)}`) === -1,
+          )
+          .map(key => `  // submit${capitalize(key)}: PropTypes.func,`),
+        ...imports
+          .filter(({ type }) => type === 'selector')
+          .filter(
+            ({ value }) => propTypesSlice.indexOf(`${value}: PropTypes`) === -1,
+          )
+          .map(
+            ({ initialValue, value }) =>
+              `  // ${value}: PropTypes.${propTypeFromTypeOf(
+                typeof initialValue,
+              )},`,
+          ),
+        ...imports
+          .filter(({ type }) => type === 'action')
+          .filter(
+            ({ property }) =>
+              propTypesSlice.indexOf(
+                `submit${capitalize(property)}: PropTypes.func,`,
+              ) === -1,
+          )
+          .map(
+            ({ property }) =>
+              `  // submit${capitalize(property)}: PropTypes.func,`,
+          ),
+      ];
+      const arrayOfLines = b.split('\n');
+      const indexToInsert = arrayOfLines.findIndex(line =>
+        line.includes('// @suit-name-only-start'),
+      );
+      return [
+        ...arrayOfLines.filter((_, index) => index <= indexToInsert),
+        ...propTypesToAdd,
+        ...arrayOfLines.filter((_, index) => index > indexToInsert),
+      ].join('\n');
     },
     prettify,
   ]);

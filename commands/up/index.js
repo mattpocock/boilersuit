@@ -8,8 +8,28 @@ const printMessages = require('../../tools/printMessages');
 const runPrettier = require('./runPrettier');
 const checkForChanges = require('./checkForChanges');
 const writeAllFiles = require('./writeAllFiles');
-const { concat } = require('../../tools/utils');
+const { concat, capitalize } = require('../../tools/utils');
 const checkForConfigFile = require('./checkForConfigFile');
+
+const composeSchema = ({ schema, folder }) => {
+  let newSchema = schema;
+  /** Look for a compose object on the schema */
+  if (schema.compose && schema.compose.length) {
+    /** For each of the 'compose' array */
+    schema.compose.forEach(c => {
+      const file = `${c}`.includes('.json') ? c : `${c}.json`;
+      if (fs.existsSync(path.resolve(folder, file))) {
+        const buf = fs.readFileSync(path.resolve(folder, file)).toString();
+        const otherSchema = JSON.parse(buf);
+        newSchema = {
+          ...schema,
+          ...otherSchema,
+        };
+      }
+    });
+  }
+  return newSchema;
+};
 
 const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
   // If no .suit folder exists at the root, create one
@@ -91,6 +111,97 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
 
     if (extendsFound) return;
 
+    let imports = [];
+
+    if (schema.import) {
+      Object.keys(schema.import).forEach(key => {
+        const importPath = path.resolve(folder, key, './suit.json');
+        if (!fs.existsSync(importPath)) {
+          errors.push(`Could not find imported file: ` + `"${key}"`.cyan);
+          return;
+        }
+        const importedSchema = composeSchema({
+          folder: path.resolve(folder, key),
+          schema: JSON.parse(fs.readFileSync(importPath).toString()),
+        });
+        imports = [
+          ...imports,
+          ...Object.keys(schema.import[key])
+            .map(domain => [
+              ...(schema.import[key][domain].selectors
+                ? schema.import[key][domain].selectors.map(selector => {
+                    const importedState = importedSchema[domain].initialState;
+                    if (typeof importedState[selector] === 'undefined') {
+                      errors.push(
+                        `Import failed: ` +
+                          `${selector}`.cyan +
+                          ` not found in the initialState of ` +
+                          `${domain} `.cyan +
+                          `in ` +
+                          `"${key}suit.json"`.cyan,
+                      );
+                    }
+                    return {
+                      value: `${domain}${capitalize(selector)}`,
+                      property: `makeSelect${capitalize(domain)}${capitalize(
+                        selector,
+                      )}`,
+                      selector: `makeSelect${capitalize(domain)}${capitalize(
+                        selector,
+                      )}`,
+                      path: key,
+                      type: 'selector',
+                      initialValue:
+                        importedSchema[domain].initialState[selector],
+                      fileName: `${key}selectors`,
+                    };
+                  })
+                : []),
+              ...(schema.import[key][domain].actions
+                ? schema.import[key][domain].actions.map(action => {
+                    const importedAction =
+                      importedSchema[domain].actions[action];
+                    if (!importedAction) {
+                      errors.push(
+                        `Import failed: ` +
+                          `${action}`.cyan +
+                          ` not found in ` +
+                          `${domain} `.cyan +
+                          `in ` +
+                          `"${key}suit.json"`.cyan,
+                      );
+                      return {};
+                    }
+                    return {
+                      property: `${action}`,
+                      action,
+                      describe: importedAction.describe || '',
+                      path: key,
+                      payload:
+                        importedAction.payload ||
+                        (
+                          importedAction.set &&
+                          Object.values(importedAction.set).filter(value =>
+                            `${value}`.includes('payload'),
+                          )
+                        ).length,
+                      type: 'action',
+                      fileName: `${key}actions`,
+                    };
+                  })
+                : []),
+            ])
+            .reduce((a, b) => [...a, ...b], []),
+        ];
+      });
+    }
+
+    if (errors.length) {
+      console.log(`\n ${folder}suit.json `.white.bgRed);
+      printError(errors);
+      return;
+    }
+
     const newSchemaBuf = JSON.stringify(schema, null, 2);
 
     /** Check for a previous suit file in folder - force prevents this check */
@@ -127,6 +238,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       messages,
     } = writeAllFiles({
       schema,
+      imports,
       errors,
       folder,
       newSchemaBuf,
