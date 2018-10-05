@@ -294,9 +294,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       return;
     }
 
-    if (quiet) {
-      console.log(`\n ${folder}suit.json `.bgGreen.black);
-    }
+    console.log(`\n ${folder}suit.json `.bgGreen.black);
 
     printMessages([
       ...saga.messages,
