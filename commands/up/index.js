@@ -6,7 +6,6 @@ const printError = require('../../tools/printError');
 const printWarning = require('../../tools/printWarning');
 const printMessages = require('../../tools/printMessages');
 const runPrettier = require('./runPrettier');
-const checkForChanges = require('./checkForChanges');
 const writeAllFiles = require('./writeAllFiles');
 const { concat, capitalize } = require('../../tools/utils');
 const checkForConfigFile = require('./checkForConfigFile');
@@ -218,24 +217,6 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
 
     const newSchemaBuf = JSON.stringify(schema, null, 2);
 
-    /** Check for a previous suit file in folder - force prevents this check */
-    const {
-      shouldContinue: anyChanges,
-      messages: changeMessages,
-    } = checkForChanges({
-      dotSuitFolder,
-      quiet,
-      force,
-      schemaBuf: newSchemaBuf,
-    });
-    if (!anyChanges) {
-      if (!quiet) {
-        console.log(`\n ${folder}suit.json `.bgGreen.black);
-        printMessages(changeMessages);
-      }
-      return;
-    }
-
     const {
       newReducerBuffer,
       newReducerTestBuffer,
@@ -249,7 +230,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       shouldContinue,
       errors: newErrors,
       warnings,
-      messages,
+      // messages,
     } = writeAllFiles({
       schema,
       imports,
@@ -304,13 +285,9 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       return;
     }
 
-    if (!quiet) {
-      if (warnings.length) {
-        console.log(`\n ${folder}suit.json `.bgYellow.black);
-      } else {
-        console.log(`\n ${folder}suit.json `.bgGreen.black);
-        printMessages(messages);
-      }
+    if (warnings.length) {
+      console.log(`\n ${folder}suit.json `.bgYellow.black);
+      printWarning(warnings);
     }
 
     if (!shouldContinue) {
@@ -361,7 +338,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
     /** Runs prettier and checks for prettier warnings */
     const prettierWarnings = runPrettier(folder);
 
-    printWarning(prettierWarnings);
+    printWarning([...warnings, ...prettierWarnings]);
   });
 };
 

@@ -12,6 +12,7 @@ const checkErrorsInSchema = require('../../tools/checkErrorsInSchema');
 const checkWarningsInSchema = require('../../tools/checkWarningsInSchema');
 const detectDiff = require('./detectDiff');
 const reservedKeywords = require('../../tools/constants/reservedKeywords');
+const checkForChanges = require('./checkForChanges');
 
 module.exports = ({
   schema,
@@ -22,6 +23,8 @@ module.exports = ({
   config = {},
   newSchemaBuf,
   imports,
+  quiet,
+  force,
 }) => {
   let errors = passedErrors;
   const arrayOfDomains = Object.keys(schema)
@@ -42,6 +45,25 @@ module.exports = ({
   }
 
   const warnings = checkWarningsInSchema(schema, config);
+
+  /** Check for a previous suit file in folder - force prevents this check */
+  const {
+    shouldContinue: anyChanges,
+    messages: changeMessages,
+  } = checkForChanges({
+    dotSuitFolder,
+    quiet,
+    force,
+    schemaBuf: newSchemaBuf,
+  });
+  if (!anyChanges) {
+    return {
+      shouldContinue: false,
+      messages: changeMessages,
+      warnings,
+      errors,
+    };
+  }
 
   /** Get a more detailed diff of the changes */
   const keyChanges = detectDiff({
