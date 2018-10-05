@@ -148,6 +148,12 @@ Usage: `suit up`
 
 Add the `--force` modifier if you want suit to re-render everything within a directory.
 
+#### --one <directory>
+
+Run suit in only one directory. Suit will still recursively check for suit files down the project tree, but only within that directory.
+
+Usage: `suit up --one app/containers/HomePage`
+
 ### Ajax
 
 Either generates or adds an ajax call to a suit.json.
@@ -468,6 +474,48 @@ Imagine a file structure that looks like this:
 ```
 
 `compose` breaks your suit file down into more manageable chunks to help keep things navigable and modular.
+
+### Import
+
+Sometimes, containers get jealous about bits of state held in other containers, and they want a piece of it. You can reference bits of state from a different container using the `import` syntax.
+
+```json
+// ../HomePage/suit.json
+{
+  "getNavBarConfig": {
+    "initialState": {
+      "isLoading": false,
+      "data": {}
+      //...
+    },
+    "actions": {
+      "getNavBarConfigStarted": {
+        //...
+      }
+    }
+  }
+}
+```
+
+```json
+// suit.json
+{
+  "import": {
+    "../HomePage": {
+      "getNavBarConfig": {
+        "selectors": ["isLoading", "data"],
+        "actions": ["getNavBarConfigStarted"]
+      }
+    }
+  }
+}
+```
+
+This will import the selectors used for `isLoading` and `data` and put them in mapStateToProps. It will also pull in the action and pass it into mapDispatchToProps.
+
+Bear in mind - this does not do anything clever, like initialize the other reducer or inject the right sagas. If you try to use a selector to a piece of state that has not been initialized yet, you will get errors.
+
+This is most useful in referencing selectors and actions which you know have been initialized, such as those on the `<App />` reducer.
 
 ## Configuration
 

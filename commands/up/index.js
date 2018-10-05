@@ -124,6 +124,20 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
           folder: path.resolve(folder, key),
           schema: JSON.parse(fs.readFileSync(importPath).toString()),
         });
+
+        Object.keys(schema.import[key]).forEach(domain => {
+          if (typeof importedSchema[domain] === 'undefined') {
+            errors.push(
+              `Could not find reducer` +
+                ` ${domain} `.cyan +
+                `in ` +
+                `${key}`.cyan,
+            );
+          }
+        });
+
+        if (errors.length) return;
+
         imports = [
           ...imports,
           ...Object.keys(schema.import[key])
