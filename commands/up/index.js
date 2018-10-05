@@ -279,6 +279,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
           : '',
       },
     });
+
     if (newErrors.length) {
       console.log(`\n ${folder}suit.json `.white.bgRed);
       printError(newErrors);
@@ -294,7 +295,9 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
       return;
     }
 
-    console.log(`\n ${folder}suit.json `.bgGreen.black);
+    if (!newErrors.length && !warnings.length) {
+      console.log(`\n ${folder}suit.json `.bgGreen.black);
+    }
 
     printMessages([
       ...saga.messages,
@@ -336,7 +339,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
     /** Runs prettier and checks for prettier warnings */
     const prettierWarnings = runPrettier(folder);
 
-    printWarning([...warnings, ...prettierWarnings]);
+    printWarning(prettierWarnings);
   });
 };
 
