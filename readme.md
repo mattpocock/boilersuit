@@ -224,6 +224,30 @@ Suit will create a selector for each of these fields on the initialState, and pu
 }
 ```
 
+### mapToContainer
+
+Sometimes, you don't want to actually pass your reducer to the container that it shares a file with. This is especially true when initialising some global functions that lots of subcontainers share, such as configurations.
+
+When you don't want to pass the reducer to the container, just specify `"mapToContainer": false` on the reducer. This will stop index.js from being written at all by this reducer.
+
+```json
+{
+  "getImages": {
+    "mapToContainer": false,
+    "initialState": {
+      "isLoading": false,
+      "hasSucceeded": true,
+      "data": null,
+      "errorMessage": "",
+      "hasError": false
+    },
+    "actions": {
+      //...
+    }
+  }
+}
+```
+
 ### actions
 
 Every reducer has an `"actions": {}` attribute, which is required to make the reducer work.
