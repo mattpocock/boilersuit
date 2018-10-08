@@ -12,17 +12,19 @@ module.exports = ({ indexBuffer, arrayOfDomains, keyChanges = [], imports }) =>
   transforms(indexBuffer, [
     cleanFile,
     fixInlineImports,
-    ...arrayOfDomains.map(({ domainName, actions, initialState }) => b => {
-      const cases = new Cases(parseCamelCaseToArray(domainName));
-      const allDomainCases = cases.all();
+    ...arrayOfDomains
+      .filter(({ mapToContainer }) => mapToContainer !== false)
+      .map(({ domainName, actions, initialState }) => b => {
+        const cases = new Cases(parseCamelCaseToArray(domainName));
+        const allDomainCases = cases.all();
 
-      return writeIndex({
-        buffer: b,
-        imports,
-        cases: allDomainCases,
-        initialState,
-        keyChanges,
-        actions,
-      });
-    }),
+        return writeIndex({
+          buffer: b,
+          imports,
+          cases: allDomainCases,
+          initialState,
+          keyChanges,
+          actions,
+        });
+      }),
   ]);
