@@ -1,5 +1,6 @@
 const colors = require('colors'); // eslint-disable-line
 const writeIndex = require('./writeIndex');
+const writeImportsToIndex = require('./writeImportsToIndex');
 const Cases = require('../../../tools/cases');
 const {
   parseCamelCaseToArray,
@@ -20,11 +21,15 @@ module.exports = ({ indexBuffer, arrayOfDomains, keyChanges = [], imports }) =>
 
         return writeIndex({
           buffer: b,
-          imports,
           cases: allDomainCases,
           initialState,
           keyChanges,
           actions,
         });
+      }),
+    b =>
+      writeImportsToIndex({
+        imports,
+        buffer: b,
       }),
   ]);

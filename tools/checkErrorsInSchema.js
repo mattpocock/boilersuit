@@ -7,7 +7,7 @@ module.exports = (schema, folder) => {
   const domainKeys = Object.keys(schema).filter(
     domain => !reservedKeywords.includes(domain),
   );
-  if (!domainKeys.length) {
+  if (!domainKeys.length && !schema.import) {
     errors.push(
       concat([
         'No domains defined within suit.json.',

@@ -140,70 +140,80 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
         imports = [
           ...imports,
           ...Object.keys(schema.import[key])
-            .map(domain => [
-              ...(schema.import[key][domain].selectors
-                ? schema.import[key][domain].selectors.map(selector => {
-                    const importedState = importedSchema[domain].initialState;
-                    if (typeof importedState[selector] === 'undefined') {
-                      errors.push(
-                        `Import failed: ` +
-                          `${selector}`.cyan +
-                          ` not found in the initialState of ` +
-                          `${domain} `.cyan +
-                          `in ` +
-                          `"${key}suit.json"`.cyan,
-                      );
-                    }
-                    return {
-                      value: `${domain}${capitalize(selector)}`,
-                      property: `makeSelect${capitalize(domain)}${capitalize(
-                        selector,
-                      )}`,
-                      selector: `makeSelect${capitalize(domain)}${capitalize(
-                        selector,
-                      )}`,
-                      path: key,
-                      type: 'selector',
-                      initialValue:
-                        importedSchema[domain].initialState[selector],
-                      fileName: `${key}selectors`,
-                    };
-                  })
-                : []),
-              ...(schema.import[key][domain].actions
-                ? schema.import[key][domain].actions.map(action => {
-                    const importedAction =
-                      importedSchema[domain].actions[action];
-                    if (!importedAction) {
-                      errors.push(
-                        `Import failed: ` +
-                          `${action}`.cyan +
-                          ` not found in ` +
-                          `${domain} `.cyan +
-                          `in ` +
-                          `"${key}suit.json"`.cyan,
-                      );
-                      return {};
-                    }
-                    return {
-                      property: `${action}`,
-                      action,
-                      describe: importedAction.describe || '',
-                      path: key,
-                      payload:
-                        importedAction.payload ||
-                        (
-                          importedAction.set &&
-                          Object.values(importedAction.set).filter(value =>
-                            `${value}`.includes('payload'),
-                          )
-                        ).length,
-                      type: 'action',
-                      fileName: `${key}actions`,
-                    };
-                  })
-                : []),
-            ])
+            .map(domain => {
+              const domainObject = schema.import[key][domain];
+              const hasSelectors =
+                typeof domainObject.selectors !== 'undefined';
+              const selectors = !hasSelectors
+                ? []
+                : typeof domainObject.selectors === 'string'
+                  ? [domainObject.selectors]
+                  : domainObject.selectors;
+              const hasActions = typeof domainObject.actions !== 'undefined';
+              const actions = !hasActions
+                ? []
+                : typeof domainObject.actions === 'string'
+                  ? [domainObject.actions]
+                  : domainObject.actions;
+              return [
+                ...selectors.map(selector => {
+                  const importedState = importedSchema[domain].initialState;
+                  if (typeof importedState[selector] === 'undefined') {
+                    errors.push(
+                      `Import failed: ` +
+                        `${selector}`.cyan +
+                        ` not found in the initialState of ` +
+                        `${domain} `.cyan +
+                        `in ` +
+                        `"${key}suit.json"`.cyan,
+                    );
+                  }
+                  return {
+                    value: `${domain}${capitalize(selector)}`,
+                    property: `makeSelect${capitalize(domain)}${capitalize(
+                      selector,
+                    )}`,
+                    selector: `makeSelect${capitalize(domain)}${capitalize(
+                      selector,
+                    )}`,
+                    path: key + key[key.length - 1] === '/' ? '' : '/',
+                    type: 'selector',
+                    initialValue: importedSchema[domain].initialState[selector],
+                    fileName: `${key}selectors`,
+                  };
+                }),
+                ...actions.map(action => {
+                  const importedAction = importedSchema[domain].actions[action];
+                  if (!importedAction) {
+                    errors.push(
+                      `Import failed: ` +
+                        `${action}`.cyan +
+                        ` not found in ` +
+                        `${domain} `.cyan +
+                        `in ` +
+                        `"${key}suit.json"`.cyan,
+                    );
+                    return {};
+                  }
+                  return {
+                    property: `${action}`,
+                    action,
+                    describe: importedAction.describe || '',
+                    path: key,
+                    payload:
+                      importedAction.payload ||
+                      (
+                        importedAction.set &&
+                        Object.values(importedAction.set).filter(value =>
+                          `${value}`.includes('payload'),
+                        )
+                      ).length,
+                    type: 'action',
+                    fileName: `${key}actions`,
+                  };
+                }),
+              ];
+            })
             .reduce((a, b) => [...a, ...b], []),
         ];
       });

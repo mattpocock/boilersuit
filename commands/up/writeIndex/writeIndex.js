@@ -8,14 +8,7 @@ const {
   capitalize,
 } = require('../../../tools/utils');
 
-module.exports = ({
-  buffer,
-  cases,
-  initialState,
-  actions,
-  keyChanges,
-  imports,
-}) => {
+module.exports = ({ buffer, cases, initialState, actions, keyChanges }) => {
   /** Checks if the passAsProp keyword is present */
   const hasPropFiltering = Object.values(actions).filter(actionValues =>
     Object.keys(actionValues).includes('passAsProp'),
@@ -36,12 +29,6 @@ module.exports = ({
             },
           );
         }),
-      ]),
-    b =>
-      transforms(b, [
-        ...imports.map(({ property, fileName }) =>
-          ensureImport(property, fileName, { destructure: true }),
-        ),
       ]),
     /** Import actions */
     b =>
@@ -73,15 +60,6 @@ module.exports = ({
               cases.pascal
             }${fieldCases.pascal}(),`;
           }),
-          ...imports
-            .filter(({ type }) => type === 'selector')
-            .filter(
-              ({ selector, value }) =>
-                b.indexOf(`  ${value}: ${selector}(),`) === -1,
-            )
-            .map(({ selector, value }) =>
-              concat([`  ${value}: ${selector}(),`]),
-            ),
           '  // @suit-end',
           b.slice(index),
         ])
@@ -98,23 +76,6 @@ module.exports = ({
         b.slice(0, index) +
         concat([
           '    // @suit-start',
-          ...imports
-            .filter(({ type }) => type === 'action')
-            .filter(
-              ({ action }) =>
-                b.indexOf(
-                  `submit${capitalize(action)}: (`,
-                  b.indexOf('mapDispatchToProps'),
-                ) === -1,
-            )
-            .map(({ action, describe, payload }) =>
-              concat([
-                describe ? `    /** ${describe} */` : null,
-                `    submit${capitalize(action)}: (${
-                  payload ? 'payload' : ''
-                }) => dispatch(${action}(${payload ? 'payload' : ''})),`,
-              ]),
-            ),
           ...Object.keys(actions)
             .filter(key => {
               /** If no prop filtering, give all props */
@@ -241,29 +202,6 @@ module.exports = ({
             key => propTypesSlice.indexOf(`submit${capitalize(key)}`) === -1,
           )
           .map(key => `  // submit${capitalize(key)}: PropTypes.func,`),
-        ...imports
-          .filter(({ type }) => type === 'selector')
-          .filter(
-            ({ value }) => propTypesSlice.indexOf(`${value}: PropTypes`) === -1,
-          )
-          .map(
-            ({ initialValue, value }) =>
-              `  // ${value}: PropTypes.${propTypeFromTypeOf(
-                typeof initialValue,
-              )},`,
-          ),
-        ...imports
-          .filter(({ type }) => type === 'action')
-          .filter(
-            ({ property }) =>
-              propTypesSlice.indexOf(
-                `submit${capitalize(property)}: PropTypes.func,`,
-              ) === -1,
-          )
-          .map(
-            ({ property }) =>
-              `  // submit${capitalize(property)}: PropTypes.func,`,
-          ),
       ];
       const arrayOfLines = b.split('\n');
       const indexToInsert = arrayOfLines.findIndex(line =>
