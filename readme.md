@@ -1,6 +1,6 @@
 <div style="text-align: center; margin-bottom: 20px;"><img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/logo.png" max-height="240px" alt="boilerplate logo"/></div>
 
-<img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/actions.gif" />
+<img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/general.gif" />
 
 ## What Is Boilersuit?
 
