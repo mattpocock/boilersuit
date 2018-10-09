@@ -1,4 +1,6 @@
-<div style="text-align: center"><img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/logo.png" max-height="240px" alt="boilerplate logo"/></div>
+<div style="text-align: center; margin-bottom: 20px;"><img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/logo.png" max-height="240px" alt="boilerplate logo"/></div>
+
+<img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/actions.gif" />
 
 ## What Is Boilersuit?
 
@@ -19,10 +21,6 @@ Ever wished that you could edit just one file, instead of ten?
 **Prevent stupid mistakes.** Suit knows if you've done a silly. Trying to change a piece of state that doesn't exist? Boilersuit will catch it. Got an action that doesn't do anything? Boilersuit will catch it.
 
 **Instant documentation.** Need to know how a reducer works? Just check the JSON file in the directory. Boilersuit can even be configured to request code comments, enforcing amazing documentation on large projects.
-
-## How To Use Boilersuit - Video
-
-[![how to use boilersuit](http://img.youtube.com/vi/HHsyoCgzFGg/0.jpg)](http://www.youtube.com/watch?v=HHsyoCgzFGg 'How To Use Boilersuit')
 
 ## How To Install
 
