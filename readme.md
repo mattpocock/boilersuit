@@ -250,6 +250,8 @@ When you don't want to pass the reducer to the container, just specify `"mapToCo
 
 ### actions
 
+<img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/actions.gif" />
+
 Every reducer has an `"actions": {}` attribute, which is required to make the reducer work.
 
 A reducer can have as many actions as you like. Each action you add will get added to the `actions.js` file, get added to the reducer, get passed to `mapDispatchToProps`, and get a unique entry in the `constants.js` file to make sure it works.
