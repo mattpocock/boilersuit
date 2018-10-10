@@ -201,6 +201,8 @@ This will create three reducers: `getConfig`, `getPosts`, and `getImages`, and a
 
 ### initialState
 
+<img src="https://raw.githubusercontent.com/mattpocock/boilersuit-raw/master/initialState.gif" />
+
 This is an object which defines the initial data structure of the reducer's state.
 
 Suit will create a selector for each of these fields on the initialState, and put them in `mapStateToProps` in your index file.
