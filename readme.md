@@ -1,6 +1,6 @@
 <div style="text-align: center; margin-bottom: 20px;"><img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/logo.png" max-height="240px" alt="boilerplate logo"/></div>
 
-<img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/general.gif" />
+<img src="https://raw.githubusercontent.com/mattpocock/boilersuit-raw/master/general.gif" />
 
 ## What Is Boilersuit?
 
@@ -248,7 +248,7 @@ When you don't want to pass the reducer to the container, just specify `"mapToCo
 
 ### actions
 
-<img src="https://raw.githubusercontent.com/mattpocock/boilersuit/master/actions.gif" />
+<img src="https://raw.githubusercontent.com/mattpocock/boilersuit-raw/master/actions.gif" />
 
 Every reducer has an `"actions": {}` attribute, which is required to make the reducer work.
 
