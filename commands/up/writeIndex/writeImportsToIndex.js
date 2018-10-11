@@ -36,13 +36,15 @@ module.exports = ({ buffer, imports }) =>
         ])
       );
     },
+    b => b.replace('\t', ' '),
     /** Get actions into mapDispatchToProps */
     b => {
-      const searchTerm = concat([
-        'mapDispatchToProps(dispatch) {',
-        '  return {\n',
-      ]);
-      const index = b.indexOf(searchTerm) + searchTerm.length;
+      const index =
+        b.indexOf('return {\n', b.indexOf('mapDispatchToProps')) +
+        'return {\n'.length;
+      if (index === -1 + 'return {\n'.length) {
+        return b;
+      }
       return (
         b.slice(0, index) +
         concat([
