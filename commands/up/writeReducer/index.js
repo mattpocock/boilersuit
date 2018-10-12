@@ -21,8 +21,12 @@ module.exports = ({
     cleanFile,
     fixInlineImports,
     /** Writes a reducer for each domain */
-    ...arrayOfDomains.map(
-      ({ domainName, initialState, actions, describe }) => b => {
+    ...arrayOfDomains
+      .filter(({ domainName }) => {
+        const buf = cleanFile(buffer);
+        return buf.indexOf(`export const ${domainName}Reducer`) === -1;
+      })
+      .map(({ domainName, initialState, actions, describe }) => b => {
         const cases = new Cases(parseCamelCaseToArray(domainName));
         const allDomainCases = cases.all();
         if (checkForErrors) {
@@ -40,8 +44,7 @@ module.exports = ({
           keyChanges,
           describe,
         });
-      },
-    ),
+      }),
   ]);
   return {
     buffer: newReducerBuffer,
