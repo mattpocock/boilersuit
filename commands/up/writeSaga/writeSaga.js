@@ -9,7 +9,6 @@ module.exports = ({ buffer, cases, actionCases, action }) => {
   const messages = [];
   const newBuffer = transforms(buffer, [
     ensureImport('takeLatest', 'redux-saga/effects', { destructure: true }),
-    ensureImport('put', 'redux-saga/effects', { destructure: true }),
     b => {
       const index = b.indexOf('{', b.indexOf('export default function*')) + 1;
       return concat([
@@ -67,9 +66,7 @@ module.exports = ({ buffer, cases, actionCases, action }) => {
         b.slice(index),
       ]);
     },
-    ensureImport(actionCases.constant, './constants', { destructure: true }),
     b => {
-      console.log(b.indexOf('call('));
       if (b.indexOf('call(') !== -1) {
         return ensureImport('call', 'redux-saga/effects', {
           destructure: true,
@@ -77,6 +74,8 @@ module.exports = ({ buffer, cases, actionCases, action }) => {
       }
       return b;
     },
+    ensureImport('put', 'redux-saga/effects', { destructure: true }),
+    ensureImport(actionCases.constant, './constants', { destructure: true }),
     prettify,
   ]);
   return {

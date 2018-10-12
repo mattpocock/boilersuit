@@ -20,7 +20,6 @@ module.exports = ({
     ensureImport(failCases.camel, './actions', { destructure: true }),
     ensureImport(successCases.camel, './actions', { destructure: true }),
     ensureImport('takeLatest', 'redux-saga/effects', { destructure: true }),
-    ensureImport('put', 'redux-saga/effects', { destructure: true }),
     b => {
       const index = b.indexOf('{', b.indexOf('export default function*')) + 1;
       return concat([
@@ -88,6 +87,7 @@ module.exports = ({
         b.slice(index),
       ]);
     },
+    ensureImport(actionCases.constant, './constants', { destructure: true }),
     b => {
       if (b.indexOf('call(') !== -1) {
         return ensureImport('call', 'redux-saga/effects', {
@@ -96,7 +96,7 @@ module.exports = ({
       }
       return b;
     },
-    ensureImport(actionCases.constant, './constants', { destructure: true }),
+    ensureImport('put', 'redux-saga/effects', { destructure: true }),
     prettify,
   ]);
   return {
