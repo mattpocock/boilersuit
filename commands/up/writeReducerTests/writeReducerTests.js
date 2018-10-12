@@ -12,14 +12,16 @@ module.exports = ({ buffer, cases, actions, initialState }) =>
   transforms(buffer, [
     ensureImport('fromJS', 'immutable', { destructure: true }),
     ensureImport(`${cases.camel}Reducer`, '../reducer', { destructure: true }),
-    ...Object.keys(actions).map(actionName => buf => {
-      const actionCases = new Cases(parseCamelCaseToArray(actionName)).all();
-      return transforms(buf, [
-        ensureImport(actionCases.camel, '../actions', {
-          destructure: true,
-        }),
-      ]);
-    }),
+    ...Object.keys(actions)
+      .filter(action => !actions[action].customFunction)
+      .map(actionName => buf => {
+        const actionCases = new Cases(parseCamelCaseToArray(actionName)).all();
+        return transforms(buf, [
+          ensureImport(actionCases.camel, '../actions', {
+            destructure: true,
+          }),
+        ]);
+      }),
     b =>
       concat([
         b,

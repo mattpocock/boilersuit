@@ -16,7 +16,6 @@ module.exports = ({ actions, keyChanges }) => buffer =>
       .filter(({ customFunction }) => typeof customFunction !== 'undefined')
       .map(({ name, describe }) => b => {
         const index = b.indexOf(`const ${name}CustomFunction`);
-        console.log(index);
         if (index !== -1) return b;
         return concat([
           b,
