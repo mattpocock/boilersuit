@@ -421,6 +421,8 @@ Allows you to add a description which is added as comments to the code
 
 #### extends
 
+<img src="https://raw.githubusercontent.com/mattpocock/boilersuit-raw/master/extends.gif" />
+
 `type: string`
 
 Allows you to take a shortcut to writing out a whole suit file.
