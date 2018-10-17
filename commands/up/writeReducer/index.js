@@ -22,10 +22,11 @@ module.exports = ({
     fixInlineImports,
     /** Writes a reducer for each domain */
     ...arrayOfDomains
-      .filter(({ domainName }) => {
-        const buf = cleanFile(buffer);
-        return buf.indexOf(`export const ${domainName}Reducer`) === -1;
-      })
+      // Filters out ones that already exist
+      // .filter(({ domainName }) => {
+      //   const buf = cleanFile(buffer);
+      //   return buf.indexOf(`export const ${domainName}Reducer`) === -1;
+      // })
       .map(({ domainName, initialState, actions, describe }) => b => {
         const cases = new Cases(parseCamelCaseToArray(domainName));
         const allDomainCases = cases.all();

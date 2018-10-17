@@ -29,7 +29,12 @@ module.exports = ({ camel, actions }) => buffer => {
       ]);
     });
   return (
-    concat([buffer.slice(0, startIndex), content]) +
+    concat([
+      buffer.slice(0, startIndex),
+      `    // @suit-start`,
+      content + `    // @suit-end`,
+      ``,
+    ]) +
     `    ` +
     buffer.slice(endIndex)
   );

@@ -317,7 +317,17 @@ const indexesOf = (needle, haystack, modifier = 0) => {
   });
 };
 
+const indexOfArray = (buffer, searchTerms = []) => {
+  let index = 0;
+  searchTerms.forEach(searchTerm => {
+    if (index === -1) return;
+    index = buffer.indexOf(searchTerm, index);
+  });
+  return index;
+};
+
 module.exports = {
+  indexOfArray,
   concat,
   indexesOf,
   fixFolderName,

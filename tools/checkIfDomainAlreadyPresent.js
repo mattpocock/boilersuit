@@ -8,10 +8,6 @@ module.exports = (folder, cases, actions) => {
     new Cases(parseCamelCaseToArray(key)).all(),
   );
   const errors = [];
-  const hasDuplicateReducer =
-    cleanFile(
-      fs.readFileSync(path.resolve(`${folder}/reducer.js`)).toString(),
-    ).indexOf(`${cases.camel}Reducer = `) !== -1;
 
   const constantFile = cleanFile(
     fs.readFileSync(path.resolve(`${folder}/constants.js`)).toString(),
@@ -29,11 +25,6 @@ module.exports = (folder, cases, actions) => {
     ({ camel }) => actionsFile.indexOf(camel) !== -1,
   );
 
-  if (hasDuplicateReducer) {
-    errors.push(
-      `Duplicate domain: ${cases.display} already present in reducer.`,
-    );
-  }
   if (hasDuplicateConstants.length) {
     errors.push(
       `Duplicate constant: ${
