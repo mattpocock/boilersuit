@@ -7,7 +7,7 @@ const printWarning = require('../../tools/printWarning');
 const printMessages = require('../../tools/printMessages');
 const runPrettier = require('./runPrettier');
 const writeAllFiles = require('./writeAllFiles');
-const { concat, capitalize } = require('../../tools/utils');
+const { concat, capitalize, fixFolderName } = require('../../tools/utils');
 const checkForConfigFile = require('./checkForConfigFile');
 
 const composeSchema = ({ schema, folder }) => {
@@ -179,7 +179,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
                     path: key + key[key.length - 1] === '/' ? '' : '/',
                     type: 'selector',
                     initialValue: importedSchema[domain].initialState[selector],
-                    fileName: `${key}selectors`,
+                    fileName: `${fixFolderName(key)}selectors`,
                   };
                 }),
                 ...actions.map(action => {
@@ -209,7 +209,7 @@ const up = (schemaFile, { quiet = false, force = false } = {}, watcher) => {
                         )
                       ).length,
                     type: 'action',
-                    fileName: `${key}actions`,
+                    fileName: `${fixFolderName(key)}actions`,
                   };
                 }),
               ];

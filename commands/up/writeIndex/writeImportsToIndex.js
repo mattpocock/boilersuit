@@ -11,7 +11,9 @@ module.exports = ({ buffer, imports }) =>
     b =>
       transforms(b, [
         ...imports.map(({ property, fileName }) =>
-          ensureImport(property, fileName, { destructure: true }),
+          ensureImport(property, fileName, {
+            destructure: true,
+          }),
         ),
       ]),
     /** Get Selectors Into mapStateToProps */
