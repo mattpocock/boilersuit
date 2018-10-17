@@ -10,7 +10,7 @@ const {
  * @param {object} domainCases
  */
 module.exports = domainCases => (
-  { name, set, payload: payloadOverride, describe },
+  { name, set, payload: payloadAttribute, describe },
   i,
 ) => buffer => {
   const c = new Cases(parseCamelCaseToArray(name));
@@ -26,9 +26,9 @@ module.exports = domainCases => (
   let content = '';
   const hasPayload =
     (set &&
-      Object.values(set).filter(value => `${value}`.indexOf('payload') !== -1)
+      Object.values(set).filter(value => `${value}`.includes('payload'))
         .length > 0) ||
-    payloadOverride;
+    payloadAttribute;
   content += concat([
     ``,
     describe ? `// ${describe}` : null,

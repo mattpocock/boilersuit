@@ -36,5 +36,23 @@ module.exports = ({ reducer, index }) => {
       ]),
     );
   }
+
+  const noMapDispatchToProps =
+    index.indexOf(`mapDispatchToProps(dispatch) {`) === -1;
+  if (noMapDispatchToProps) {
+    errors.push(
+      concat([
+        `No 'createStructuredSelector({' in './index.js'`,
+        `- Consider a refactor to use mapDispatchToProps.`,
+        ``,
+        `function mapDispatchToProps(dispatch) {`,
+        `  return {`,
+        `    submitGetTweets: (payload) => dispatch(getTweetsStarted(payload)),`,
+        `  };`,
+        `}`,
+      ]),
+    );
+  }
+
   return errors;
 };

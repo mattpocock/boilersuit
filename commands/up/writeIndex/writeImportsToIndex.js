@@ -28,7 +28,7 @@ module.exports = ({ buffer, imports }) =>
             .filter(({ type }) => type === 'selector')
             .filter(
               ({ selector, value }) =>
-                b.indexOf(`  ${value}: ${selector}(),`) === -1,
+                b.indexOf(`${value}: ${selector}(),`) === -1,
             )
             .map(({ selector, value }) =>
               concat([`  ${value}: ${selector}(),`]),
