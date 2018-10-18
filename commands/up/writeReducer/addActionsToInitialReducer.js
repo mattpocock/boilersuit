@@ -9,7 +9,6 @@ module.exports = ({ camel, actions }) => buffer => {
   p.toNext(`export const ${camel}Reducer =`);
   const searchTerm = `switch (type) {`;
   const startIndex = p.toNext(searchTerm).index + searchTerm.length;
-  const { index: endIndex } = p.toNext('default:');
   let content = '';
   Object.keys(actions)
     .map(key => ({ ...actions[key], name: key }))
@@ -33,9 +32,8 @@ module.exports = ({ camel, actions }) => buffer => {
       buffer.slice(0, startIndex),
       `    // @suit-start`,
       content + `    // @suit-end`,
-      ``,
     ]) +
     `    ` +
-    buffer.slice(endIndex)
+    buffer.slice(startIndex)
   );
 };
