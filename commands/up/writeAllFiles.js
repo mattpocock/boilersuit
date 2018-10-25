@@ -13,6 +13,8 @@ const checkWarningsInSchema = require('../../tools/checkWarningsInSchema');
 const detectDiff = require('./detectDiff');
 const reservedKeywords = require('../../tools/constants/reservedKeywords');
 const checkForChanges = require('./checkForChanges');
+const checkForDebrisInNameOnly = require('./checkForDebrisInNameOnly');
+const { concat } = require('../../tools/utils');
 
 module.exports = ({
   schema,
@@ -44,7 +46,7 @@ module.exports = ({
     return { errors, shouldContinue: false };
   }
 
-  const warnings = checkWarningsInSchema(schema, config);
+  let warnings = checkWarningsInSchema(schema, config);
 
   /** Check for a previous suit file in folder - force prevents this check */
   const {
@@ -83,6 +85,27 @@ module.exports = ({
     return { errors: domainErrors, warnings, shouldContinue: false };
   }
 
+  warnings = [
+    ...warnings,
+    ...checkForDebrisInNameOnly({
+      buffer: newReducerBuffer,
+      searchTerms: ['export const', 'Reducer'],
+      trimFunction: line =>
+        line
+          .split(' ')
+          .find(word => word.includes('Reducer'))
+          .replace('Reducer', ''),
+      domains: arrayOfDomains,
+    }).map(domain =>
+      concat([
+        `Useless code in reducers file`,
+        `Found:`,
+        domain.map(dom => ` - ` + `${dom}`.cyan + ` Reducer`),
+        `Remove this, otherwise you'll get errors`,
+      ]),
+    ),
+  ];
+
   /** Write Actions */
   const { buffer: newActionsBuffer } = writeActions({
     buffer: buffers.actions,
@@ -120,6 +143,27 @@ module.exports = ({
   if (saga.errors.length) {
     return { errors, shouldContinue: false };
   }
+
+  warnings = [
+    ...warnings,
+    ...checkForDebrisInNameOnly({
+      buffer: saga.buffer,
+      searchTerms: ['function*'],
+      domains: arrayOfDomains,
+      trimFunction: line =>
+        line
+          .replace('function*', '')
+          .replace(' ', '')
+          .split('(')[0],
+    }).map(domain =>
+      concat([
+        `Useless code in saga file`,
+        `Found:`,
+        domain.map(dom => ` - ` + `${dom}`.cyan + ` Saga`),
+        `Remove this, otherwise you'll get errors`,
+      ]),
+    ),
+  ];
 
   /** Write reducer tests */
   const newReducerTestBuffer = writeReducerTests({
