@@ -2,7 +2,8 @@ const Cases = function(array) {
   this.array = array;
 };
 
-Cases.prototype.capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
+Cases.prototype.capitalize = string =>
+  string.charAt(0).toUpperCase() + string.slice(1);
 
 Cases.prototype.camel = function() {
   return this.array
