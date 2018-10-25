@@ -150,6 +150,7 @@ module.exports = ({
       buffer: saga.buffer,
       searchTerms: ['function*'],
       domains: arrayOfDomains,
+      // This trims the line from 'function* getNotes({ })'... to 'getNotes'
       trimFunction: line =>
         line
           .replace('function*', '')

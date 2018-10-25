@@ -18,9 +18,9 @@ module.exports = (schema, config) => {
       if (!domain.describe) {
         warnings.push(
           concat([
-            `No "describe" key defined on ${
-              domain.name
-            }. Write a description so we know what's going on.`,
+            `No "describe" key defined on ` +
+              `${domain.name}`.cyan +
+              `. Write a description so we know what's going on.`,
             `| {`,
             `|   "${domain.name}": {`,
             `|     "describe": "What do I do? Why do I exist?"`,
@@ -47,9 +47,9 @@ module.exports = (schema, config) => {
         if (!action.describe && (action.passAsProp || notUsingPassAsProp)) {
           warnings.push(
             concat([
-              `No "describe" key defined on ${
-                action.name
-              }. Write a description so we know what the action does.`,
+              `No "describe" key defined on ` +
+                `${action.name}`.cyan +
+                `. Write a description so we know what the action does.`,
               `| {`,
               `|   "${domain.name}": {`,
               `|     "actions": {`,
